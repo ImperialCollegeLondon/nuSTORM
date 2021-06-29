@@ -1,4 +1,4 @@
-﻿Parameter,Name,Value,Unit,Comment
+Parameter,Name,Value,Unit,Comment
 Circumference,Circumference,616,m,nuSIM-2021-01
 Length of production straight,ProdStrghtLen,180,m,nuSIM-2021-01
 Momentum acceptance,pAcc,15,%,nuSIM-2021-01
@@ -8,3 +8,4 @@ Distance from end of straighg to detector hall,HallWallDist,50,m,nuSIM-2021-01
 Detector half width,DetHlfWdth,2,m,nuSIM-2021-01
 Detector length,DetLngth,4,m,nuSIM-2021-01
 Distance from hall wall to detector entrance,Hall2Det,5,m,nuSIM-2021-01
+Length of arc ,ArcLen,128,m,
