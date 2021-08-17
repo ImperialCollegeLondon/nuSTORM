@@ -1,0 +1,10 @@
+# Macro file for running 1000 events
+
+# run in batch by typing in ./triangles run_eve1000.mac
+
+/run/initialize
+
+# The first run where the necessary info is for some reason not recorded.
+/run/beamOn
+
+/run/beamOn 100
