@@ -26,7 +26,8 @@ Class nuSTORMPrdStrght:
   _pAcc            = Momentum acceptance (%)
   _epsilon         = Representative emittance/acceptance (pi mm rad)
   _beta            = Representative beta function (mm)
-    
+  _ArcLen          = Arc Length (m)
+
   Methods:
   --------
   Built-in methods __new__, __repr__ and __str__.
@@ -42,6 +43,7 @@ Class nuSTORMPrdStrght:
       pAcc         : Get momentum acceptance (%)
       epsilon      : Get acceptance/emittance (pi mm rad)
       beta         : Get beta function (mm)
+      ArcLen       : Get (semi-circular) Arc Length (m)
 
   Generation, calcution methods and utilities:
       GenerateMmtm : Generates momentum centred on p0 (input float).
@@ -90,7 +92,6 @@ class nuSTORMPrdStrght(object):
             cls._DetLngth        = cls._PrdStrghtParams.iat[7,2]
             cls._Hall2Det        = cls._PrdStrghtParams.iat[8,2]
             cls._ArcLen          = cls._PrdStrghtParams.iat[9,2]
-            
         return cls.__instance
 
     def __repr__(self):
@@ -98,10 +99,10 @@ class nuSTORMPrdStrght(object):
 
     def __str__(self):
         return "nuSTORMPrdStrght: version=%g, circumference=%g m, length of production straight=%g," \
-               " momentum acceptance=%g%%, transverse acceptance=%g pi mm rad, beta=%g mm. \n" \
-               "                  Production straight to hall wall=%g m, detector halfwidth=%g, detector length=%g, hall wall to detector=%g m." % \
+               "momentum acceptance=%g%%, transverse acceptance=%g pi mm rad, beta=%g mm. \n" \
+               "Production straight to hall wall=%g m, detector halfwidth=%g, detector length=%g, hall wall to detector=%g m, Length of Arc=%g m." % \
                (self.CdVrsn(), self.Circumference(), self.ProdStrghtLen(), self.pAcc(), self.epsilon(), self.beta(), \
-                self.HallWallDist(), self.DetHlfWdth(), self.DetLngth(), self.Hall2Det())
+                self.HallWallDist(), self.DetHlfWdth(), self.DetLngth(), self.Hall2Det(), self.ArcLen())
 
 #--------  Simulation methods:
     def GenerateMmtm(self,p0):
@@ -168,3 +169,5 @@ class nuSTORMPrdStrght(object):
     def printParams(self):
         print(self._PrdStrghtParams)
       
+    def ArcLen(self):
+        return deepcopy(self._ArcLen)
