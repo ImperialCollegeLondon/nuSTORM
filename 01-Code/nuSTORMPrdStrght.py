@@ -89,7 +89,7 @@ class nuSTORMPrdStrght(object):
             cls._DetHlfWdth      = cls._PrdStrghtParams.iat[6,2]
             cls._DetLngth        = cls._PrdStrghtParams.iat[7,2]
             cls._Hall2Det        = cls._PrdStrghtParams.iat[8,2]
-            cls._runType         = cls._PrdStrghtParams.iat[9,2]
+            cls._ArcLen          = cls._PrdStrghtParams.iat[9,2]
             
         return cls.__instance
 
