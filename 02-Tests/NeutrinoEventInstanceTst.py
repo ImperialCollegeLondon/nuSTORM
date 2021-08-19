@@ -85,6 +85,7 @@ Ee      = np.array([])
 Enue    = np.array([])
 Enumu   = np.array([])
 PBl     = []
+Pml     = []               #.. Exact muon momentum
 Pe      = np.array([])     #.. Pe  stored in an np.array
 Pel     = []               #.. Pe stored in a list for plotting
 Pnue    = np.array([])
@@ -99,18 +100,23 @@ Rnumu   = np.array([])
 CutEnue = np.array([])
 CutEnumu= np.array([])
 
+Cosmu            = np.array([])
 Cose             = np.array([])      # Cosine of angles with respect to beam direction
 Cosnue           = np.array([])
 Cosnumu          = np.array([])
+PrdStrghtcosmu   = np.array([])
 PrdStrghtcose    = np.array([])
 PrdStrghtcosnue  = np.array([])
 PrdStrghtcosnumu = np.array([])
+Arc1cosmu        = np.array([])
 Arc1cose         = np.array([])
 Arc1cosnue       = np.array([])
 Arc1cosnumu      = np.array([])
+RetStrghtcosmu   = np.array([])
 RetStrghtcose    = np.array([])
 RetStrghtcosnue  = np.array([])
 RetStrghtcosnumu = np.array([])
+Arc2cosmu        = np.array([])
 Arc2cose         = np.array([])
 Arc2cosnue       = np.array([])
 Arc2cosnumu      = np.array([])
@@ -164,12 +170,22 @@ for nuEvt in nuEI:
     Enumu = np.append(Enumu, nuEvt.getnumu4mmtm()[0])
     
     #3 momentum of the beam and decay products
-    Pb     = nuEvt.getPb()
+    Pb     = nuEvt.getPb()              #Only Longitudinal component of muon decay momentum
+    Pmx = nuEvt.getTraceSpaceCoord()[4]
+    Pmy = nuEvt.getTraceSpaceCoord()[5]
+    Pmz = nuEvt.getTraceSpaceCoord()[6]
+    Pm  = [Pmx,Pmy,Pmz]                 #Exact Muon decay momentum
+   
+    
     if(debug==1):
       print("SoakTest: Pb", Pb)
+      print("SoakTest: Pm", Pm)
     PBl.append(Pb)
+    Pml.append(Pm)
     Pb     = np.array(Pb)
-    
+    Pm     = np.array(Pm)
+    cosmu    = np.dot(Pb,Pm)/(np.linalg.norm(Pb)*np.linalg.norm(Pm))
+    Cosmu    = np.append(Cosmu, cosmu)
  
     Pe3    = nuEvt.gete4mmtm()[1]
     if(debug==1):
@@ -193,6 +209,7 @@ for nuEvt in nuEI:
    
 
     #cosine of angle between the beam direction and counting detected decay products
+   
     cose     = np.dot(Pb,Pe3)/(np.linalg.norm(Pb)*np.linalg.norm(Pe3))
     cosnue   = np.dot(Pb,Pnue3)/(np.linalg.norm(Pb)*np.linalg.norm(Pnue3))
     cosnumu  = np.dot(Pb,Pnumu3)/(np.linalg.norm(Pb)*np.linalg.norm(Pnumu3))
@@ -202,13 +219,13 @@ for nuEvt in nuEI:
     Cosnumu = np.append(Cosnumu, cosnumu)
     
     if(debug==1):
-       print("cose; cosnue; cosnumu", cose, cosnue, cosnumu)
+       print("cosmu; cose; cosnue; cosnumu", cosmu, cose, cosnue, cosnumu)
 
    
     if (PrdStrghtLngth>=where>=0):
         if(debug==1):
           print("Soak Test: In the production straight")
-
+        PrdStrghtcosmu = np.append(PrdStrghtcosmu,cosmu)
         PrdStrghtcose = np.append(PrdStrghtcose,cose)
         PrdStrghtcosnue = np.append(PrdStrghtcosnue,cosnue)
         PrdStrghtcosnumu = np.append(PrdStrghtcosnumu,cosnumu)
@@ -223,7 +240,7 @@ for nuEvt in nuEI:
     if ((PrdStrghtLngth+ArcLen)>=where>PrdStrghtLngth):
         if(debug==1):
           print("Soak Test: In the Arc 1")
-
+        Arc1cosmu = np.append(Arc1cosmu,cosmu)
         Arc1cose = np.append(Arc1cose,cose)
         Arc1cosnue = np.append(Arc1cosnue,cosnue)
         Arc1cosnumu = np.append(Arc1cosnumu,cosnumu)
@@ -238,7 +255,7 @@ for nuEvt in nuEI:
     if ((2*PrdStrghtLngth+ArcLen)>=where>(PrdStrghtLngth+ArcLen)):
         if(debug==1):
           print("Soak Test: In the return straight")
-
+        RetStrghtcosmu = np.append(RetStrghtcosmu,cosmu)
         RetStrghtcose = np.append(RetStrghtcose,cose)
         RetStrghtcosnue = np.append(RetStrghtcosnue,cosnue)
         RetStrghtcosnumu = np.append(RetStrghtcosnumu,cosnumu)
@@ -253,7 +270,7 @@ for nuEvt in nuEI:
     if ((2*PrdStrghtLngth+2*ArcLen)>=where>(2*PrdStrghtLngth+ArcLen)):
         if(debug==1):
           print("Soak Test: In the return straight")
-
+        Arc2cosmu = np.append(Arc2cosmu,cosmu)
         Arc2cose = np.append(Arc2cose,cose)
         Arc2cosnue = np.append(Arc2cosnue,cosnue)
         Arc2cosnumu = np.append( Arc2cosnumu,cosnumu)
@@ -372,6 +389,28 @@ plt.title('Beam Direction')
 plt.savefig('Scratch/NeutrinoEventInstanceTst_plot18.pdf')
 plt.close()
 
+##Exact Muon Momentum Plotting
+fig, ax = plt.subplots()
+U=np.array([])
+V=np.array([])
+i=1
+for P in Pml:
+    if(debug==1):
+          print("Plotting: Exact muon momentum Pm",P)
+          print("Number of instance:", i)
+          i=i+1
+    U=np.append(U,- P[2])
+    V=np.append(V,- P[0])
+    # X= nuSTORM -Z axis; # Y= nuSTORM -X axis
+Q=ax.quiver(z,x, U, V)
+ax.quiverkey(Q, X=0.5, Y=0.90, U=5, label='Muon Momentum', labelpos='E')
+ax.invert_xaxis()
+ax.invert_yaxis()
+plt.xlabel('Z')
+plt.ylabel('X')
+plt.title('Exact Muon Decay Momentum')
+plt.savefig('Scratch/NeutrinoEventInstanceTst_plot26.pdf')
+plt.close()
 
 ##Decay product momentum direction
 fig, ax = plt.subplots()
@@ -481,6 +520,13 @@ plt.close()
 
 
 ##Angular distribution of decay product momentum with respect to beam momentum
+n, bins, patches = plt.hist(PrdStrghtcosmu, bins=100, color='y', range=(0.999999,1))
+plt.xlabel('PrdStrghtcosmu')
+plt.ylabel('Frequency')
+plt.title('Angular distribution of muon momentum \n with respect to beam direction in the production straight')
+plt.savefig('Scratch/NeutrinoEventInstanceTst_plot27.pdf')
+plt.close()
+
 n, bins, patches = plt.hist(PrdStrghtcose, bins=500, color='y', range=(0.99,1))
 plt.xlabel('PrdStrghtcose')
 plt.ylabel('Frequency')
@@ -501,6 +547,13 @@ plt.xlabel('PrdStrghtcosnumu')
 plt.ylabel('Frequency')
 plt.title('Angular distribution of muon neutrino momentum \n with respect to beam direction in the production straight')
 plt.savefig('Scratch/NeutrinoEventInstanceTst_plot8.pdf')
+plt.close()
+
+n, bins, patches = plt.hist(Arc1cosmu, bins=100, color='y', range=(0.999999,1))
+plt.xlabel('Arc1cosmu')
+plt.ylabel('Frequency')
+plt.title('Angular distribution of muon momentum \n with respect to beam direction in the first arc')
+plt.savefig('Scratch/NeutrinoEventInstanceTst_plot28.pdf')
 plt.close()
 
 n, bins, patches = plt.hist(Arc1cose, bins=500, color='y', range=(0.99,1))
@@ -525,6 +578,14 @@ plt.title('Angular distribution of muon neutrino momentum \n with respect to bea
 plt.savefig('Scratch/NeutrinoEventInstanceTst_plot11.pdf')
 plt.close()
 
+n, bins, patches = plt.hist(RetStrghtcosmu, bins=100, color='y', range=(0.999999,1))
+plt.xlabel('RetStrghtcosmu')
+plt.ylabel('Frequency')
+plt.title('Angular distribution of muon momentum \n with respect to beam direction in the return straight')
+plt.savefig('Scratch/NeutrinoEventInstanceTst_plot29.pdf')
+plt.close()
+
+
 n, bins, patches = plt.hist(RetStrghtcose, bins=500, color='y', range=(0.99,1))
 plt.xlabel('RetStrghtcose')
 plt.ylabel('Frequency')
@@ -545,6 +606,13 @@ plt.xlabel('RetStrghtcosnumu')
 plt.ylabel('Frequency')
 plt.title('Angular distribution of electron neutrino momentum \n with respect to beam direction in the return straight')
 plt.savefig('Scratch/NeutrinoEventInstanceTst_plot14.pdf')
+plt.close()
+
+n, bins, patches = plt.hist(Arc2cosmu, bins=100, color='y', range=(0.999999,1))
+plt.xlabel('Arc2cosmu')
+plt.ylabel('Frequency')
+plt.title('Angular distribution of muon momentum \n with respect to beam direction in the second arc')
+plt.savefig('Scratch/NeutrinoEventInstanceTst_plot30.pdf')
 plt.close()
 
 n, bins, patches = plt.hist(Arc2cose, bins=500, color='y', range=(0.99,1))
@@ -569,21 +637,21 @@ plt.title('Angular distribution of muon neutrino momentum \n with respect to bea
 plt.savefig('Scratch/NeutrinoEventInstanceTst_plot17.pdf')
 plt.close()
 
-n, bins, patches = plt.hist(Cose, bins=500, color='r', range=(0.99,1))
+n, bins, patches = plt.hist(Cose, bins=500, color='r', range=(0.995,1))
 plt.xlabel('Cos(Angle between electron direction and beam direction)')
 plt.ylabel('Frequency')
 plt.title('Angular distribution of electron momentum \n with respect to beam direction')
 plt.savefig('Scratch/NeutrinoEventInstanceTst_plot20.pdf')
 plt.close()
 
-n, bins, patches = plt.hist(Cosnue, bins=500, color='g', range=(0.99,1))
+n, bins, patches = plt.hist(Cosnue, bins=500, color='g', range=(0.995,1))
 plt.xlabel('Cos(Angle between electron neutrino direction and beam direction)')
 plt.ylabel('Frequency')
 plt.title('Angular distribution of electron neutrino momentum \n with respect to beam direction')
 plt.savefig('Scratch/NeutrinoEventInstanceTst_plot21.pdf')
 plt.close()
 
-n, bins, patches = plt.hist(Cosnumu, bins=500, color='b', range=(0.99,1))
+n, bins, patches = plt.hist(Cosnumu, bins=500, color='b', range=(0.995,1))
 plt.xlabel('Cos(Angle between muon neutrino direction and beam direction)')
 plt.ylabel('Frequency')
 plt.title('Angular distribution of muon neutrino momentum \n with respect to beam direction')
