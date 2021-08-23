@@ -20,17 +20,22 @@ Class traceSpace:
       __init__ : Creates trace Space instance
       __repr__ : One liner with call.
       __str__  : Dump of values in the object
+      __eq__   : two objects equal
+      __ne__   : two objects not euqal
 
   Get/set methods:
-        s : get value of s (m)
-        x : get value of x (m)
-        y : get value of y (m)
-        z : get value of z (m)
+        s  : get value of s (m)
+        x  : get value of x (m)
+        y  : get value of y (m)
+        z  : get value of z (m)
+        xp : get value of x'
+        yp : get value of y'
   General methods:
 
 Created on Tue 20Aug12: Version history:
 ----------------------------------------------
  1.0: 20Aug21: First implementation
+ 1.1: 22Aug21: Add __eq__ and __ne__ methods
 
 @author: PaulKyberd
 """
@@ -52,8 +57,19 @@ class traceSpace:
         self._z  = z
         self._xp = xp
         self._yp = yp
-
         return
+
+# Override the __eq__ method
+    def __eq__(self, comp):
+        if isinstance(comp, self.__class__):
+            return self.__dict__ == comp.__dict__
+        else:
+            return False
+
+# Override the __ne__ method
+    def __ne__(self, comp):
+        return not self.__eq__(comp)
+
 
     def __repr__(self):
         return "traceSpace co-ordinates"
@@ -83,3 +99,4 @@ class traceSpace:
 
     def Version(self):
         return deepcopy(self.__version)
+    
