@@ -50,23 +50,23 @@ class pion:
     __Debug  = False
     
 #--------  "Built-in methods":
-    def __init__(self, s, x, y, z, px, py, pz, t):
+    def __init__(self, s, x, y, z, px, py, pz, t, weight):
 
         E = math.sqrt(px*px + py*py + pz*pz + self.__pimass*self.__pimass)
         p = np.array([px, py, pz])
         self._p = np.array([E, np.array([px, py, pz])],dtype=object)
         self._TrcSpc = traceSpace.traceSpace(s, x, y, z, px/pz, py/pz)
         self._t = t
-        self._weight = 0
+        self._weight = weight
         return
 
     def __repr__(self):
-        return "pion(x, y, z, s, px, py, pz, t)"
+        return "pion(x, y, z, s, px, py, pz, t, weight)"
 
     def __str__(self):
-        return "pion: E (GeV) = %g, p (GeV) = (%g  %g  %g),  t = %g, s = %g, x = %g, y = %g, z = %g, x' = %g , y' = %g " % \
+        return "pion: E (GeV) = %g, p (GeV) = (%g  %g  %g),  t = %g, s = %g, x = %g, y = %g, z = %g, x' = %g, y' = %g, weight = %g " % \
                   (self._p[0], self._p[1][0],  self._p[1][1], self._p[1][2],self._t, self._TrcSpc.s(), self._TrcSpc.x(), 
-                    self._TrcSpc.y(), self._TrcSpc.z(), self._TrcSpc.xp() ,self._TrcSpc.yp()  )
+                    self._TrcSpc.y(), self._TrcSpc.z(), self._TrcSpc.xp() ,self._TrcSpc.yp(), self._weight  )
     
 #--------  get/set methods:
     def getP(self):
@@ -78,23 +78,23 @@ class pion:
     def t(self):
         return deepcopy(self._t)
 
-#    def getcostheta(self):
-#        return deepcopy(self._costheta)
+    def weight(self):
+        return deepcopy(self._weight)
 
-#    def getTraceSpaceCoord(self):
-#        return deepcopy(self._TrcSpcCrd)
+    def s(self):
+        return deepcopy(self._TrcSpc.s())
 
-#    def getmu4mmtm(self):
-#        return deepcopy(self._P_mu)
+    def x(self):
+        return deepcopy(self._TrcSpc.x())
 
-#    def getnumu4mmtm(self):
-#        return deepcopy(self._P_numu)
+    def y(self):
+        return deepcopy(self._TrcSpc.y())
 
-#    def getppiGen(self):
-#        return deepcopy(self._ppiGen)
-if __name__ == "__main__":
-    print("in main(pion)")
-    x = pion(0.1, 0.15, -100.0, 0.0, 0.2, 0.22, 5.12, 0.00)
+    def z(self):
+        return deepcopy(self._TrcSpc.z())
 
-    print(x)
+    def xp(self):
+        return deepcopy(self._TrcSpc.xp())
 
+    def yp(self):
+        return deepcopy(self._TrcSpc.yp())

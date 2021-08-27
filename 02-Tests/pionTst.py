@@ -24,7 +24,7 @@ pionTest = 1
 print()
 print("pionTest:", pionTest, " Create pion and print quantities.")
 
-pi = pion.pion(0.1, 0.15, -100.0, 0.0, 0.2, 0.22, 5.12, 0.00)
+pi = pion.pion(0.1, 0.15, -100.0, 0.0, 0.2, 0.22, 5.12, 0.00, 0.16)
 print("    __str__:", pi)
 print("    --repr__", repr(pi))
 del pi
@@ -43,18 +43,19 @@ px = 0.82
 py = 0.45
 pz = 4.67
 t = 24.5
+weight = 0.15
 tSC = traceSpace.traceSpace(s, x, y, z, px/pz, py/pz)
 
 piErr = 0
-pi = pion.pion(s, x, y, z, px, py, pz, t)
+pi = pion.pion(s, x, y, z, px, py, pz, t, weight)
 
 if pi.t() != t:
     piErr = piErr + 1
     print ("pi.t() is ", pi.t(), "and should be ", t)
 
-if pi.t() != t:
+if pi.weight() != weight:
     piErr = piErr + 1
-    print ("pi.t() is ", pi.t(), "and should be ", t)
+    print ("pi.weight() is ", pi.weight(), "and should be ", weight)
 
 if pi.traceSpace() != tSC:
     piErr = piErr + 1
