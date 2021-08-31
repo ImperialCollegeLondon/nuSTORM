@@ -33,12 +33,14 @@ debug=0
 ##! Create instance, test built-in methods:
 NeutrinoEventInstanceTest = 1
 print()
-print("NeutrinoEventInstanceTest:", NeutrinoEventInstanceTest, " Test built-in methods.")
+print("NeutrinoEventInstanceTest:", NeutrinoEventInstanceTest, \
+      " Test built-in methods.")
 nuSIMPATH = os.getenv('nuSIMPATH')
-filename  = os.path.join(nuSIMPATH, '11-Parameters/nuSTORM-PrdStrght-Params-v1.0.csv')
+filename  = os.path.join(nuSIMPATH, \
+                         '11-Parameters/nuSTORM-PrdStrght-Params-v1.0.csv')
 nuEI = nuEvtInst.NeutrinoEventInstance(5., filename)
-print("    __str__:", nuEI)
-print("    --repr__", repr(nuEI))
+print("    __str__: \n", nuEI)
+print("    --repr__: \n", repr(nuEI))
 
 ##! Test get/set methods:
 NeutrinoEventInstanceTest = 2
@@ -54,7 +56,10 @@ print("NeutrinoEventInstanceTest:", NeutrinoEventInstanceTest, \
       "Test methods by which neutrino-creation event is generated.")
 nuStrt = nuPrdStrt.nuSTORMPrdStrght(filename)
 x = nuEI.CreateNeutrinos(nuStrt)
-print("    Neutrino event: trace-space coordinates of muon at decay, P_e, P_nue, P_numu:", x)
+print("    Neutrino event: trace-space coordinates of muon at decay:")
+print("    ----> P_e:", x[4])
+print("    ----> P_nue:", x[5])
+print("    ----> P_numu:", x[6])
 del nuEI
 
 ##! Soak test:
@@ -66,11 +71,10 @@ Pmu = 5.
 print("    ----> Muon momentum:", Pmu)
 nuEI = []
 for i in range(10000):
-    if(debug==1):
-      print("Number of instance:", i+1)
+#for i in range(5):
     nuEI.append(nuEvtInst.NeutrinoEventInstance(Pmu, filename))
 for i in range(5):
-    print("    nuEI[i]:", nuEI[i])
+    print("    nuEI[",i, "]: \n", nuEI[i])
 
 ##! Plot result of soak test:
 NeutrinoEventInstanceTest = 5
@@ -99,7 +103,7 @@ Rnumu   = np.array([])
 CutEnue = np.array([])
 CutEnumu= np.array([])
 
-Cose             = np.array([])      # Cosine of angles with respect to beam direction
+Cose             = np.array([])  # Cosine of angles wrt beam direction
 Cosnue           = np.array([])
 Cosnumu          = np.array([])
 PrdStrghtcose    = np.array([])
@@ -115,34 +119,12 @@ Arc2cose         = np.array([])
 Arc2cosnue       = np.array([])
 Arc2cosnumu      = np.array([])
 
-
 PrdStrghtLngth = nuStrt.ProdStrghtLen()
 Circumference  = nuStrt.Circumference()
 ArcLen         = nuStrt.ArcLen()
 ArcRad         = ArcLen/mth.pi
 
-detected_e     = 0    #.. Detection counters
-detected_nue   = 0
-detected_numu  = 0
-
-PrdStrght_detected_nue  = 0   
-PrdStrght_detected_numu = 0
-Background_detected_nue = 0
-Background_detected_numu= 0
-
-
-countPrdStrght = 0   #.. Event counters
-countArc1      = 0   
-countRetStrght = 0
-countArc2      = 0
-
-if (debug==1):
-    print("Soak Test:PrdStrghtLngth, Circumference, ArcLen, ArcRad ",PrdStrghtLngth, Circumference, ArcLen, ArcRad)
-    i=1
 for nuEvt in nuEI:
-    if (debug==1):
-         print("Number of instance:", i)
-         i=i+1
     s     = np.append(s,     nuEvt.getTraceSpaceCoord()[0])
     where = nuEvt.getTraceSpaceCoord()[0]%Circumference
     
@@ -152,47 +134,27 @@ for nuEvt in nuEI:
     zi    = nuEvt.getTraceSpaceCoord()[3]
     z     = np.append(z,     zi)
     
-    if(debug==1):
-        print("Soak Test: s, where, xi, zi",nuEvt.getTraceSpaceCoord()[0], where, xi, zi)
-        
-   
-
- 
-
     Ee    = np.append(Ee,    nuEvt.gete4mmtm()[0])
     Enue  = np.append(Enue,  nuEvt.getnue4mmtm()[0])
     Enumu = np.append(Enumu, nuEvt.getnumu4mmtm()[0])
     
     #3 momentum of the beam and decay products
     Pb     = nuEvt.getPb()
-    if(debug==1):
-      print("SoakTest: Pb", Pb)
     PBl.append(Pb)
     Pb     = np.array(Pb)
     
- 
     Pe3    = nuEvt.gete4mmtm()[1]
-    if(debug==1):
-      print("SoakTest: Pe3", Pe3)
     Pel.append(Pe3)
     Pe    = np.append(Pe,    Pe3)
     
-    
     Pnue3    = nuEvt.getnue4mmtm()[1]
-    if(debug==1):
-      print("SoakTest: Pnue3", Pnue3)
     Pnuel.append(Pnue3)
     Pnue    = np.append(Pnue,    Pe3)
     
-    
     Pnumu3  = nuEvt.getnumu4mmtm()[1]
-    if(debug==1):
-      print("SoakTest: Pnumu3", Pnumu3)
     Pnumul.append(Pnumu3)
     Pnumu = np.append(Pnumu, Pnumu3)
-   
 
-    #cosine of angle between the beam direction and counting detected decay products
     cose     = np.dot(Pb,Pe3)/(np.linalg.norm(Pb)*np.linalg.norm(Pe3))
     cosnue   = np.dot(Pb,Pnue3)/(np.linalg.norm(Pb)*np.linalg.norm(Pnue3))
     cosnumu  = np.dot(Pb,Pnumu3)/(np.linalg.norm(Pb)*np.linalg.norm(Pnumu3))
@@ -201,105 +163,33 @@ for nuEvt in nuEI:
     Cosnue  = np.append(Cosnue, cosnue)
     Cosnumu = np.append(Cosnumu, cosnumu)
     
-    if(debug==1):
-       print("cose; cosnue; cosnumu", cose, cosnue, cosnumu)
-
-   
     if (PrdStrghtLngth>=where>=0):
-        if(debug==1):
-          print("Soak Test: In the production straight")
-
         PrdStrghtcose = np.append(PrdStrghtcose,cose)
         PrdStrghtcosnue = np.append(PrdStrghtcosnue,cosnue)
         PrdStrghtcosnumu = np.append(PrdStrghtcosnumu,cosnumu)
-
-        countPrdStrght+=1
-
-        if nuEvt.is_nue_detected():
-             PrdStrght_detected_nue+=1
-        if nuEvt.is_numu_detected():
-             PrdStrght_detected_numu+=1
-
-    if ((PrdStrghtLngth+ArcLen)>=where>PrdStrghtLngth):
-        if(debug==1):
-          print("Soak Test: In the Arc 1")
-
+    elif ((PrdStrghtLngth+ArcLen)>=where>PrdStrghtLngth):
         Arc1cose = np.append(Arc1cose,cose)
         Arc1cosnue = np.append(Arc1cosnue,cosnue)
         Arc1cosnumu = np.append(Arc1cosnumu,cosnumu)
-
-        countArc1+=1
-
-        if nuEvt.is_nue_detected():
-             Background_detected_nue+=1
-        if nuEvt.is_numu_detected():
-             Background_detected_numu+=1
-
-    if ((2*PrdStrghtLngth+ArcLen)>=where>(PrdStrghtLngth+ArcLen)):
-        if(debug==1):
-          print("Soak Test: In the return straight")
-
+    elif ((2*PrdStrghtLngth+ArcLen)>=where>(PrdStrghtLngth+ArcLen)):
         RetStrghtcose = np.append(RetStrghtcose,cose)
         RetStrghtcosnue = np.append(RetStrghtcosnue,cosnue)
         RetStrghtcosnumu = np.append(RetStrghtcosnumu,cosnumu)
-
-        countRetStrght+=1
-
-        if nuEvt.is_nue_detected():
-             Background_detected_nue+=1
-        if nuEvt.is_numu_detected():
-             Background_detected_numu+=1
-
-    if ((2*PrdStrghtLngth+2*ArcLen)>=where>(2*PrdStrghtLngth+ArcLen)):
-        if(debug==1):
-          print("Soak Test: In the return straight")
-
+    elif ((2*PrdStrghtLngth+2*ArcLen)>=where>(2*PrdStrghtLngth+ArcLen)):
         Arc2cose = np.append(Arc2cose,cose)
         Arc2cosnue = np.append(Arc2cosnue,cosnue)
         Arc2cosnumu = np.append( Arc2cosnumu,cosnumu)
 
-        countArc2+=1
-
-        if nuEvt.is_nue_detected():
-             Background_detected_nue+=1
-        if nuEvt.is_numu_detected():
-             Background_detected_numu+=1
-
-#..Total detection counting
-    if nuEvt.is_e_detected():
-             detected_e+=1
-    if nuEvt.is_nue_detected():
-             detected_nue+=1
-    if nuEvt.is_numu_detected():
-             detected_numu+=1
-
-
-    pt_e    = np.sqrt(nuEvt.gete4mmtm()[1][0]**2 + nuEvt.gete4mmtm()[1][1]**2)
-    pt_nue  = np.sqrt(nuEvt.getnue4mmtm()[1][0]**2 + nuEvt.getnue4mmtm()[1][1]**2)
-    pt_numu = np.sqrt(nuEvt.getnumu4mmtm()[1][0]**2 + nuEvt.getnumu4mmtm()[1][1]**2)
+    pt_e    = np.sqrt(nuEvt.gete4mmtm()[1][0]**2 \
+                      + nuEvt.gete4mmtm()[1][1]**2)
+    pt_nue  = np.sqrt(nuEvt.getnue4mmtm()[1][0]**2 \
+                      + nuEvt.getnue4mmtm()[1][1]**2)
+    pt_numu = np.sqrt(nuEvt.getnumu4mmtm()[1][0]**2 \
+                      + nuEvt.getnumu4mmtm()[1][1]**2)
 
     tane    = np.append(tane,    (pt_e/nuEvt.gete4mmtm()[1][2]) )
     tannue  = np.append(tannue,  (pt_nue/nuEvt.getnue4mmtm()[1][2]) )
     tannumu = np.append(tannumu, (pt_numu/nuEvt.getnumu4mmtm()[1][2]) )
-
-print("Number of decays after evaluation cos", (countPrdStrght+countArc1+countRetStrght+countArc2))
-print("Number of electrons", len(PrdStrghtcose)+len(Arc1cose)+len(RetStrghtcose)+len(Arc2cose))
-print("Number of electronneutrinos", len(PrdStrghtcosnue)+len(Arc1cosnue)+len(RetStrghtcosnue)+len(Arc2cosnue))
-print("Number of muon neutrinos", len(PrdStrghtcosnumu)+len(Arc1cosnumu)+len(RetStrghtcosnumu)+len(Arc2cosnumu))
-
-#print("Detected electrons", detected_e)
-print("Detected electron neutrinos from the beam in Production straight", PrdStrght_detected_nue)
-print("Detected muon neutrinos from the beam in the Production straight", PrdStrght_detected_numu)
-print("Detected electron neutrinos from the background", Background_detected_nue)
-print("Detected muon neutrinos from the background", Background_detected_numu)
-
-Noise_percentage = 100*(Background_detected_nue + Background_detected_numu)/(Background_detected_nue + Background_detected_numu + PrdStrght_detected_nue + PrdStrght_detected_numu)
-print("Background Neutrino percentage",Noise_percentage)
-
-countPrdStrght=0
-countArc1=0
-countRetStrght=0
-countArc2=0
 
 #-- Lifetime distribution:
 n, bins, patches = plt.hist(s, bins=50, color='y', log=True)
@@ -346,8 +236,6 @@ plt.ylabel('X')
 plt.title('Muon Decay Position')
 plt.savefig('Scratch/NeutrinoEventInstanceTst_plot5.pdf')
 plt.close()
-
-debug=0
 
 ##beamdirectionplotting
 fig, ax = plt.subplots()

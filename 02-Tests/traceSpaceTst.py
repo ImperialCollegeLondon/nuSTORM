@@ -18,6 +18,7 @@ import traceSpace as trSp
 ##! Start:
 print("========  traceSpace: tests start  ========")
 
+testError = 0
 ##! Create instance, test built-in methods:
 traceSpaceTest = 1
 print()
@@ -33,23 +34,130 @@ print("    __str__:", tS)
 print("    --repr__", repr(tS))
 del tS
 
-##! Create instance, test get methods:
-traceSpaceTest = 2
+tS = trSp.traceSpace(sVal, xVal, yVal, zVal, xpVal, ypVal)
+tS1 = trSp.traceSpace(sVal, xVal, yVal, zVal, xpVal, ypVal)
+
+##! Create instance, test dynamic methods:
+traceSpaceTest = traceSpaceTest + 1
+print("\ntraceSpaceTest:", traceSpaceTest, " check __eq__ and __ne__")
+tS = trSp.traceSpace(sVal, xVal, yVal, zVal, xpVal, ypVal)
+tS1 = trSp.traceSpace(sVal, xVal, yVal, zVal, xpVal, ypVal)
+# check equality
+if tS == tS1:
+    pass
+else:
+    print ("traceSpaceTest: __eq__ fails")
+    testError = testError + 1
+del tS1
+
+tS1 = trSp.traceSpace(sVal+0.1, xVal, yVal, zVal, xpVal, ypVal)
+if tS == tS1:
+    print ("traceSpaceTest: __eq__ fails")
+    testError = testError + 1
+del tS1
+
+tS1 = trSp.traceSpace(sVal, xVal+0.1, yVal, zVal, xpVal, ypVal)
+if tS == tS1:
+    print ("traceSpaceTest: __eq__ fails")
+    testError = testError + 1
+del tS1
+
+tS1 = trSp.traceSpace(sVal, xVal, yVal+0.1, zVal, xpVal, ypVal)
+if tS == tS1:
+    print ("traceSpaceTest: __eq__ fails")
+    testError = testError + 1
+del tS1
+
+tS1 = trSp.traceSpace(sVal, xVal, yVal, zVal+0.1, xpVal, ypVal)
+if tS == tS1:
+    print ("traceSpaceTest: __eq__ fails")
+    testError = testError + 1
+del tS1
+
+tS1 = trSp.traceSpace(sVal, xVal, yVal, zVal, xpVal+0.1, ypVal)
+if tS == tS1:
+    print ("traceSpaceTest: __eq__ fails")
+    testError = testError + 1
+del tS1
+
+tS1 = trSp.traceSpace(sVal, xVal, yVal, zVal, xpVal, ypVal+0.1)
+if tS == tS1:
+    print ("traceSpaceTest: __eq__ fails")
+    testError = testError + 1
+del tS1
+
+tS1 = trSp.traceSpace(sVal+0.1, xVal, yVal, zVal, xpVal, ypVal)
+if tS != tS1:
+    pass
+else:
+    print ("traceSpaceTest: __ne__ fails")
+    testError = testError + 1
+del tS1
+
+tS1 = trSp.traceSpace(sVal, xVal+0.1, yVal, zVal, xpVal, ypVal)
+if tS != tS1:
+    pass
+else:
+    print ("traceSpaceTest: __ne__ fails")
+    testError = testError + 1
+del tS1
+
+
+tS1 = trSp.traceSpace(sVal, xVal, yVal+0.1, zVal, xpVal, ypVal)
+if tS != tS1:
+    pass
+else:
+    print ("traceSpaceTest: __ne__ fails")
+    testError = testError + 1
+del tS1
+
+tS1 = trSp.traceSpace(sVal, xVal, yVal, zVal+0.1, xpVal, ypVal)
+if tS != tS1:
+    pass
+else:
+    print ("traceSpaceTest: __ne__ fails")
+    testError = testError + 1
+del tS1
+
+tS1 = trSp.traceSpace(sVal, xVal, yVal, zVal, xpVal+0.1, ypVal)
+if tS != tS1:
+    pass
+else:
+    print ("traceSpaceTest: __ne__ fails")
+    testError = testError + 1
+del tS1
+
+tS1 = trSp.traceSpace(sVal, xVal, yVal, zVal, xpVal, ypVal+0.1)
+if tS != tS1:
+    pass
+else:
+    print ("traceSpaceTest: __ne__ fails")
+    testError = testError + 1
+del tS1
+
+traceSpaceTest = traceSpaceTest + 1
+
 print()
 print("traceSpaceTest:", traceSpaceTest, " Check get methods.")
 tS = trSp.traceSpace(sVal, xVal, yVal, zVal, xpVal, ypVal)
 if (tS.s() != sVal):
-    sys.exit("traceSpace.s() is not working")
+    print("traceSpace.s() is not working")
+    testError = testError + 1
 elif (tS.x() != xVal):
-    sys.exit("traceSpace.x() is not working")
+    print("traceSpace.x() is not working")
+    testError = testError + 1
 elif (tS.y() != yVal):
-    sys.exit("traceSpace.y() is not working")
+    print("traceSpace.y() is not working")
+    testError = testError + 1
 elif (tS.z() != zVal):
-    sys.exit("traceSpace.z() is not working")
+    print("traceSpace.z() is not working")
+    testError = testError + 1
 elif (tS.xp() != xpVal):
-    sys.exit("traceSpace.xp() is not working")
+    print("traceSpace.xp() is not working")
+    testError = testError + 1
 elif (tS.yp() != ypVal):
-    sys.exit("traceSpace.yp() is not working")
+    print("traceSpace.yp() is not working")
+    testError = testError + 1
 else:
     del tS
 
@@ -74,5 +182,6 @@ else:
 
 ##! Complete:
 print()
-print("========  traceSpace:tests complete sucessfully  ========")
+print("========  traceSpace:tests complete   ========")
+print ("\n >>>>> number of test errors is ", testError, " <<<<<<\n")
 sys.exit(0)

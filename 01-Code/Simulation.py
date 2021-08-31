@@ -41,6 +41,8 @@ Class Simulation
 
 Created on Thu 10Jan21;11:04: Version history:
 ----------------------------------------------
+ 2.3: KL: Dirty hack at line 136: run_type was not properly included.  I've
+      set runType=1 to allow muon running.
  2.1: 08Jul21: Make pmu pbeam - to allow muon and pion running
  2.0: 12May21: Add a runType to allow muon and pion flash
  1.1: 25Feb21: Add Output to a root file
@@ -130,7 +132,8 @@ class Simulation(object):
 # Define the distance of the downstream plane where the flux is calculated
 #  parameters length of straight; distance from end of straight of plane.
         fluxPlane = plane.plane(self._nuStrt.ProdStrghtLen(), self._nuStrt.HallWallDist())
-        runType = self._nuStrt.runType()
+#KL! Hack        runType = self._nuStrt.runType()
+        runType = 1
         iCnt = 0
         Scl  = 1
         prt  = 0

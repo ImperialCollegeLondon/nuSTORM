@@ -7,6 +7,11 @@ Class: ntupleMake:
 
 Outputs nuStorm monte-carlo production data as a root ntuple
 
+Version 2.9                                    28/08/2021
+Author: Ken Long
+Update muon branch to include update to NeutrinoEventInstance class that
+produces muon decays around the ring.
+
 Version 2.8                                    26/05/2021
 Author: Paul Kyberd
 method to include information for pion flash into the flux section
@@ -217,9 +222,10 @@ class ntupleMake:
 # get the 4 vector of the muon. In fact Emu ~ Pmu ~ PMuz - but calculate precisely
 		pMu = nuEvt.getpmuGen()
 		self.event.Emu  = np.sqrt(pMu*pMu + self.__muMass**2)
-		self.event.pMuX = pMu*self.event.xp
-		self.event.pMuY = pMu*self.event.yp
-		self.event.pMuZ = np.sqrt(pMu*pMu - self.event.pMuX**2 - self.event.pMuY**2)
+		pBeam = nuEvt.getPb()
+		self.event.pMuX = pBeam[0]
+		self.event.pMuY = pBeam[1]
+		self.event.pMuZ = pBeam[2]
 # get the 4 vector of the electron
 		self.event.Ee  = nuEvt.gete4mmtm()[0]
 		self.event.peX = nuEvt.gete4mmtm()[1][0]
