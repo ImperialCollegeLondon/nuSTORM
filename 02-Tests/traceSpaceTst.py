@@ -33,7 +33,7 @@ print("    __str__:", tS)
 print("    --repr__", repr(tS))
 del tS
 
-##! Create instance, test dynamic methods:
+##! Create instance, test get methods:
 traceSpaceTest = 2
 print()
 print("traceSpaceTest:", traceSpaceTest, " Check get methods.")
@@ -52,6 +52,25 @@ elif (tS.yp() != ypVal):
     sys.exit("traceSpace.yp() is not working")
 else:
     del tS
+
+##! Create instance and check equals
+traceSpaceTest = 3
+print()
+print("traceSpaceTest:", traceSpaceTest, " Check equals and not equals.")
+tS = trSp.traceSpace(sVal, xVal, yVal, zVal, xpVal, ypVal)
+tS1 = trSp.traceSpace(sVal, xVal, yVal, zVal, xpVal, ypVal)
+
+if (tS == tS1):
+    pass
+else:
+    print("equality fails.")
+
+tS2 = trSp.traceSpace(sVal+1.0, xVal, yVal, zVal, xpVal, ypVal)
+
+if (tS != tS2):
+    pass
+else:
+    print("not equals fails.")
 
 ##! Complete:
 print()
