@@ -136,6 +136,7 @@ else:
 del tS1
 
 traceSpaceTest = traceSpaceTest + 1
+
 print()
 print("traceSpaceTest:", traceSpaceTest, " Check get methods.")
 tS = trSp.traceSpace(sVal, xVal, yVal, zVal, xpVal, ypVal)
@@ -159,6 +160,25 @@ elif (tS.yp() != ypVal):
     testError = testError + 1
 else:
     del tS
+
+##! Create instance and check equals
+traceSpaceTest = 3
+print()
+print("traceSpaceTest:", traceSpaceTest, " Check equals and not equals.")
+tS = trSp.traceSpace(sVal, xVal, yVal, zVal, xpVal, ypVal)
+tS1 = trSp.traceSpace(sVal, xVal, yVal, zVal, xpVal, ypVal)
+
+if (tS == tS1):
+    pass
+else:
+    print("equality fails.")
+
+tS2 = trSp.traceSpace(sVal+1.0, xVal, yVal, zVal, xpVal, ypVal)
+
+if (tS != tS2):
+    pass
+else:
+    print("not equals fails.")
 
 ##! Complete:
 print()

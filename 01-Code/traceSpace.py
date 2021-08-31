@@ -75,8 +75,17 @@ class traceSpace:
         return "traceSpace co-ordinates"
 
     def __str__(self):
-        return "s = %gm, x = %gm, y = %gm, z = %gm, x' = %g, y' = %g ," % \
+        return "s = %gm, x = %gm, y = %gm, z = %gm, x' = %g, y' = %g " % \
                   (self._s, self._x, self._y, self._z, self._xp, self._yp  )
+
+    def __eq__(self, comp):
+        if isinstance(comp, self.__class__):
+            return self.__dict__ == comp.__dict__
+        else:
+            return False
+
+    def __ne__(self,comp):
+        return not self.__eq__(comp)
     
 #--------  get/set methods:
     def s(self):
