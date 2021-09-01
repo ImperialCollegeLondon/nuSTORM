@@ -14,6 +14,7 @@ import sys
 import numpy as np
 import math as mt
 import pion as pion
+import PionConst as PionConst
 import traceSpace
 
 ##! Start:
@@ -84,6 +85,14 @@ if pi.traceSpace().xp() != px/pz:
 if pi.traceSpace().yp() != py/pz:
     piErr = piErr + 1
     print ("pi.traceSpace().yp() is ", pi.traceSpace().yp(), "and should be ", py/pz)
+
+piCnst = PionConst.PionConst()
+pimass = piCnst.mass()/1000.
+E = mt.sqrt(px*px + py*py + pz*pz + pimass*pimass)
+pp = pi.p()
+if pp[1][0] != px or pp[1][1] != py or pp[1][2] != pz or pp[0] != E:
+    piErr = piErr + 1
+    print ("pi.p() is ", pi.p(), "and should be ", fourVector)
 
 
 ##! Complete:
