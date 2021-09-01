@@ -42,31 +42,30 @@ import traceSpace
 import abc
     
 class particle:
-
-    __pmass = 0.0
     __Debug  = False
     
 #--------  "Built-in methods":
-    def __init__(self, s, x, y, z, px, py, pz, t, weight):
+    def __init__(self, s, x, y, z, px, py, pz, t, weight, mass):
 
-        E = math.sqrt(px*px + py*py + pz*pz + self.__pmass*self.__pmass)
+        E = math.sqrt(px*px + py*py + pz*pz + mass*mass)
         p = np.array([px, py, pz])
         self._p = np.array([E, np.array([px, py, pz])],dtype=object)
         self._TrcSpc = traceSpace.traceSpace(s, x, y, z, px/pz, py/pz)
         self._t = t
         self._weight = weight
+        self._mass = mass
         return
 
     def __repr__(self):
-        return "particle(x, y, z, s, px, py, pz, t, weight)"
+        return "particle(x, y, z, s, px, py, pz, t, weight, mass)"
 
     def __str__(self):
-        return "particle: E (GeV) = %g, p (GeV) = (%g  %g  %g),  t = %g, s = %g, x = %g, y = %g, z = %g, x' = %g, y' = %g, weight = %g " % \
-                  (self._p[0], self._p[1][0],  self._p[1][1], self._p[1][2],self._t, self._TrcSpc.s(), self._TrcSpc.x(), 
+        return "particle: E (GeV) = %g, p (GeV) = (%g  %g  %g),  mass = %g, t = %g, s = %g, x = %g, y = %g, z = %g, x' = %g, y' = %g, weight = %g " % \
+                  (self._p[0], self._p[1][0],  self._p[1][1], self._p[1][2],self._mass, self._t, self._TrcSpc.s(), self._TrcSpc.x(), 
                     self._TrcSpc.y(), self._TrcSpc.z(), self._TrcSpc.xp() ,self._TrcSpc.yp(), self._weight  )
     
 #--------  get/set methods:
-    def getP(self):
+    def p(self):
         return deepcopy(self._p)
 
     def traceSpace(self):
@@ -77,6 +76,9 @@ class particle:
 
     def weight(self):
         return deepcopy(self._weight)
+
+    def mass(self):
+        return deepcopy(self._mass)
 
     def s(self):
         return deepcopy(self._TrcSpc.s())
