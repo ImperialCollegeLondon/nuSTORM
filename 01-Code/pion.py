@@ -60,9 +60,9 @@ class pion(particle):
 # getting the mass from the piConstant class and using it to call the particle
 # constructor.
 
-    def __init__(self, s, x, y, z, px, py, pz, t, weight):
+    def __init__(self, run, event, s, x, y, z, px, py, pz, t, weight):
         mass = piCnst.mass()/1000.
-        particle.__init__(self, s, x, y, z, px, py, pz, t, weight, mass)
+        particle.__init__(self, run, event, s, x, y, z, px, py, pz, t, weight, mass)
 
     def __repr__(self):
-        return "particle(x, y, z, s, px, py, pz, t, weight)"
+        return "particle(run, event, x, y, z, s, px, py, pz, t, weight)"

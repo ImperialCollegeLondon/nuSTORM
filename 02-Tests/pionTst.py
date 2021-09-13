@@ -25,7 +25,7 @@ pionTest = 1
 print()
 print("pionTest:", pionTest, " Create pion and print quantities.")
 
-pi = pion.pion(0.1, 0.15, -100.0, 0.0, 0.2, 0.22, 5.12, 0.00, 0.16)
+pi = pion.pion(26, 134, 0.1, 0.15, -100.0, 0.0, 0.2, 0.22, 5.12, 0.00, 0.16)
 print("    __str__:", pi)
 print("    --repr__", repr(pi))
 del pi
@@ -36,6 +36,8 @@ print("pionTest:", pionTest, " Create pion and check get methods.")
 ##! Create instance, test get methods
 pionTest = pionTest + 1
 print()
+runNum = 137
+eventNum = 695
 x = 1.4
 y = 2.3
 z = 10.3
@@ -48,7 +50,15 @@ weight = 0.15
 tSC = traceSpace.traceSpace(s, x, y, z, px/pz, py/pz)
 
 piErr = 0
-pi = pion.pion(s, x, y, z, px, py, pz, t, weight)
+pi = pion.pion(runNum, eventNum, s, x, y, z, px, py, pz, t, weight)
+
+if pi.run() != runNum:
+    parErr = parErr + 1
+    print ("p.run() is ", p.run(), "and should be ", runNum)
+
+if pi.event() != eventNum:
+    parErr = parErr + 1
+    print ("p.event() is ", p.event(), "and should be ", eventNum)
 
 if pi.t() != t:
     piErr = piErr + 1

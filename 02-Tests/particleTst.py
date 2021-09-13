@@ -24,7 +24,7 @@ particleTest = 1
 print()
 print("particleTest:", particleTest, " Create particle and print quantities.")
 
-p = particle.particle(0.1, 0.15, -100.0, 0.0, 0.2, 0.22, 5.12, 0.00, 0.16, 0.99)
+p = particle.particle(42, 125, 0.1, 0.15, -100.0, 0.0, 0.2, 0.22, 5.12, 0.00, 0.16, 0.99)
 print("    __str__:", p)
 print("    --repr__", repr(p))
 del p
@@ -35,6 +35,8 @@ print("particleTest:", particleTest, " Create particle and check get methods.")
 ##! Create instance, test get methods
 particleTest = particleTest + 1
 print()
+runNum = 43
+eventNum = 67
 x = 1.4
 y = 2.3
 z = 10.3
@@ -48,7 +50,15 @@ mass = 0.99
 tSC = traceSpace.traceSpace(s, x, y, z, px/pz, py/pz)
 
 parErr = 0
-p = particle.particle(s, x, y, z, px, py, pz, t, weight, mass)
+p = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz, t, weight, mass)
+
+if p.run() != runNum:
+    parErr = parErr + 1
+    print ("p.run() is ", p.run(), "and should be ", runNum)
+
+if p.event() != eventNum:
+    parErr = parErr + 1
+    print ("p.event() is ", p.event(), "and should be ", eventNum)
 
 if p.t() != t:
     parErr = parErr + 1

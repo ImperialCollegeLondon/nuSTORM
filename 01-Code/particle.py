@@ -45,7 +45,7 @@ class particle:
     __Debug  = False
     
 #--------  "Built-in methods":
-    def __init__(self, s, x, y, z, px, py, pz, t, weight, mass):
+    def __init__(self, runNum, eventNum, s, x, y, z, px, py, pz, t, weight, mass):
 
         E = math.sqrt(px*px + py*py + pz*pz + mass*mass)
         p = np.array([px, py, pz])
@@ -54,6 +54,8 @@ class particle:
         self._t = t
         self._weight = weight
         self._mass = mass
+        self._runNum = runNum
+        self._eventNum = eventNum
         return
 
     def __repr__(self):
@@ -65,6 +67,12 @@ class particle:
                     self._TrcSpc.y(), self._TrcSpc.z(), self._TrcSpc.xp() ,self._TrcSpc.yp(), self._weight  )
     
 #--------  get/set methods:
+    def run(self):
+        return deepcopy(self._runNum)
+
+    def event(self):
+        return deepcopy(self._eventNum)
+
     def p(self):
         return deepcopy(self._p)
 
