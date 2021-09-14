@@ -49,16 +49,20 @@ t = 24.5
 weight = 0.15
 tSC = traceSpace.traceSpace(s, x, y, z, px/pz, py/pz)
 
+piCnst = PionConst.PionConst()
+mass = piCnst.mass()/1000.
+
+
 piErr = 0
 pi = pion.pion(runNum, eventNum, s, x, y, z, px, py, pz, t, weight)
 
 if pi.run() != runNum:
-    parErr = parErr + 1
-    print ("p.run() is ", p.run(), "and should be ", runNum)
+    piErr = piErr + 1
+    print ("pi.run() is ", pi.run(), "and should be ", runNum)
 
 if pi.event() != eventNum:
-    parErr = parErr + 1
-    print ("p.event() is ", p.event(), "and should be ", eventNum)
+    piErr = piErr + 1
+    print ("pi.event() is ", pi.event(), "and should be ", eventNum)
 
 if pi.t() != t:
     piErr = piErr + 1
@@ -67,6 +71,10 @@ if pi.t() != t:
 if pi.weight() != weight:
     piErr = piErr + 1
     print ("pi.weight() is ", pi.weight(), "and should be ", weight)
+
+if pi.mass() != mass:
+    piErr = piErr + 1
+    print ("pi.mass() is ", pi.mass(), "and should be ", mass)
 
 if pi.traceSpace() != tSC:
     piErr = piErr + 1
@@ -96,9 +104,7 @@ if pi.traceSpace().yp() != py/pz:
     piErr = piErr + 1
     print ("pi.traceSpace().yp() is ", pi.traceSpace().yp(), "and should be ", py/pz)
 
-piCnst = PionConst.PionConst()
-pimass = piCnst.mass()/1000.
-E = mt.sqrt(px*px + py*py + pz*pz + pimass*pimass)
+E = mt.sqrt(px*px + py*py + pz*pz + mass*mass)
 pp = pi.p()
 if pp[1][0] != px or pp[1][1] != py or pp[1][2] != pz or pp[0] != E:
     piErr = piErr + 1

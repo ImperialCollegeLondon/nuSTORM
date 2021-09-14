@@ -15,21 +15,18 @@ import numpy as np
 import math as mt
 import muon as muon
 import traceSpace
-import MuonConst as muConst
-
-muCnst = muConst.MuonConst()
+import MuonConst as MuonConst
 
 ##! Start:
 classToTest="muon"
 print("========  ", classToTest, ": tests start  ========")
-
 
 ##! Create instance, test built-in methods:
 muonTest = 1
 print()
 print("muonTest:", muonTest, " Create muon and print quantities.")
 
-mu = muon.muon(0.1, 0.15, -100.0, 0.0, 0.2, 0.22, 5.12, 0.00, 0.15)
+mu = muon.muon(26, 134, 0.1, 0.15, -100.0, 0.0, 0.2, 0.22, 5.12, 0.00, 0.15)
 print("    __str__:", mu)
 print("    --repr__", repr(mu))
 del mu
@@ -39,6 +36,8 @@ muonTest = muonTest + 1
 print("muonTest:", muonTest, " Create muon and check get methods.")
 ##! Create instance, test get methods
 print()
+runNum = 137
+eventNum = 695
 x = 1.4
 y = 2.3
 z = 10.3
@@ -49,10 +48,20 @@ pz = 4.67
 t = 24.5
 weight = 0.15
 tSC = traceSpace.traceSpace(s, x, y, z, px/pz, py/pz)
+
+muCnst = MuonConst.MuonConst()
 mass = muCnst.mass()/1000.
 
 muErr = 0
-mu = muon.muon(s, x, y, z, px, py, pz, t, weight)
+mu = muon.muon(runNum, eventNum, s, x, y, z, px, py, pz, t, weight)
+
+if mu.run() != runNum:
+    muErr = muErr + 1
+    print ("mu.run() is ", mu.run(), "and should be ", runNum)
+
+if mu.event() != eventNum:
+    muErr = muErr + 1
+    print ("mu.event() is ", mu.event(), "and should be ", eventNum)
 
 if mu.t() != t:
     muErr = muErr + 1
@@ -94,12 +103,11 @@ if mu.traceSpace().yp() != py/pz:
     muErr = muErr + 1
     print ("mu.traceSpace().yp() is ", mu.traceSpace().yp(), "and should be ", py/pz)
 
-mumass = muCnst.mass()/1000.
-E = mt.sqrt(px*px + py*py + pz*pz + mumass*mumass)
+E = mt.sqrt(px*px + py*py + pz*pz + mass*mass)
 pp = mu.p()
 if pp[1][0] != px or pp[1][1] != py or pp[1][2] != pz or pp[0] != E:
     muErr = muErr + 1
-    print ("pi.p() is ", pi.p(), "and should be ", fourVector)
+    print ("mu.p() is ", mu.p(), "and should be ", fourVector)
 
 
 ##! Complete:

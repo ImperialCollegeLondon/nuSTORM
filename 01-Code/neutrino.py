@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Class muon:
-===========
+Class neutrino:
+===============
 
-  Description of a muon
+  Description of a neutrino
 
   Class attributes:
 
@@ -14,12 +14,12 @@ Class muon:
   --------------------
   _TrcSpcCrd: Trace space (s, x, y, z, x', y') in numpy array - what are s and z?
   _t        : time in nanoseconds
-  _p        : muon 4 momentum: (E, array(px, py, pz)), GeV
-  _weight   : event Weight
+  _p        : Pion 4 momentum: (E, array(px, py, pz)), GeV
+  _weight   : event weight
   _mass     : pion mass
   _runNum   : run number
   _eventNum : event number
-  
+    
   Methods:
   --------
   Built-in methods __new__, __repr__ and __str__.
@@ -40,34 +40,31 @@ Class muon:
     z():            get z (trace space)
     xp():           get xp (trace space)
     yp():           get yp (trace space)
-    
+  
   General methods:
 
-Created on Wed 01Sept 09:50: Version history:
+Created on Tue 20Aug12;35: Version history:
 ----------------------------------------------
- 1.0: 20Aug21: First implementation - attempting inheritance
- 1.1: 14Sept21: Add run number 
-
+ 1.0: 20Aug21: First implementation
+ 1.1: 22Aug21: Use the traceSpace class
+ 1.2: 01Sep21: replace getP() by p() to return vector, for consistency
+ 2.0: 01Sep21: make the class a derived class of the particle class
+ 2.1: 13Sep21: modify the pion class to track the changes in the particle class
 
 @author: PaulKyberd
 """
 
 from particle import particle
-import MuonConst as muConst
 
-muCnst = muConst.MuonConst()
 
-class muon(particle):
+class neutrino(particle):
 
 # the generic particle has no mass defined so it must provided. It is done by
-# getting the mass from the muonConstant class and using it to call the particle
-# constructor.
+# providing the mass and using it to call the particle constructor.
 
-    def __init__(self, runNum, eventNum, s, x, y, z, px, py, pz, t, weight):
-        mass = muCnst.mass()/1000.
-        particle.__init__(self, runNum, eventNum, s, x, y, z, px, py, pz, t, weight, mass)
+    def __init__(self, run, event, s, x, y, z, px, py, pz, t, weight):
+        mass = 0.0
+        particle.__init__(self, run, event, s, x, y, z, px, py, pz, t, weight, mass)
 
     def __repr__(self):
-        return "particle(x, y, z, s, px, py, pz, t, weight)"
-
-
+        return "particle(run, event, x, y, z, s, px, py, pz, t, weight,mass)"

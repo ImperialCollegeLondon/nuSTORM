@@ -15,8 +15,10 @@ Class pion:
   _TrcSpcCrd: Trace space (s, x, y, z, x', y') in numpy array - what are s and z?
   _t        : time in nanoseconds
   _p        : Pion 4 momentum: (E, array(px, py, pz)), GeV
-  _weight   : not sure how to define
+  _weight   : event weight
   _mass     : pion mass
+  _runNum   : run number
+  _eventNum : event number
     
   Methods:
   --------
@@ -26,6 +28,8 @@ Class pion:
       __str__  : Dump of values of decay
 
   Get/set methods:
+    run():          get the run number
+    event():        get the event number
     p():            get the 4 vector
     traceSpace():   get the trace space vectr
     t():            get the time
@@ -45,6 +49,7 @@ Created on Tue 20Aug12;35: Version history:
  1.1: 22Aug21: Use the traceSpace class
  1.2: 01Sep21: replace getP() by p() to return vector, for consistency
  2.0: 01Sep21: make the class a derived class of the particle class
+ 2.1: 13Sep21: modify the pion class to track the changes in the particle class
 
 @author: PaulKyberd
 """
