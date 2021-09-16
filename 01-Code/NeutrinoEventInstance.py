@@ -82,8 +82,14 @@ import MuonDecay as MuonDecay
 import MuonConst as MuonConst
 import numpy as np
 import math
+import PionEventInstance as piEvt
+import Simulation as Simu
+
 
 muCnst = MuonConst.MuonConst()
+Ppi0=8
+piEvt  = piEvt.PionEventInstance(Ppi0)
+
     
 class NeutrinoEventInstance:
 
@@ -93,14 +99,15 @@ class NeutrinoEventInstance:
     __Debug  = False
 
 #--------  "Built-in methods":
-    def __init__(self, pmu=5., filename=None):
+    def __init__(self, piEvt, filename=None):
 
         nuStrt = nuPrdStrt.nuSTORMPrdStrght(filename)
+  
 
         self._pmu = pmu
         self._ct, self._TrcSpcCrd, self._pmuGen, self._pmuDirCos,  \
             self._P_e, self._P_nue, self._P_numu \
-                = self.CreateNeutrinos(nuStrt)
+                = self.CreateNeutrinos(nuStrt, PiEvt)
 
         return
 
@@ -122,11 +129,17 @@ class NeutrinoEventInstance:
     
 #--------  Generation of neutrino-creation event:
 #.. Manager:
-    def CreateNeutrinos(self, nuStrt):
+    def CreateNeutrinos(self, nuStrt, piEvt):
         PrdStrghtLngth = nuStrt.ProdStrghtLen()
         Circumference  = nuStrt.Circumference()
         ArcLen         = nuStrt.ArcLen()       
         ArcRad         = ArcLen / math.pi
+        
+        tpi = piEvt.gettpi()
+        spi = PiEvt.getTraceSpaceCoord()[0]
+        Emu = piEvt.getmu4mmtm()[0]
+        Pmu = piEvt.getmu4mmtm()[1]
+        
 
         if NeutrinoEventInstance.__Debug:
            print(" NeutrinoEventInstance.CreateNeutrinos: entered")

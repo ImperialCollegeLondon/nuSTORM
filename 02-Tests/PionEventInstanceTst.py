@@ -45,7 +45,7 @@ PionEventInstanceTest = PionEventInstanceTest + 1
 print()
 print("PionEventInstanceTest:", PionEventInstanceTest, \
       "Test methods by which muon-creation event is generated.")
-decayPnt, PPi, Pmu, Pnumu = piEI.CreateMuon()
+decayPnt, PPi, Pmu, Pnumu, tpi = piEI.CreateMuon()
 print("    Neutrino event: trace-space coordinates of muon at decay, P_pi, P_mu, P_numu:", decayPnt, "\n", \
            "    ", PPi,"    ", Pmu, "    ", Pnumu)
 ETot = Pmu[0]+Pnumu[0]
@@ -61,7 +61,7 @@ print("PionEventInstanceTest:", PionEventInstanceTest, \
       "soak test.")
 piEI = []
 Ppion=6.0
-for i in range(6000):
+for i in range(10000):
     piEI.append(piEvtInst.PionEventInstance(Ppion))
 for i in range(5):
     print("    piEI[i]:", piEI[i])
@@ -73,6 +73,7 @@ print()
 print("PionEventInstanceTest:", PionEventInstanceTest, \
       " plots from soak test.")
 
+tpi      = np.array([])
 s        = np.array([])
 Epi      = np.array([])
 Emu      = np.array([])
@@ -82,6 +83,7 @@ costheta = np.array([])
 
 
 for piEvt in piEI:
+    tpi   = np.append(tpi,    piEvt.gettpi())
     s     = np.append(s,     piEvt.getTraceSpaceCoord()[0])
 #    Ee    = np.append(Ee,    nuEvt.gete4mmtm()[0])
 #    Enue  = np.append(Enue,  nuEvt.getnue4mmtm()[0])
@@ -103,8 +105,23 @@ n, bins, patches = plt.hist(s, bins=50, color='y', log=True)
 plt.xlabel('s (m)')
 plt.ylabel('Entries')
 plt.title('s distribution')
+
+
 ## add a 'best fit' line - convert en
 charDist = Ppion*1000.0*pc.SoL()*pc.lifetime()/pc.mass()
+slope = 1./charDist
+y = n[0]*np.exp(-slope*bins)
+plt.plot(bins, y, '-', color='b')
+plt.show()
+plt.close()
+
+n, bins, patches = plt.hist(tpi, bins=50, color='y', log=True)
+plt.xlabel('tpi (ns)')
+plt.ylabel('Entries')
+plt.title('Time of pion decay distribution')
+
+## add a 'best fit' line - convert en
+charDist = pc.lifetime()
 slope = 1./charDist
 y = n[0]*np.exp(-slope*bins)
 plt.plot(bins, y, '-', color='b')

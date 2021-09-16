@@ -21,6 +21,7 @@ Class PionEventInstance:
   _pmuGen   : Generated pion momentum
   _P_mu     : Muon 4 momentum: (E, array(px, py, pz)), GeV
   _P_numu   : Muon-neuutrino 4 momentum: (E, array(px, py, pz)), GeV
+  _tpi      : Time of pion decay
     
   Methods:
   --------
@@ -36,7 +37,8 @@ Class PionEventInstance:
     getppiGen         : Returns generated pion momentum (GeV)
     getmu4mmtm        : Returns muon 4 momentum: (E, array(px, py, pz)), GeV
     getnumu4mmtm      : Returns muon-neutrino 4 momentum: (E, array(px, py, pz)), GeV
-  
+    gettpi            : Returns time of pion decay
+    
   General methods:
     CreateNeutrinos      : Manager for neutrino decay, returns z (m) of decay (real), P_e, P_nue, P_numu, RestFrame
                            Restframe contains a dump of the instance attributes of the MuonDecay class
@@ -79,7 +81,7 @@ class PionEventInstance:
         self._ppi = ppi
         self._phi=-10.0
         self._costheta=-10.0
-        self._TrcSpcCrd, self._ppiGen, self._P_mu, self._P_numu = self.CreateMuon()
+        self._TrcSpcCrd, self._ppiGen, self._P_mu, self._P_numu, self._tpi = self.CreateMuon()
 
         return
 
@@ -87,12 +89,13 @@ class PionEventInstance:
         return "PionEventInstance(pmu)"
 
     def __str__(self):
-        return "PionEventInstance: p_mu (GeV) = %g, s (m) = %g, z (m) = %g, generated momentum=%g, \r\n \
+        return "PionEventInstance: tpi (ns) = %g, p_mu (GeV) = %g, s (m) = %g, z (m) = %g, generated momentum=%g, \r\n \
                 P_mu (%g, [%g, %g, %g]), \r\n \
                 P_numu (%g, [%g, %g, %g]), \r\n" % \
-            (self._ppi, self._TrcSpcCrd[0], self._TrcSpcCrd[3], self._ppiGen, \
+            (self._tpi, self._ppi, self._TrcSpcCrd[0], self._TrcSpcCrd[3], self._ppiGen, \
              self._P_mu[0], self._P_mu[1][0],self._P_mu[1][1],self._P_mu[1][2], \
              self._P_numu[0], self._P_numu[1][0],self._P_numu[1][1],self._P_numu[1][2] )
+             
     
 #--------  Generation of neutrino-creation event:
 #.. Manager:
@@ -123,6 +126,7 @@ class PionEventInstance:
             Tmax = nuStrt.ProdStrghtLen() / (gamma * v)
 
             Dcy = PionDecay.PionDecay(Tmax=Tmax)
+            tpi = Dcy.getLifetime()
             self._phi = Dcy.getphi()
             self._costheta = Dcy.getcostheta()
 #            print("PionEventInstance.CreatePion: Dcy ", Dcy)
@@ -144,7 +148,7 @@ class PionEventInstance:
         del Dcy
 
 #        print ("Ending create muon")
-        return DcyCoord, ppiGen, P_mu, P_numu
+        return DcyCoord, ppiGen, P_mu, P_numu, tpi
 
 #.. Trace space coordinate generation: array(s, x, y, z, x', y')
     def GenerateDcyPhaseSpace(self, Dcy, Ppi):
@@ -243,6 +247,9 @@ class PionEventInstance:
         return Po
     
 #--------  get/set methods:
+    def gettpi(self):
+        return deepcopy(self._tpi)
+        
     def getppi(self):
         return deepcopy(self._ppi)
 

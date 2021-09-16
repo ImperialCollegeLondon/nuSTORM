@@ -70,7 +70,7 @@ print("NeutrinoEventInstanceTest:", NeutrinoEventInstanceTest, \
 Pmu = 5.
 print("    ----> Muon momentum:", Pmu)
 nuEI = []
-for i in range(10000):
+for i in range(100):
 #for i in range(5):
     nuEI.append(nuEvtInst.NeutrinoEventInstance(Pmu, filename))
 for i in range(5):
