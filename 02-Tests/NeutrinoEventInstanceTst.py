@@ -18,12 +18,18 @@ import os
 import MuonConst as muCnst
 import nuSTORMPrdStrght as nuPrdStrt
 import NeutrinoEventInstance as nuEvtInst
+import PionEventInstance as piEvtInst
 import numpy as np
 import matplotlib.pyplot as plt
 import Simulation as Simu
 import math as mth
 
 mc = muCnst.MuonConst()
+piEvt= piEvtInst.PionEventInstance(8)
+tpi=piEvt.gettpi()
+spi=piEvt.getTraceSpaceCoord()[0]
+Emu=piEvt.getmu4mmtm()[0]
+Pmu=np.linalg.norm(piEvt.getmu4mmtm()[1])
 
 ##! Start:
 print("========  NeutrinoEventInstance: tests start  ========")
@@ -38,7 +44,7 @@ print("NeutrinoEventInstanceTest:", NeutrinoEventInstanceTest, \
 nuSIMPATH = os.getenv('nuSIMPATH')
 filename  = os.path.join(nuSIMPATH, \
                          '11-Parameters/nuSTORM-PrdStrght-Params-v1.0.csv')
-nuEI = nuEvtInst.NeutrinoEventInstance(5., filename)
+nuEI = nuEvtInst.NeutrinoEventInstance(tpi, spi, Emu, Pmu, filename)
 print("    __str__: \n", nuEI)
 print("    --repr__: \n", repr(nuEI))
 
@@ -55,7 +61,7 @@ print()
 print("NeutrinoEventInstanceTest:", NeutrinoEventInstanceTest, \
       "Test methods by which neutrino-creation event is generated.")
 nuStrt = nuPrdStrt.nuSTORMPrdStrght(filename)
-x = nuEI.CreateNeutrinos(nuStrt)
+x = nuEI.CreateNeutrinos(tpi, spi, Emu, Pmu, nuStrt)
 print("    Neutrino event: trace-space coordinates of muon at decay:")
 print("    ----> P_e:", x[4])
 print("    ----> P_nue:", x[5])
@@ -70,9 +76,9 @@ print("NeutrinoEventInstanceTest:", NeutrinoEventInstanceTest, \
 Pmu = 5.
 print("    ----> Muon momentum:", Pmu)
 nuEI = []
-for i in range(100):
+for i in range(10000):
 #for i in range(5):
-    nuEI.append(nuEvtInst.NeutrinoEventInstance(Pmu, filename))
+    nuEI.append(nuEvtInst.NeutrinoEventInstance(tpi, spi, Emu, Pmu, filename))
 for i in range(5):
     print("    nuEI[",i, "]: \n", nuEI[i])
 
