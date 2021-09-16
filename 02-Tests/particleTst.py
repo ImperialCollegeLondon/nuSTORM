@@ -24,7 +24,7 @@ particleTest = 1
 print()
 print("particleTest:", particleTest, " Create particle and print quantities.")
 
-p = particle.particle(42, 125, 0.1, 0.15, -100.0, 0.0, 0.2, 0.22, 5.12, 0.00, 0.16, 0.99)
+p = particle.particle(42, 125, 0.1, 0.15, -100.0, 0.0, 0.2, 0.22, 5.12, 0.00, 0.16, 0.99, -14)
 print("    __str__:", p)
 print("    --repr__", repr(p))
 del p
@@ -47,10 +47,11 @@ pz = 4.67
 t = 24.5
 weight = 0.15
 mass = 0.99
+pdgCode = 211
 tSC = traceSpace.traceSpace(s, x, y, z, px/pz, py/pz)
 
 parErr = 0
-p = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz, t, weight, mass)
+p = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz, t, weight, mass, pdgCode)
 
 if p.run() != runNum:
     parErr = parErr + 1

@@ -16,6 +16,7 @@ Class pion:
   _t        : time in nanoseconds
   _p        : Pion 4 momentum: (E, array(px, py, pz)), GeV
   _weight   : not sure how to define
+  _PDG      : PDG code - so we track particle v anti-particle and any new stuff
     
   Methods:
   --------
@@ -45,7 +46,7 @@ class particle:
     __Debug  = False
     
 #--------  "Built-in methods":
-    def __init__(self, runNum, eventNum, s, x, y, z, px, py, pz, t, weight, mass):
+    def __init__(self, runNum, eventNum, s, x, y, z, px, py, pz, t, weight, mass, PDG):
 
         E = math.sqrt(px*px + py*py + pz*pz + mass*mass)
         p = np.array([px, py, pz])
@@ -56,6 +57,7 @@ class particle:
         self._mass = mass
         self._runNum = runNum
         self._eventNum = eventNum
+        self._PDG = PDG
         return
 
     def __repr__(self):

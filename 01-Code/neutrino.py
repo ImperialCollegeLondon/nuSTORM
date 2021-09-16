@@ -64,7 +64,8 @@ class neutrino(particle):
 
     def __init__(self, run, event, s, x, y, z, px, py, pz, t, weight):
         mass = 0.0
-        particle.__init__(self, run, event, s, x, y, z, px, py, pz, t, weight, mass)
+        pdgCode = 12
+        particle.__init__(self, run, event, s, x, y, z, px, py, pz, t, weight, mass, pdgCode)
 
     def __repr__(self):
-        return "particle(run, event, x, y, z, s, px, py, pz, t, weight,mass)"
+        return "particle(run, event, PDGID, x, y, z, s, px, py, pz, t, weight, mass, pdgCode)"
