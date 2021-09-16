@@ -46,14 +46,14 @@ class particle:
     __Debug  = False
     
 #--------  "Built-in methods":
-    def __init__(self, runNum, eventNum, s, x, y, z, px, py, pz, t, weight, mass, PDG):
+    def __init__(self, runNum, eventNum, s, x, y, z, px, py, pz, t, eventWeight, mass, PDG):
 
         E = math.sqrt(px*px + py*py + pz*pz + mass*mass)
         p = np.array([px, py, pz])
         self._p = np.array([E, np.array([px, py, pz])],dtype=object)
         self._TrcSpc = traceSpace.traceSpace(s, x, y, z, px/pz, py/pz)
         self._t = t
-        self._weight = weight
+        self._eventWeight = eventWeight
         self._mass = mass
         self._runNum = runNum
         self._eventNum = eventNum
@@ -64,9 +64,27 @@ class particle:
         return "particle(x, y, z, s, px, py, pz, t, weight, mass)"
 
     def __str__(self):
-        return "particle: E (GeV) = %g, p (GeV) = (%g  %g  %g),  mass = %g, t = %g, s = %g, x = %g, y = %g, z = %g, x' = %g, y' = %g, weight = %g " % \
+        return "particle: E (GeV) = %g, p (GeV) = (%g  %g  %g),  mass = %g, t = %g, s = %g,\n x = %g, y = %g, z = %g, x' = %g, y' = %g, weight = %g " % \
                   (self._p[0], self._p[1][0],  self._p[1][1], self._p[1][2],self._mass, self._t, self._TrcSpc.s(), self._TrcSpc.x(), 
-                    self._TrcSpc.y(), self._TrcSpc.z(), self._TrcSpc.xp() ,self._TrcSpc.yp(), self._weight  )
+                    self._TrcSpc.y(), self._TrcSpc.z(), self._TrcSpc.xp() ,self._TrcSpc.yp(), self._eventWeight  )
+
+# Override the __eq__ method
+    def __eq__(self, comp):
+        if isinstance(comp, self.__class__):
+            if (self._p[0] == comp._p[0]) and (self._p[1][0] == comp._p[1][0]) and (self._p[1][1] == comp._p[1][1]) and \
+               (self._p[1][2] == comp._p[1][2]) and (self._mass == comp._mass) and (self._t == comp._t)  and \
+               (self._TrcSpc == comp._TrcSpc) and (self._eventWeight == comp._eventWeight) and (self._PDG == comp._PDG) and \
+               (self._runNum == comp._runNum) and (self._eventNum == comp._eventNum):
+                return True
+            else:
+                return False
+        else:
+            return False 
+
+# Override the __ne__ method
+    def __ne__(self, comp):
+        return not self.__eq__(comp)
+
     
 #--------  get/set methods:
     def run(self):
@@ -85,7 +103,7 @@ class particle:
         return deepcopy(self._t)
 
     def weight(self):
-        return deepcopy(self._weight)
+        return deepcopy(self._eventWeight)
 
     def mass(self):
         return deepcopy(self._mass)
