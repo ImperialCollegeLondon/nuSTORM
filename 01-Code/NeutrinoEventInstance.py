@@ -96,15 +96,16 @@ class NeutrinoEventInstance:
     __Debug  = False
 
 #--------  "Built-in methods":
-    def __init__(self, tpi, spi, Emu, Pmu, filename=None):
+    def __init__(self, tpi, piTraceSpaceCoord, mu4mmtm, filename=None):
 
         nuStrt = nuPrdStrt.nuSTORMPrdStrght(filename)
-  
-
+        
+        Pmu = np.linalg.norm(mu4mmtm[1])        
+    
         self._pmu = Pmu
-        self._ct, self._TrcSpcCrd, self._pmuGen, self._pmuDirCos,  \
+        self._tmu, self._TrcSpcCrd, self._pmuGen, self._pmuDirCos,  \
             self._P_e, self._P_nue, self._P_numu \
-                = self.CreateNeutrinos(tpi, spi, Emu, Pmu, nuStrt)
+                = self.CreateNeutrinos(tpi, piTraceSpaceCoord, mu4mmtm, nuStrt)
 
         return
 
@@ -112,13 +113,13 @@ class NeutrinoEventInstance:
         return "NeutrinoEventInstance(pmu)"
 
     def __str__(self):
-        return "NeutrinoEventInstance: p_mu (GeV) = %g, " \
+        return "NeutrinoEventInstance: tmu (s) = %g, p_mu (GeV) = %g, " \
                " s (m) = %g, z (m) = %g,\n" \
                " Generated momentum=%g, direction cosines=[%g, %g, %g]\n" \
                " P_e (%g, [%g,, %g, %g]), \n" \
                " P_nue (%g, [%g,, %g, %g]), \n" \
                " P_numu (%g, [%g,, %g, %g])" % \
-       (self._pmu, self._TrcSpcCrd[0], self._TrcSpcCrd[3], self._pmuGen, \
+       (self._tmu, self._pmu, self._TrcSpcCrd[0], self._TrcSpcCrd[3], self._pmuGen, \
         self._pmuDirCos[0], self._pmuDirCos[1], self._pmuDirCos[2], \
        self._P_e[0], self._P_e[1][0], self._P_e[1][1], self._P_e[1][2], \
        self._P_nue[0], self._P_nue[1][0],self._P_nue[1][1],self._P_nue[1][2], \
@@ -126,16 +127,16 @@ class NeutrinoEventInstance:
     
 #--------  Generation of neutrino-creation event:
 #.. Manager:
-    def CreateNeutrinos(self, tpi, spi, Emu, Pmu, nuStrt):
+    def CreateNeutrinos(self, tpi, piTraceSpaceCoord, mu4mmtm, nuStrt):
         PrdStrghtLngth = nuStrt.ProdStrghtLen()
         Circumference  = nuStrt.Circumference()
         ArcLen         = nuStrt.ArcLen()       
         ArcRad         = ArcLen / math.pi
         
-        #tpi = piEvt.gettpi()
-        #spi = PiEvt.getTraceSpaceCoord()[0]
-        #Emu = piEvt.getmu4mmtm()[0]
-        #Pmu = piEvt.getmu4mmtm()[1]
+       
+        spi = piTraceSpaceCoord[0]
+        Pmu = np.linalg.norm(mu4mmtm[1]) 
+        
         
 
         if NeutrinoEventInstance.__Debug:
@@ -150,17 +151,27 @@ class NeutrinoEventInstance:
         if isinstance(Dcy, MuonDecay.MuonDecay):
             del Dcy
         Dcy = MuonDecay.MuonDecay()
-
-        #Pmu0             = self.getpmu()
-        #PmuGen           = nuStrt.GenerateMmtm(Pmu0)
   
-        DcyCoord, DirCos = self.GenerateDcyPhaseSpace(Dcy, Pmu, nuStrt, spi)
+        DcyCoord, DirCos = self.GenerateDcyPhaseSpace(Dcy, Pmu, nuStrt, piTraceSpaceCoord)
+        
+        z   = DcyCoord[3]
+        tmu  = Dcy.getLifetime() + tpi #time of muon decay
+        s   = DcyCoord[0]
+        
+        
+        ##... if s < PrdStrghtLngth: continue     ##The muon decay occurs before 
+                                                  ##entering the ring
+        ##... else: 
+        ##           Absorbed = NewMethod(x,y,xp,yp)       ##Input the transverse coordinate 
+                                                           ##into the new function
+                                                           
+        ##           if Absorbed == True, Label the decay, ##The muon is absorbed
+                                       
+        ##           if Absorbed  == False, Continue       ## The muon is not absorbed
 
-        z  = DcyCoord[3]
-        ct = Dcy.getLifetime() + tpi #time of muon decay
-        s  = DcyCoord[0]
-
-
+        ##           In the test script, if labelled, do not store the neutrino information 
+        ##           in the arrays/TTree or store them as absorbed
+          
         if z > (PrdStrghtLngth+ArcRad+1.):
             print("     ----> !!!! CreateNeutrinos Alarm:", z)
 
@@ -180,35 +191,36 @@ class NeutrinoEventInstance:
 
         del Dcy
         
-        return ct, DcyCoord, Pmu, DirCos, P_e, P_nue, P_numu
+        return tmu, DcyCoord, Pmu, DirCos, P_e, P_nue, P_numu
 
 #.. Trace space coordinate generation: array(s, x, y, z, x', y')
-    def GenerateDcyPhaseSpace(self, Dcy, Pmu, nuStrt, spi):
+    def GenerateDcyPhaseSpace(self, Dcy, Pmu, nuStrt, piTraceSpaceCoord):
 
         coord = np.array([0., 0., 0., 0., 0., 0.])
 
         #.. longitudinal position, "s", z:
-        coord[0] = self.GenerateLongiPos(Dcy, Pmu) + spi
-
-        R, Rinv, BeamPos, theta = self.BeamDir(coord[0], nuStrt, Pmu)
+        spi, x, y, zpi, xp, yp = piTraceSpaceCoord
         
-        x, y, xp, yp = nuStrt.GenerateTrans(coord[0])
-        
-        coord[1] = x + BeamPos[0]
-       
-        coord[2] = y + BeamPos[1]
+        coord[0] = self.GenerateLongiPos(Dcy, Pmu) + spi #distance travelled by muon + pion
   
-        coord[3] = BeamPos[2]
-      
+        R, Rinv, BeamPos, theta = self.BeamDir(coord[0], nuStrt)
+        
+        coord[1] = x*math.cos(theta) + BeamPos[0]
+       
+        coord[2] = y + BeamPos[1]  
+        
+        coord[3] = -x*math.sin(theta) + BeamPos[2]      
+                                  
         coord[4] = xp
         coord[5] = yp
-
+        
+        
         p0    = np.array([0., 0., 0.])
-        p1    = np.array([0., 0., 0.])
-        p0[0] = xp
-        p0[1] = yp
-        p0[2] = math.sqrt(1. - xp**2 - yp**2)
-
+        p1    = np.array([0., 0., 0.]) 
+        p0[0] = xp/Pmu  
+        p0[1] = yp/Pmu  
+        p0[2] = math.sqrt(1. - p0[0]**2 - p0[1]**2) 
+        
         p1    = R.dot(p0)
 
         if NeutrinoEventInstance.__Debug:
@@ -232,7 +244,7 @@ class NeutrinoEventInstance:
 
 #.. Beam position, direction and corresponding rotation operator:
 
-    def BeamDir(self, s, nuStrt, Pmu):
+    def BeamDir(self, s, nuStrt):
         PrdStrghtLngth = nuStrt.ProdStrghtLen()
         Circumference  = nuStrt.Circumference()
         ArcLen         = nuStrt.ArcLen()

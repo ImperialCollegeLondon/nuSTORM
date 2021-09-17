@@ -25,11 +25,11 @@ import Simulation as Simu
 import math as mth
 
 mc = muCnst.MuonConst()
+
 piEvt= piEvtInst.PionEventInstance(8)
 tpi=piEvt.gettpi()
-spi=piEvt.getTraceSpaceCoord()[0]
-Emu=piEvt.getmu4mmtm()[0]
-Pmu=np.linalg.norm(piEvt.getmu4mmtm()[1])
+piTraceSpaceCoord=piEvt.getTraceSpaceCoord()
+mu4mmtm=piEvt.getmu4mmtm()
 
 ##! Start:
 print("========  NeutrinoEventInstance: tests start  ========")
@@ -44,7 +44,8 @@ print("NeutrinoEventInstanceTest:", NeutrinoEventInstanceTest, \
 nuSIMPATH = os.getenv('nuSIMPATH')
 filename  = os.path.join(nuSIMPATH, \
                          '11-Parameters/nuSTORM-PrdStrght-Params-v1.0.csv')
-nuEI = nuEvtInst.NeutrinoEventInstance(tpi, spi, Emu, Pmu, filename)
+                      
+nuEI = nuEvtInst.NeutrinoEventInstance(tpi, piTraceSpaceCoord, mu4mmtm, filename)
 print("    __str__: \n", nuEI)
 print("    --repr__: \n", repr(nuEI))
 
@@ -61,7 +62,8 @@ print()
 print("NeutrinoEventInstanceTest:", NeutrinoEventInstanceTest, \
       "Test methods by which neutrino-creation event is generated.")
 nuStrt = nuPrdStrt.nuSTORMPrdStrght(filename)
-x = nuEI.CreateNeutrinos(tpi, spi, Emu, Pmu, nuStrt)
+
+x = nuEI.CreateNeutrinos(tpi,  piTraceSpaceCoord, mu4mmtm, nuStrt)
 print("    Neutrino event: trace-space coordinates of muon at decay:")
 print("    ----> P_e:", x[4])
 print("    ----> P_nue:", x[5])
@@ -78,7 +80,11 @@ print("    ----> Muon momentum:", Pmu)
 nuEI = []
 for i in range(10000):
 #for i in range(5):
-    nuEI.append(nuEvtInst.NeutrinoEventInstance(tpi, spi, Emu, Pmu, filename))
+    piEvt= piEvtInst.PionEventInstance(8)
+    tpi=piEvt.gettpi()
+    piTraceSpaceCoord=piEvt.getTraceSpaceCoord()
+    mu4mmtm=piEvt.getmu4mmtm()
+    nuEI.append(nuEvtInst.NeutrinoEventInstance(tpi,  piTraceSpaceCoord, mu4mmtm, filename))
 for i in range(5):
     print("    nuEI[",i, "]: \n", nuEI[i])
 
@@ -131,6 +137,8 @@ ArcLen         = nuStrt.ArcLen()
 ArcRad         = ArcLen/mth.pi
 
 for nuEvt in nuEI:
+    #print(spi,smu,tpi,tmu)
+
     s     = np.append(s,     nuEvt.getTraceSpaceCoord()[0])
     where = nuEvt.getTraceSpaceCoord()[0]%Circumference
     
@@ -210,6 +218,7 @@ l = 1./(gamma*mc.lifetime()*beta*mc.SoL())
 y = n[0]*np.exp(-l*bins)
 plt.plot(bins, y, '-', color='b')
 plt.savefig('Scratch/NeutrinoEventInstanceTst_plot1.pdf')
+plt.show()
 plt.close()
 
 #-- Energy distributions:
@@ -218,6 +227,7 @@ plt.xlabel('Energy (GeV)')
 plt.ylabel('Frequency')
 plt.title('Electron energy distribution')
 plt.savefig('Scratch/NeutrinoEventInstanceTst_plot2.pdf')
+plt.show()
 plt.close()
 
 n, bins, patches = plt.hist(Enue, bins=50, color='y', range=(0.,5.))
@@ -225,6 +235,7 @@ plt.xlabel('Energy (GeV)')
 plt.ylabel('Frequency')
 plt.title('Electron-neutrino energy distribution')
 plt.savefig('Scratch/NeutrinoEventInstanceTst_plot3.pdf')
+plt.show()
 plt.close()
 
 n, bins, patches = plt.hist(Enumu, bins=50, color='y', range=(0.,5.))
@@ -232,6 +243,7 @@ plt.xlabel('Energy (GeV)')
 plt.ylabel('Frequency')
 plt.title('Muon-neutrino energy distribution')
 plt.savefig('Scratch/NeutrinoEventInstanceTst_plot4.pdf')
+plt.show()
 plt.close()
 
 ## Z vs X distribution
@@ -241,6 +253,7 @@ plt.xlabel('Z')
 plt.ylabel('X')
 plt.title('Muon Decay Position')
 plt.savefig('Scratch/NeutrinoEventInstanceTst_plot5.pdf')
+plt.show()
 plt.close()
 
 ##beamdirectionplotting
@@ -264,6 +277,7 @@ plt.xlabel('Z')
 plt.ylabel('X')
 plt.title('Beam Direction')
 plt.savefig('Scratch/NeutrinoEventInstanceTst_plot18.pdf')
+plt.show()
 plt.close()
 
 
@@ -482,6 +496,7 @@ plt.xlabel('Cos(Angle between muon neutrino direction and beam direction)')
 plt.ylabel('Frequency')
 plt.title('Angular distribution of muon neutrino momentum \n with respect to beam direction')
 plt.savefig('Scratch/NeutrinoEventInstanceTst_plot22.pdf')
+plt.show()
 plt.close()
 
 
