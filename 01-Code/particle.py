@@ -64,9 +64,9 @@ class particle:
         return "particle(x, y, z, s, px, py, pz, t, weight, mass)"
 
     def __str__(self):
-        return "particle: E (GeV) = %g, p (GeV) = (%g  %g  %g),  mass = %g, t = %g, s = %g,\n x = %g, y = %g, z = %g, x' = %g, y' = %g, weight = %g " % \
+        return "particle: E (GeV) = %g, p (GeV) = (%g  %g  %g),  mass = %g, t = %g, s = %g,\n x = %g, y = %g, z = %g, x' = %g, y' = %g, weight = %g, PDGCode = %i" % \
                   (self._p[0], self._p[1][0],  self._p[1][1], self._p[1][2],self._mass, self._t, self._TrcSpc.s(), self._TrcSpc.x(), 
-                    self._TrcSpc.y(), self._TrcSpc.z(), self._TrcSpc.xp() ,self._TrcSpc.yp(), self._eventWeight  )
+                    self._TrcSpc.y(), self._TrcSpc.z(), self._TrcSpc.xp() ,self._TrcSpc.yp(), self._eventWeight, self._PDG )
 
 # Override the __eq__ method
     def __eq__(self, comp):
