@@ -157,6 +157,12 @@ plt.title('Muon phi distribution')
 plt.show()
 plt.close()
 
+plt.scatter(Emu,phi)
+plt.xlabel('Emu (GeV)')
+plt.ylabel('phi')
+plt.title('phi vs Emu plot')
+plt.show()
+plt.close()
 ##! Complete:
 print()
 print("========  PionEventInstance: tests complete  ========")

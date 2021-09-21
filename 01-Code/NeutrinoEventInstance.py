@@ -23,6 +23,7 @@ Class NeutrinoEventInstance:
   _P_e      : Electron 4 momentum: (E, array(px, py, pz)), GeV
   _P_nue    : Electron-neutrino 4 momentum: (E, array(px, py, pz)), GeV
   _P_numu   : Muon-neuutrino 4 momentum: (E, array(px, py, pz)), GeV
+  _Absorbed : Whether the muon is accepted (False) or not (True)
 
       
   Methods:
@@ -60,6 +61,9 @@ Class NeutrinoEventInstance:
     Boost2nuSTORM        : Boost to nuSTORM rest frame -- i.e. boost to pmuGen.
                            Uses TLorentVector class from ROOT.  Returns:
                            [P_e], [P_nue], [P_numu]
+    AbsorptionMethod     : Check whether a muon is accepted in the ring,
+                           Returns True if absorbed
+                           Returns False if accepted
 
 
 Created on Sat 16Jan21;02:26: Version history:
@@ -87,7 +91,6 @@ import Simulation as Simu
 
 muCnst = MuonConst.MuonConst()
 
-
 class NeutrinoEventInstance:
 
     __mumass = muCnst.mass()/1000.
@@ -104,7 +107,8 @@ class NeutrinoEventInstance:
     
         self._pmu = Pmu
         self._tmu, self._TrcSpcCrd, self._pmuGen, self._pmuDirCos,  \
-            self._P_e, self._P_nue, self._P_numu \
+        self._P_e, self._P_nue, self._P_numu, \
+        self._Absorbed \
                 = self.CreateNeutrinos(tpi, piTraceSpaceCoord, mu4mmtm, nuStrt)
 
         return
@@ -114,12 +118,12 @@ class NeutrinoEventInstance:
 
     def __str__(self):
         return "NeutrinoEventInstance: tmu (s) = %g, p_mu (GeV) = %g, " \
-               " s (m) = %g, z (m) = %g,\n" \
+               " s (m) = %g, z (m) = %g, Abosrbed = %s,\n" \
                " Generated momentum=%g, direction cosines=[%g, %g, %g]\n" \
                " P_e (%g, [%g,, %g, %g]), \n" \
                " P_nue (%g, [%g,, %g, %g]), \n" \
                " P_numu (%g, [%g,, %g, %g])" % \
-       (self._tmu, self._pmu, self._TrcSpcCrd[0], self._TrcSpcCrd[3], self._pmuGen, \
+       (self._tmu, self._pmu, self._TrcSpcCrd[0], self._TrcSpcCrd[3],self._Absorbed, self._pmuGen, \
         self._pmuDirCos[0], self._pmuDirCos[1], self._pmuDirCos[2], \
        self._P_e[0], self._P_e[1][0], self._P_e[1][1], self._P_e[1][2], \
        self._P_nue[0], self._P_nue[1][0],self._P_nue[1][1],self._P_nue[1][2], \
@@ -135,6 +139,8 @@ class NeutrinoEventInstance:
         
        
         spi = piTraceSpaceCoord[0]
+        
+        
         Pmu = np.linalg.norm(mu4mmtm[1]) 
         
         
@@ -155,23 +161,10 @@ class NeutrinoEventInstance:
         DcyCoord, DirCos = self.GenerateDcyPhaseSpace(Dcy, Pmu, nuStrt, piTraceSpaceCoord)
         
         z   = DcyCoord[3]
-        tmu  = Dcy.getLifetime() + tpi #time of muon decay
+        tmu = Dcy.getLifetime() + tpi #time of muon decay
         s   = DcyCoord[0]
-        
-        
-        ##... if s < PrdStrghtLngth: continue     ##The muon decay occurs before 
-                                                  ##entering the ring
-        ##... else: 
-        ##           Absorbed = NewMethod(x,y,xp,yp)       ##Input the transverse coordinate 
-                                                           ##into the new function
-                                                           
-        ##           if Absorbed == True, Label the decay, ##The muon is absorbed
-                                       
-        ##           if Absorbed  == False, Continue       ## The muon is not absorbed
-
-        ##           In the test script, if labelled, do not store the neutrino information 
-        ##           in the arrays/TTree or store them as absorbed
-          
+               
+                                                                   
         if z > (PrdStrghtLngth+ArcRad+1.):
             print("     ----> !!!! CreateNeutrinos Alarm:", z)
 
@@ -180,6 +173,11 @@ class NeutrinoEventInstance:
             
         if NeutrinoEventInstance.__Debug:
             print("    ----> Rotate and boost to nuSTORM rest frame")
+        
+        if s <= PrdStrghtLngth:
+          Absorbed = False    
+        else: 
+          Absorbed = self.AbsorptionMethod(piTraceSpaceCoord, mu4mmtm)    
 
         P_e, P_nue, P_numu = self.Boost2nuSTORM(Dcy, Pmu, DirCos)
 
@@ -191,7 +189,7 @@ class NeutrinoEventInstance:
 
         del Dcy
         
-        return tmu, DcyCoord, Pmu, DirCos, P_e, P_nue, P_numu
+        return tmu, DcyCoord, Pmu, DirCos, P_e, P_nue, P_numu, Absorbed
 
 #.. Trace space coordinate generation: array(s, x, y, z, x', y')
     def GenerateDcyPhaseSpace(self, Dcy, Pmu, nuStrt, piTraceSpaceCoord):
@@ -217,8 +215,8 @@ class NeutrinoEventInstance:
         
         p0    = np.array([0., 0., 0.])
         p1    = np.array([0., 0., 0.]) 
-        p0[0] = xp/Pmu  
-        p0[1] = yp/Pmu  
+        p0[0] = xp  
+        p0[1] = yp  
         p0[2] = math.sqrt(1. - p0[0]**2 - p0[1]**2) 
         
         p1    = R.dot(p0)
@@ -397,7 +395,32 @@ class NeutrinoEventInstance:
         P_numu[1][2] = P_numu4v.Pz()
         
         return P_e, P_nue, P_numu
-    
+         
+    def AbsorptionMethod(self, piTraceSpaceCoord, mu4mmtm):
+      n = 4.8 #how much rounded
+   
+      x0 = 0 # graph translation 
+      y0 = 0
+      Mux = piTraceSpaceCoord[1]         #Pion decay transverse position coordinates = Muon Decay transverse position coordinates
+      Muy = piTraceSpaceCoord[2]
+      Muxp= mu4mmtm[1][0]/mu4mmtm[1][2]  #xp and yp from generated muon momentum
+      Muyp= mu4mmtm[1][1]/mu4mmtm[1][2]
+      Muy = Muy*2.5/0.15
+      Muyp = Muyp*2./0.006
+      def k(i):
+        return (2*math.pi*i)/3
+      def g(t):
+        return (abs(t-(1./3.)))**n
+      def f(x,y):
+        return 0.1*g(-(x+x0)*math.cos(k(1))-(y+y0)*math.sin(k(1)))+0.1*g(-(x+x0)*math.cos(k(2))-(y+y0)*math.sin(k(2)))+0.1*g(-(x+x0)*math.cos(k(3))-(y+y0)*math.sin(k(3)))
+
+
+      if (Mux*Mux/(0.05*0.05))+(Muxp*Muxp/(0.004*0.004)) < 1. and f(Muy, Muyp) < 1.0:
+            Absorbed = False
+      else:
+            Absorbed = True
+            
+      return Absorbed
 
 #--------  get/set methods:
     def getpmu(self):
@@ -408,6 +431,9 @@ class NeutrinoEventInstance:
 
     def getpmuGen(self):
         return deepcopy(self._pmuGen)
+        
+    def getAbsorbed(self):
+        return deepcopy(self._Absorbed)    
     
     def getPb(self):
         Pb = np.array([self._pmuGen*self._pmuDirCos[0], \
