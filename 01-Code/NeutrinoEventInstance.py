@@ -14,11 +14,11 @@ Class NeutrinoEventInstance:
       
   Instance attributes:
   --------------------
-  _pmu      : Muon momentum; i/p argument at instance creation
-  _ct       : Decay time * speed-of-light
+  _pmu      : Muon momentum magnitude from muon 3 momentum 
+  _tmu      : Time of muon decay
   _TrcSpcCrd: Trace space (s, x, y, z, x', y') in numpy array at 
               point of decay
-  _pmuGen   : Generated muon momentum
+  _pmuGen   : same as pmu
   _pmuDirCos: np.array([d, d, d]) with three direction cosines
   _P_e      : Electron 4 momentum: (E, array(px, py, pz)), GeV
   _P_nue    : Electron-neutrino 4 momentum: (E, array(px, py, pz)), GeV
@@ -34,9 +34,9 @@ Class NeutrinoEventInstance:
       __str__  : Dump of values of decay and beam params at decay point
 
   Get/set methods:
-    getpmu            : Returns nominal muon momentum (GeV)
+    getpmu            : Returns magitude of muon momentum (GeV)
     getTraceSpaceCoord: Returns trace space: (s, x, y, z, x', y') (m)
-    getpmuGen         : Returns generated muon momentum (GeV)
+    getpmuGen         : Returns generated muon momentum (GeV) #not anymore
     getPb             : Returns three vector (np.array) of beam momentum (GeV)
     gete4mmtm         : Returns electron 4 momentum: (E, array(px, py, pz))
                             (GeV)
@@ -423,6 +423,9 @@ class NeutrinoEventInstance:
       return Absorbed
 
 #--------  get/set methods:
+    def gettmu(self):
+        return deepcopy(self._tmu)
+        
     def getpmu(self):
         return deepcopy(self._pmu)
 

@@ -76,7 +76,7 @@ class PionEventInstance:
     __Debug  = False
     
 #--------  "Built-in methods":
-    def __init__(self, ppi=6.):
+    def __init__(self, ppi):
 
         self._ppi = ppi
         self._phi=-10.0
