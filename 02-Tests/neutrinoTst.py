@@ -24,7 +24,8 @@ neuTest = 1
 print()
 print("neutrino Test:", neuTest, " Create neutrino and print quantities.")
 
-nu = neutrino.neutrino(26, 134, 0.1, 0.15, -100.0, 0.0, 0.2, 0.22, 5.12, 0.00, 0.16)
+nu = neutrino.neutrino(26, 134, 0.1, 0.15, -100.0, 0.0, 0.2, 0.22, 5.12, 12.12, 0.011)
+
 print("    __str__:", nu)
 print("    --repr__", repr(nu))
 del nu
@@ -45,13 +46,15 @@ px = 0.82
 py = 0.45
 pz = 4.67
 t = 24.5
-weight = 0.15
+eventWeight = 0.15
 tSC = traceSpace.traceSpace(s, x, y, z, px/pz, py/pz)
 
 mass = 0.0
+pdgCode = 12        # a nue
 
 neuErr = 0
-neu = neutrino.neutrino(runNum, eventNum, s, x, y, z, px, py, pz, t, weight)
+neu = neutrino.neutrino(runNum, eventNum, s, x, y, z, px, py, pz, t, eventWeight)
+
 
 if neu.run() != runNum:
     neuErr = neuErr + 1
@@ -65,9 +68,9 @@ if neu.t() != t:
     neuErr = neuErr + 1
     print ("neu.t() is ", neu.t(), "and should be ", t)
 
-if neu.weight() != weight:
+if neu.weight() != eventWeight:
     neuErr = neuErr + 1
-    print ("neu.weight() is ", neu.weight(), "and should be ", weight)
+    print ("neu.weight() is ", neu.weight(), "and should be ", eventWeight)
 
 if neu.mass() != mass:
     neuErr = neuErr + 1
