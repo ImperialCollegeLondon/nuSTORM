@@ -65,9 +65,10 @@ class muon(particle):
 
     def __init__(self, runNum, eventNum, s, x, y, z, px, py, pz, t, weight):
         mass = muCnst.mass()/1000.
-        particle.__init__(self, runNum, eventNum, s, x, y, z, px, py, pz, t, weight, mass)
+        muonPDG = 13
+        particle.__init__(self, runNum, eventNum, s, x, y, z, px, py, pz, t, weight, mass,muonPDG)
 
     def __repr__(self):
-        return "particle(x, y, z, s, px, py, pz, t, weight)"
+        return "particle(runNum, eventNum, s, x, y, z, px, py, pz, t, weight, mass)"
 
 
