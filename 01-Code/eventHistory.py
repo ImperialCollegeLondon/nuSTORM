@@ -381,7 +381,7 @@ class eventHistory:
 #  Close the output file
 	def outFileClose(self ):
 		self._outTFile.Close()
-		
+
 	def fill(self):
 
 # target
@@ -548,8 +548,6 @@ class eventHistory:
 		self.nueDetector.t = self._particles[10].t()
 		self.nueDetector.eventWeight = self._particles[10].weight()
 		self.nueDetector.mass = self._particles[10].mass()
-
-
 
 # write out
 		self.evTree.Fill()
