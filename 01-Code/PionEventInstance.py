@@ -89,7 +89,7 @@ class PionEventInstance:
         return "PionEventInstance(pmu)"
 
     def __str__(self):
-        return "PionEventInstance: tpi (ns) = %g, p_mu (GeV) = %g, s (m) = %g, z (m) = %g, generated momentum=%g, \r\n \
+        return "PionEventInstance: tpi (ns or s?) = %g, p_mu (GeV) = %g, s (m) = %g, z (m) = %g, generated momentum=%g, \r\n \
                 P_mu (%g, [%g, %g, %g]), \r\n \
                 P_numu (%g, [%g, %g, %g]), \r\n" % \
             (self._tpi, self._ppi, self._TrcSpcCrd[0], self._TrcSpcCrd[3], self._ppiGen, \

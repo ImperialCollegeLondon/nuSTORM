@@ -99,7 +99,7 @@ class NeutrinoEventInstance:
     __Debug  = False
 
 #--------  "Built-in methods":
-    def __init__(self, tpi, piTraceSpaceCoord, mu4mmtm, filename=None):
+    def __init__(self, tpi, piTraceSpaceCoord, mu4mmtm, mucostheta, filename=None):
 
         nuStrt = nuPrdStrt.nuSTORMPrdStrght(filename)
         
@@ -109,7 +109,7 @@ class NeutrinoEventInstance:
         self._tmu, self._TrcSpcCrd, self._pmuGen, self._pmuDirCos,  \
         self._P_e, self._P_nue, self._P_numu, \
         self._Absorbed \
-                = self.CreateNeutrinos(tpi, piTraceSpaceCoord, mu4mmtm, nuStrt)
+                = self.CreateNeutrinos(tpi, piTraceSpaceCoord, mu4mmtm, mucostheta, nuStrt)
 
         return
 
@@ -131,7 +131,7 @@ class NeutrinoEventInstance:
     
 #--------  Generation of neutrino-creation event:
 #.. Manager:
-    def CreateNeutrinos(self, tpi, piTraceSpaceCoord, mu4mmtm, nuStrt):
+    def CreateNeutrinos(self, tpi, piTraceSpaceCoord, mu4mmtm, mucostheta, nuStrt):
         PrdStrghtLngth = nuStrt.ProdStrghtLen()
         Circumference  = nuStrt.Circumference()
         ArcLen         = nuStrt.ArcLen()       
@@ -177,7 +177,7 @@ class NeutrinoEventInstance:
         if s <= PrdStrghtLngth:
           Absorbed = False    
         else: 
-          Absorbed = self.AbsorptionMethod(piTraceSpaceCoord, mu4mmtm)    
+          Absorbed = self.AbsorptionMethod(piTraceSpaceCoord, mu4mmtm, mucostheta)    
 
         P_e, P_nue, P_numu = self.Boost2nuSTORM(Dcy, Pmu, DirCos)
 
@@ -396,7 +396,7 @@ class NeutrinoEventInstance:
         
         return P_e, P_nue, P_numu
          
-    def AbsorptionMethod(self, piTraceSpaceCoord, mu4mmtm):
+    def AbsorptionMethod(self, piTraceSpaceCoord, mu4mmtm, mucostheta):
       n = 4.8 #how much rounded
    
       x0 = 0 # graph translation 
@@ -415,7 +415,7 @@ class NeutrinoEventInstance:
         return 0.1*g(-(x+x0)*math.cos(k(1))-(y+y0)*math.sin(k(1)))+0.1*g(-(x+x0)*math.cos(k(2))-(y+y0)*math.sin(k(2)))+0.1*g(-(x+x0)*math.cos(k(3))-(y+y0)*math.sin(k(3)))
 
 
-      if (Mux*Mux/(0.05*0.05))+(Muxp*Muxp/(0.004*0.004)) < 1. and f(Muy, Muyp) < 1.0:
+      if (Mux*Mux/(0.05*0.05))+(Muxp*Muxp/(0.004*0.004)) < 1. and f(Muy, Muyp) < 1.0 and mucostheta < 0:
             Absorbed = False
       else:
             Absorbed = True

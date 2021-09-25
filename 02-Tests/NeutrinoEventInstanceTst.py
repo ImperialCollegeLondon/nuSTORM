@@ -30,6 +30,7 @@ piEvt= piEvtInst.PionEventInstance(8)
 tpi=piEvt.gettpi()
 piTraceSpaceCoord=piEvt.getTraceSpaceCoord()
 mu4mmtm=piEvt.getmu4mmtm()
+mucostheta=piEvt.getcostheta()
 
 ##! Start:
 print("========  NeutrinoEventInstance: tests start  ========")
@@ -45,7 +46,7 @@ nuSIMPATH = os.getenv('nuSIMPATH')
 filename  = os.path.join(nuSIMPATH, \
                          '11-Parameters/nuSTORM-PrdStrght-Params-v1.0.csv')
                       
-nuEI = nuEvtInst.NeutrinoEventInstance(tpi, piTraceSpaceCoord, mu4mmtm, filename)
+nuEI = nuEvtInst.NeutrinoEventInstance(tpi, piTraceSpaceCoord, mu4mmtm, mucostheta, filename)
 print("    __str__: \n", nuEI)
 print("    --repr__: \n", repr(nuEI))
 
@@ -63,7 +64,7 @@ print("NeutrinoEventInstanceTest:", NeutrinoEventInstanceTest, \
       "Test methods by which neutrino-creation event is generated.")
 nuStrt = nuPrdStrt.nuSTORMPrdStrght(filename)
 
-x = nuEI.CreateNeutrinos(tpi,  piTraceSpaceCoord, mu4mmtm, nuStrt)
+x = nuEI.CreateNeutrinos(tpi,  piTraceSpaceCoord, mu4mmtm, mucostheta, nuStrt)
 print("    Neutrino event: trace-space coordinates of muon at decay:")
 print("    ----> P_e:", x[4])
 print("    ----> P_nue:", x[5])
@@ -82,12 +83,13 @@ piEI = []
 
 for i in range(10000):
 
-    piEvt= piEvtInst.PionEventInstance(8)
+    piEvt= piEvtInst.PionEventInstance(2)
     piEI.append(piEvt)
     tpi=piEvt.gettpi()
     piTraceSpaceCoord=piEvt.getTraceSpaceCoord()
     mu4mmtm=piEvt.getmu4mmtm()
-    nuEI.append(nuEvtInst.NeutrinoEventInstance(tpi,  piTraceSpaceCoord, mu4mmtm, filename))
+    mucostheta=piEvt.getcostheta()
+    nuEI.append(nuEvtInst.NeutrinoEventInstance(tpi,  piTraceSpaceCoord, mu4mmtm, mucostheta, filename))
 for i in range(5):
     print("    piEI[",i, "]: \n", piEI[i])
     print("    nuEI[",i, "]: \n", nuEI[i])
@@ -274,7 +276,7 @@ plt.close()
 
 #-- Energy distributions:
 
-n, bins, patches = plt.hist(Emu, bins=50, color='y', range=(3,9))
+n, bins, patches = plt.hist(Emu, bins=50, color='y', range=(0,9))
 plt.xlabel('Energy (GeV)')
 plt.ylabel('Frequency')
 plt.title('Muon energy distribution')
