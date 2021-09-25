@@ -67,7 +67,8 @@ class pion(particle):
 
     def __init__(self, run, event, s, x, y, z, px, py, pz, t, weight):
         mass = piCnst.mass()/1000.
-        particle.__init__(self, run, event, s, x, y, z, px, py, pz, t, weight, mass)
+        pionPDG = 211
+        particle.__init__(self, run, event, s, x, y, z, px, py, pz, t, weight, mass, pionPDG)
 
     def __repr__(self):
-        return "particle(run, event, x, y, z, s, px, py, pz, t, weight)"
+        return "particle(run, event, s, x, y, z, px, py, pz, t, weight)"
