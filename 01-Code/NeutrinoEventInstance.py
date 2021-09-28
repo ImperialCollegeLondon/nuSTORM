@@ -34,9 +34,11 @@ Class NeutrinoEventInstance:
       __str__  : Dump of values of decay and beam params at decay point
 
   Get/set methods:
+    gettmu            : Returns time of muon decay (s)
     getpmu            : Returns magitude of muon momentum (GeV)
     getTraceSpaceCoord: Returns trace space: (s, x, y, z, x', y') (m)
     getpmuGen         : Returns generated muon momentum (GeV) #not anymore
+    getAbsorbed       : Returns whether the muon is absorbed or not
     getPb             : Returns three vector (np.array) of beam momentum (GeV)
     gete4mmtm         : Returns electron 4 momentum: (E, array(px, py, pz))
                             (GeV)
@@ -61,7 +63,7 @@ Class NeutrinoEventInstance:
     Boost2nuSTORM        : Boost to nuSTORM rest frame -- i.e. boost to pmuGen.
                            Uses TLorentVector class from ROOT.  Returns:
                            [P_e], [P_nue], [P_numu]
-    AbsorptionMethod     : Check whether a muon is accepted in the ring,
+    Absorption           : Check whether a muon is accepted in the ring,
                            Returns True if absorbed
                            Returns False if accepted
 
@@ -177,7 +179,7 @@ class NeutrinoEventInstance:
         if s <= PrdStrghtLngth:
           Absorbed = False    
         else: 
-          Absorbed = self.AbsorptionMethod(piTraceSpaceCoord, mu4mmtm, mucostheta)    
+          Absorbed = self.Absorption(piTraceSpaceCoord, mu4mmtm, mucostheta)    
 
         P_e, P_nue, P_numu = self.Boost2nuSTORM(Dcy, Pmu, DirCos)
 
@@ -396,7 +398,7 @@ class NeutrinoEventInstance:
         
         return P_e, P_nue, P_numu
          
-    def AbsorptionMethod(self, piTraceSpaceCoord, mu4mmtm, mucostheta):
+    def Absorption(self, piTraceSpaceCoord, mu4mmtm, mucostheta):
       n = 4.8 #how much rounded
    
       x0 = 0 # graph translation 

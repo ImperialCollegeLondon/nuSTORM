@@ -81,9 +81,9 @@ print("NeutrinoEventInstanceTest:", NeutrinoEventInstanceTest, \
 nuEI = []
 piEI = []
 
-for i in range(10000):
+for i in range(10):
 
-    piEvt= piEvtInst.PionEventInstance(2)
+    piEvt= piEvtInst.PionEventInstance(8)
     piEI.append(piEvt)
     tpi=piEvt.gettpi()
     piTraceSpaceCoord=piEvt.getTraceSpaceCoord()
@@ -104,6 +104,7 @@ s       = np.array([])
 x       = np.array([])
 z       = np.array([])
 Emu     = np.array([])
+tmu     = np.array([])
 xpi     = np.array([])
 ypi     = np.array([])
 pxpi    = np.array([])
@@ -159,6 +160,7 @@ for (piEvt,nuEvt) in zip(piEI,nuEI):
     pxpi   = np.append(pxpi,    piEvt.getmu4mmtm()[1][0]/piEvt.getmu4mmtm()[1][2])
     pypi   = np.append(pypi,    piEvt.getmu4mmtm()[1][1]/piEvt.getmu4mmtm()[1][2])
     
+    tmu     = np.append(tmu,     nuEvt.gettmu())
     s     = np.append(s,     nuEvt.getTraceSpaceCoord()[0])
     where = nuEvt.getTraceSpaceCoord()[0]%Circumference
     
@@ -228,19 +230,19 @@ for (piEvt,nuEvt) in zip(piEI,nuEI):
  
 #-- Accepted Muon Trace Space Plots
 plt.scatter(xpi,pxpi)
-plt.xlabel('Transverse x coordinate of pion decay')
-plt.ylabel('Transverse px coordinate of pion decay')
+plt.xlabel('x')
+plt.ylabel('xp')
 plt.title('Accepted Muon Phase Space (X coordinates)')
 plt.savefig('Scratch/NeutrinoEventInstanceTst_xp vs x.pdf')
-plt.show()
+#plt.show()
 plt.close()
 
 plt.scatter(ypi,pypi)
-plt.xlabel('Transverse y coordinate of pion decay')
-plt.ylabel('Transverse py coordinate of pion decay')
+plt.xlabel('y')
+plt.ylabel('yp')
 plt.title('Accepted Muon Phase Space (Y coordinates)')
 plt.savefig('Scratch/NeutrinoEventInstanceTst_yp vs y.pdf')
-plt.show()
+#plt.show()
 plt.close()
 
 plt.scatter(pxpi,Emu)
@@ -248,7 +250,7 @@ plt.xlabel('xp')
 plt.ylabel('Muon Energy Emu (Gev)')
 plt.title('Muon energy vs xp plot')
 plt.savefig('Scratch/NeutrinoEventInstanceTst_Emu vs xp.pdf')
-plt.show()
+#plt.show()
 plt.close()    
 
 plt.scatter(pypi,Emu)
@@ -256,7 +258,7 @@ plt.xlabel('yp')
 plt.ylabel('Muon Energy Emu (Gev)')
 plt.title('Muon energy vs yp')
 plt.savefig('Scratch/NeutrinoEventInstanceTst_Emu vs yp.pdf')
-plt.show()
+#plt.show()
 plt.close()
 
 #-- Lifetime distribution:
@@ -272,6 +274,19 @@ plt.title('s distribution')
 #plt.plot(bins, y, '-', color='b')
 plt.savefig('Scratch/NeutrinoEventInstanceTst_plot1.pdf')
 #plt.show()
+plt.close()
+
+#-- Lifetime distribution:
+n, bins, patches = plt.hist(tmu, bins=50, color='y', log=True)
+plt.xlabel('tmu (s)')
+plt.ylabel('Entries')
+plt.title('Muon Decay Time Distribution')
+# add a 'best fit' line  
+l = 1/mc.lifetime()
+y = n[0]*np.exp(-l*bins)
+plt.plot(bins, y, '-', color='b')
+plt.savefig('Scratch/NeutrinoEventInstanceTst_tmu.pdf')
+plt.show()
 plt.close()
 
 #-- Energy distributions:

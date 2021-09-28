@@ -60,7 +60,7 @@ print()
 print("PionEventInstanceTest:", PionEventInstanceTest, \
       "soak test.")
 piEI = []
-Ppion=6.0
+Ppion=8.0
 for i in range(10000):
     piEI.append(piEvtInst.PionEventInstance(Ppion))
 for i in range(5):
@@ -116,7 +116,7 @@ plt.show()
 plt.close()
 
 n, bins, patches = plt.hist(tpi, bins=50, color='y', log=True)
-plt.xlabel('tpi (ns)')
+plt.xlabel('tpi (s)')
 plt.ylabel('Entries')
 plt.title('Time of pion decay distribution')
 
@@ -125,6 +125,7 @@ charDist = pc.lifetime()
 slope = 1./charDist
 y = n[0]*np.exp(-slope*bins)
 plt.plot(bins, y, '-', color='b')
+plt.savefig("Scratch/PionEventInstance_tpi.pdf")
 plt.show()
 plt.close()
 
