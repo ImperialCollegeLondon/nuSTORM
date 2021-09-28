@@ -108,7 +108,7 @@ E = mt.sqrt(px*px + py*py + pz*pz + mass*mass)
 pp = pi.p()
 if pp[1][0] != px or pp[1][1] != py or pp[1][2] != pz or pp[0] != E:
     piErr = piErr + 1
-    print ("pi.p() is ", pi.p(), "and should be ", fourVector)
+    print ("pi.p() is ", pi.p(), "and should be ", E, ", ", px, ", ", py, ", ", pz)
 
 
 ##! Complete:
