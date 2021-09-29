@@ -17,6 +17,7 @@ Version history:
 """
 
 import sys
+import os
 import numpy as np
 import math as mt
 import particle as particle
@@ -42,8 +43,20 @@ print(testTitle, ": ",  descString)
 
 p = particle.particle(42, 125, 132.1, 0.1, 0.15, -100.0, 0.0, 0.2, 0.22, 5.12, 0.001, "pi+")
 #    def __init__(self, runNum, eventNum, s, x, y, z, px, py, pz, t, eventWeight, particleType):
+#  redirect standard out to a file
+restoreOut = sys.stdout
+sys.stdout = open("Scratch/particleTst.out","w")
 print("    __str__:", p)
 print("    --repr__", repr(p))
+sys.stdout.close()
+sys.stdout = restoreOut
+# compare the standard output to a reference file
+a = os.popen('diff Scratch/particleTst.out 02-Tests/particleTst.ref')
+output = a.read()
+if (output == ""):
+    pass
+else:
+    testFails = testFails + 1
 del p
 
 ##! Create particle and check get methods #############################################################################
@@ -275,4 +288,7 @@ else:
 print()
 print("========  particle:tests complete  ========")
 print ("\nNumber of tests is ", nTests, " number of fails is ", testFails)
-sys.exit(0)
+if testFails == 0:
+    sys.exit(0)
+else:
+    sys.exit(1)

@@ -115,4 +115,7 @@ if pp[1][0] != px or pp[1][1] != py or pp[1][2] != pz or pp[0] != E:
 print()
 print("========  pion:tests complete  ========")
 print ("number of Errors is ", piErr)
-sys.exit(0)
+if (piErr == 0):
+    sys.exit(0)
+else:
+    sys.exit(1)
