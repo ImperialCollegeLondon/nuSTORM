@@ -35,17 +35,50 @@ SimulationTest = 2
 print()
 print("SimulationTest:", SimulationTest, " check get methods.")
 print("    Simulation: version:", Smltn.CdVrsn())
-print("    __RandomSeed:", Smltn.getRandomSeed())
-print("    Random no.  :", Simu.getRandom())
-print("    Random no.  :", Simu.getRandom())
-print("    Random no.  :", Simu.getRandom())
-print("    Random no.  :", Simu.getRandom())
-print("    Random no.  :", Simu.getRandom())
-print("    Random no.  :", Simu.getRandom())
-print("    Random no.  :", Simu.getRandom())
-print("    Random no.  :", Simu.getRandom())
-print("    Random no.  :", Simu.getRandom())
-print("    Random no.  :", Simu.getRandom())
+rS = Smltn.getRandomSeed()
+if (rS < 100000000.0):
+      raise Exception("Simulation seed is too small ", rS)
+print("    __RandomSeed:", rS)
+r1 = Simu.getRandom()
+if ((r1 < 0.0) or (r1 > 1.0)):
+    raise Exception("Simulation returns random number not beteen 0.0 and 1.0 ", r1)
+print("    Random no.  :", r1)
+r1 = Simu.getRandom()
+if ((r1 < 0.0) or (r1 > 1.0)):
+    raise Exception("Simulation returns random number not beteen 0.0 and 1.0 ", r1)
+print("    Random no.  :", r1)
+r1 = Simu.getRandom()
+if ((r1 < 0.0) or (r1 > 1.0)):
+    raise Exception("Simulation returns random number not beteen 0.0 and 1.0 ", r1)
+print("    Random no.  :", r1)
+r1 = Simu.getRandom()
+if ((r1 < 0.0) or (r1 > 1.0)):
+    raise Exception("Simulation returns random number not beteen 0.0 and 1.0 ", r1)
+print("    Random no.  :", r1)
+r1 = Simu.getRandom()
+if ((r1 < 0.0) or (r1 > 1.0)):
+    raise Exception("Simulation returns random number not beteen 0.0 and 1.0 ", r1)
+print("    Random no.  :", r1)
+r1 = Simu.getRandom()
+if ((r1 < 0.0) or (r1 > 1.0)):
+    raise Exception("Simulation returns random number not beteen 0.0 and 1.0 ", r1)
+print("    Random no.  :", r1)
+r1 = Simu.getRandom()
+if ((r1 < 0.0) or (r1 > 1.0)):
+    raise Exception("Simulation returns random number not beteen 0.0 and 1.0 ", r1)
+print("    Random no.  :", r1)
+r1 = Simu.getRandom()
+if ((r1 < 0.0) or (r1 > 1.0)):
+    raise Exception("Simulation returns random number not beteen 0.0 and 1.0 ", r1)
+print("    Random no.  :", r1)
+r1 = Simu.getRandom()
+if ((r1 < 0.0) or (r1 > 1.0)):
+    raise Exception("Simulation returns random number not beteen 0.0 and 1.0 ", r1)
+print("    Random no.  :", r1)
+r1 = Simu.getRandom()
+if ((r1 < 0.0) or (r1 > 1.0)):
+    raise Exception("Simulation returns random number not beteen 0.0 and 1.0 ", r1)
+print("    Random no.  :", r1)
 
 ##! Complete:
 print()

@@ -206,19 +206,17 @@ testPnt = testPnt + 1
 # test truncatedmuon decay
 testFile = '02-Tests/SimulationTst.py'
 testDesc.append(testFile)
-notes.append("not run yet")
-#test = run(['python', testFile])
+notes.append("Checks values of seed and random, not distribution of values")
+test = run(['python', testFile])
 
-#if (test.returncode == 0):
-#	print (testFile, " passes")
-#	print (notes[testPnt])
-#	testStatus.append("passes")
-#
-#else:
-#	print (testFile, " fails")
-#	testFails = testFails + 1
-#	testStatus.append("fails")
-testStatus.append("Not run")
+if (test.returncode == 0):
+	print (testFile, " passes")
+	print (notes[testPnt])
+	testStatus.append("passes")
+else:
+	print (testFile, " fails")
+	testFails = testFails + 1
+	testStatus.append("fails")
 
 testPnt = testPnt + 1
 #		Test 11
@@ -319,7 +317,7 @@ testStatus.append("Not run")
 testPnt = testPnt + 1
 #		Test 16
 # test truncatedmuon decay
-testFile = '02-Tests/PideDecayTst.py'
+testFile = '02-Tests/PionDecayTst.py'
 testDesc.append(testFile)
 notes.append("not run yet")
 #test = run(['python', testFile])
