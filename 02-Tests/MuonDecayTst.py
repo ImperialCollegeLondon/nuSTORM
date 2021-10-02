@@ -102,6 +102,7 @@ l = 1./mc.lifetime()
 y = n[0]*np.exp(-l*bins)
 plt.plot(bins, y, '-', color='b')
 plt.savefig('Scratch/MuonDecayTst_plot1.pdf')
+plt.show()
 plt.close()
 
 #-- Energy distributions:
@@ -116,6 +117,7 @@ y  = 3.*x2 - (4./mc.mass())*x3
 y  = (16.*s/(mc.mass()**3)) * y
 plt.plot(bins, y, '-', color='b')
 plt.savefig('Scratch/MuonDecayTst_plot2.pdf')
+plt.show()
 plt.close()
 
 n, bins, patches = plt.hist(Enue, bins=50, color='y', range=(0.,50.))
@@ -127,6 +129,7 @@ y  = x2 - (2./mc.mass())*x3
 y  = (96.*s/(mc.mass()**3)) * y
 plt.plot(bins, y, '-', color='b')
 plt.savefig('Scratch/MuonDecayTst_plot3.pdf')
+plt.show()
 plt.close()
 
 n, bins, patches = plt.hist(Enumu, bins=50, color='y', range=(0.,50.))
@@ -138,6 +141,7 @@ y  = 3.*x2 - (4./mc.mass())*x3
 y  = (16.*s/(mc.mass()**3)) * y
 plt.plot(bins, y, '-', color='b')
 plt.savefig('Scratch/MuonDecayTst_plot4.pdf')
+plt.show()
 plt.close()
 
 #-- Angular distributions:
@@ -146,6 +150,7 @@ plt.xlabel('Cos(theta)')
 plt.ylabel('Frequency')
 plt.title('Electron neutrino cos(theta) distribution')
 plt.savefig('Scratch/MuonDecayTst_plot5.pdf')
+plt.show()
 plt.close()
 
 n, bins, patches = plt.hist(cosnumu, bins=50, color='y', range=(-1.,1.))
@@ -153,6 +158,7 @@ plt.xlabel('Cos(theta)')
 plt.ylabel('Frequency')
 plt.title('Muon neutrino cos(theta) distribution')
 plt.savefig('Scratch/MuonDecayTst_plot6.pdf')
+plt.show()
 plt.close()
 
 ##! Complete:

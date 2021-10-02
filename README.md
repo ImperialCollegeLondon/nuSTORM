@@ -11,6 +11,8 @@ Execute "startup.bash" from this directory (i.e. run the bash command "source st
 ## Directories:
  * Python classes and "library" code stored in "01-Code"
  * Test scripts stored in "02-Tests"
+ * Integration tests are stored in "03-Integration-Test"
+ * Parameters to control the run conditions are stored in "11-Parameters"
 
 Rudimentary, but, goal is one test script per class/package file in 01-Code.
 

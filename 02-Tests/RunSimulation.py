@@ -19,7 +19,7 @@ nuSIMPATH = os.getenv('nuSIMPATH')
 filename  = os.path.join(nuSIMPATH, '11-Parameters/nuSTORM-PrdStrght-Params-v1.0.csv')
 rootfilename = os.path.join(nuSIMPATH, 'Scratch/nuSIM-RunSimulation.root')
 
-Smltn = Simu.Simulation(5000, 5., filename, rootfilename)
+Smltn = Simu.Simulation(5000, 6., filename, rootfilename)
 
 print()
 print(".... Execute simulation")

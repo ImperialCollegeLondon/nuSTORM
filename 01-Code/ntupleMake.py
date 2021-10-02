@@ -7,6 +7,25 @@ Class: ntupleMake:
 
 Outputs nuStorm monte-carlo production data as a root ntuple
 
+Version 2.9                                    28/08/2021
+Author: Ken Long
+Update muon branch to include update to NeutrinoEventInstance class that
+produces muon decays around the ring.
+
+Version 2.8                                    26/05/2021
+Author: Paul Kyberd
+method to include information for pion flash into the flux section
+
+Version 2.7                                    14/05/2021
+Author: Paul Kyberd
+Pion data goes in the electron location. Fixed
+
+Version 2.6a                                    12/05/2021
+Author: Paul Kyberd
+Add a method to fill the ntuple from the pion flash data.
+Don't change the version number; at present the pion data goes
+in the electron location. Need to fix
+
 Version 2.6									    26/02/2021
 Author: Paul Kyberd
 Add a branch for the downstream information
@@ -62,6 +81,7 @@ from ROOT import TFile, TNtuple, gROOT, TROOT, TTree, AddressOf, addressof
 
 # nuStorm imports
 import MuonConst as MuonConst
+import PionConst as PionConst
 import NeutrinoEventInstance as nuEvtInst
 
 #  Need a structure so 
@@ -80,6 +100,10 @@ gROOT.ProcessLine(
 };" );
 gROOT.ProcessLine(
 "struct event_t {\
+   Float_t         Epi;\
+   Float_t         pPiX;\
+   Float_t         pPiY;\
+   Float_t         pPiZ;\
    Float_t         Emu;\
    Float_t         pMuX;\
    Float_t         pMuY;\
@@ -122,12 +146,14 @@ gROOT.ProcessLine(
 };" );
 
 muCnst = MuonConst.MuonConst()
+piCnst = PionConst.PionConst()
 
 class ntupleMake:
 	Version = 2.6
 	__Validated__ = False
 	outputFilename="" 
 	__muMass = muCnst.mass()/1000.
+	__piMass = piCnst.mass()/1000.
 
 # built-in methods
 	def __init__(self, runNum, nuPrdStrt, outputFilename="nuStorm.root"):
@@ -162,7 +188,8 @@ class ntupleMake:
 # a TTree for the production data from every event
 		self.event = ROOT.event_t()
 		self.evTree = TTree('beam', 'nuStorm Event')
-		self.evTree.Branch( 'muon', self.event, 'E/F:pX:pY:pZ' )
+		self.evTree.Branch( 'pion', self.event, 'E/F:pX:pY:pZ' )
+		self.evTree.Branch( 'muon', addressof( self.event, 'Emu'), 'E/F:pX:pY:pZ' )
 		self.evTree.Branch( 'Decay', addressof( self.event, 's'), 's/F:x:y:z:xp:yp:t')
 		self.evTree.Branch( 'Electron', addressof( self.event, 'Ee'), 'E/F:pX:pY:pZ')
 		self.evTree.Branch( 'NuMu', addressof( self.event, 'Enumu'), 'E/F:pX:pY:pZ')
@@ -195,9 +222,10 @@ class ntupleMake:
 # get the 4 vector of the muon. In fact Emu ~ Pmu ~ PMuz - but calculate precisely
 		pMu = nuEvt.getpmuGen()
 		self.event.Emu  = np.sqrt(pMu*pMu + self.__muMass**2)
-		self.event.pMuX = pMu*self.event.xp
-		self.event.pMuY = pMu*self.event.yp
-		self.event.pMuZ = np.sqrt(pMu*pMu - self.event.pMuX**2 - self.event.pMuY**2)
+		pBeam = nuEvt.getPb()
+		self.event.pMuX = pBeam[0]
+		self.event.pMuY = pBeam[1]
+		self.event.pMuZ = pBeam[2]
 # get the 4 vector of the electron
 		self.event.Ee  = nuEvt.gete4mmtm()[0]
 		self.event.peX = nuEvt.gete4mmtm()[1][0]
@@ -216,8 +244,38 @@ class ntupleMake:
 
 		self.evTree.Fill()
 
-	def fluxFill(self, hitE, hitMu):
+# fill the tree from a pion flash decau
+	def pionTreeFill(self, piEvt):
 
+# tracespace coordinates of the decay point
+		self.event.s = piEvt.getTraceSpaceCoord()[0]
+		self.event.x = piEvt.getTraceSpaceCoord()[1]
+		self.event.y = piEvt.getTraceSpaceCoord()[2]
+		self.event.z = piEvt.getTraceSpaceCoord()[3]
+		self.event.xp = piEvt.getTraceSpaceCoord()[4]
+		self.event.yp = piEvt.getTraceSpaceCoord()[5]
+		self.event.t = 0.0;
+# get the 4 vector of the decay muon.
+		self.event.Emu  = piEvt.getmu4mmtm()[0]
+		self.event.pMuX = piEvt.getmu4mmtm()[1][0]
+		self.event.pMuY = piEvt.getmu4mmtm()[1][1]
+		self.event.pMuZ = piEvt.getmu4mmtm()[1][2]
+# get the 4 vector of the pion
+		pPion = piEvt.getppiGen()
+		self.event.Epi  = np.sqrt(pPion*pPion + self.__piMass**2)
+		self.event.pPiX = pPion*self.event.xp
+		self.event.pPiY = pPion*self.event.yp
+		self.event.pPiZ = np.sqrt(pPion*pPion - self.event.peX**2 - self.event.peY**2)
+# get the 4 vector of the muon neutrino
+		self.event.Enumu  = piEvt.getnumu4mmtm()[0]
+		self.event.pnumuX = piEvt.getnumu4mmtm()[1][0]
+		self.event.pnumuY = piEvt.getnumu4mmtm()[1][1]
+		self.event.pnumuZ = piEvt.getnumu4mmtm()[1][2]
+
+		self.evTree.Fill()
+
+	def fluxFill(self, hitE, hitMu):
+		
 		self.flux.nuEx = hitE[0]
 		self.flux.nuEy = hitE[1]
 		self.flux.nuEpx = hitE[5]
@@ -232,17 +290,32 @@ class ntupleMake:
 		self.flux.nuMuE = hitMu[8]
 
 		self.fluxTree.Fill()
+#
+#  Fill the flux branch from pion flash run - just remove the electron code
+	def flashFluxFill(self, hitMu):
+
+		self.flux.nuMux = hitMu[0]
+		self.flux.nuMuy = hitMu[1]
+		self.flux.nuMupx = hitMu[5]
+		self.flux.nuMupy = hitMu[6]
+		self.flux.nuMupz = hitMu[7]
+		self.flux.nuMuE = hitMu[8]
+
+		self.fluxTree.Fill()
+
 
 	def output(self):
 #	Write out the data
 		self.evTree.Write()
 		self.fluxTree.Write()
 		return
-
-
+		
+		
 	def closeFile(self):
 		self.evTree.Print()
 		self.evTree.Write()
+		self.fluxTree.Print()
+		self.fluxTree.Write()
 		return
 
 	def initNtuple(self, labels):

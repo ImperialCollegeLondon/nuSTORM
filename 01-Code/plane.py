@@ -8,6 +8,11 @@ Class plane:
 
   Version: 2.2                                  Date:11 March 2021
   Author: Paul Kyberd
+  
+  Version 2.5   findHitPostion name clash - not resolved by different parameters.
+                create two routines findHitPositionMuEvt and findHitPositionPiEvt
+  
+  Version 2.4   Add a findHitPosition for the pion decays
 
   Version 2.3   Production straight and flux plane from data file
 
@@ -76,8 +81,8 @@ class plane:
         return "plane : z(m) = %g \r\n" \
                 % (self.zPos)
 
-# Find the intercept of the particle with plane and store it along with the energy
-    def findHitPosition(self, nuEvt):
+# Find the intercept of the particles with plane and store it along with the energy for muon events
+    def findHitPositionMuEvt(self, nuEvt):
 #  Decay point information
         DecayPntX = nuEvt.getTraceSpaceCoord()[1]
         DecayPntY = nuEvt.getTraceSpaceCoord()[2]
@@ -127,3 +132,41 @@ class plane:
         if self.__Debug: print (" hit: x, y, R, phi, E ", hitMu[0], " ", hitMu[1], " ", hitMu[2], " ", hitMu[3], " ", hitMu[4])
 
         return hitE, hitMu
+
+# Find the intercept of the particle with plane and store it along with the energy for pion flash events
+    def findHitPositionPiEvt(self, piEvt):
+#  Decay point information
+        DecayPntX = piEvt.getTraceSpaceCoord()[1]
+        DecayPntY = piEvt.getTraceSpaceCoord()[2]
+        DecayPntZ = piEvt.getTraceSpaceCoord()[3]
+
+#  Now the information for the neutrino
+        eMu = piEvt.getnumu4mmtm()[0]       # number
+        pMu = piEvt.getnumu4mmtm()[1]       # 3 vector
+
+#  Distance to the plane
+#        deltaZ = self.zPos - DecayPntZ
+        deltaZ = self.zPos
+        if self.__Debug: print ("path length is ", deltaZ)
+
+#  Position of the numu hit               # need to check by hand - no test
+        hitMu=[]
+        xPnt = (DecayPntX + pMu[0]*deltaZ/pMu[2])
+        yPnt = (DecayPntY + pMu[1]*deltaZ/pMu[2])
+        if (xPnt < -200.0):
+            print ("xPnt is ", xPnt, "   yPnt is ", yPnt)
+            print ("piEvt is ", piEvt)
+        hitMu.append(xPnt)                                 # x
+        hitMu.append(yPnt)                                 # y
+        hitMu.append(self.zPos)                            # z
+        hitMu.append(np.sqrt(xPnt*xPnt + yPnt*yPnt))       # R
+        hitMu.append(math.atan2(yPnt, xPnt))               # phi
+        hitMu.append(pMu[0])                               # px
+        hitMu.append(pMu[1])                               # py
+        hitMu.append(pMu[2])                               # pz
+        hitMu.append(eMu)                                  # E
+
+
+        if self.__Debug: print (" hit: x, y, R, phi, E ", hitMu[0], " ", hitMu[1], " ", hitMu[2], " ", hitMu[3], " ", hitMu[4])
+
+        return hitMu

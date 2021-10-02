@@ -66,7 +66,42 @@ presented is:
 \end{description}
 The instruction in the \verb+README.md+ file should be followed to set
 up and run the code.
+
+\section{Running the code}
+The file in 02-Tests/RunSimulation.py - will run the code and produce a root data  set.\newline
+
+\noindent The file {\bf RunSimulation.py} contains:
+\begin{itemize}
+\item the definition of the root output file for the generated dataset \newline
+rootfilename = os.path.join(nuSIMPATH, 'Scratch/nuSIM-RunSimulation.root')
+\item the definition of csv  input file to control the running of the Simulation \newline
+filename  = os.path.join(nuSIMPATH, '11-Parameters/nuSTORM-PrdStrght-Params-v1.0.csv')
+\item the call to the Simulation class with; the number of events to generate; the central energy to generate; and the filenames\newline
+Smltn = Simu.Simulation(5000, 6., filename, rootfilename)
+\end{itemize}
+\hfill\newline
+\noindent Most of the entries for the file {\bf nuSTORM-PrdStrght-Params-v1.0.csv} are self explanatory but it is worth noting:
+\begin{itemize}
+\item Run Type, rType, 1, i, numSim-2021-01\newline
+1 generates a muon decay and 2 generates a pion beam\newline
+\item Momentum acceptance,pAcc,10,\%,nuSIM-2021-01\newline
+Generates a parabolic distribution with a half width given by the number. For standard generation 10 should be used for pions and 15 muons
+\end{itemize}
+
   
+ \subsection{Plots}
+ There is a file {\bf 01-Code/Plots.py}. It produces a separate root file with histograms filled by running the programme. The
+ plots are written to {\bf plots.root} in the directory from which the job is run. In the default case it will produce a plot
+ of the energy of the $\nu_{\mu}$ created by either the $\mu$ or $\pi$ beam. You can either modify this file or produce your own file. The calls are made from {\bf Simulation.py} and Plots.py is included with the line \newline {\it import Plots as plots}
+ \hfill\newline
+ 
+ \noindent The class contains three methods: \_\_init\_\_; fill; histdo.\newline
+ \_\_init\_\_ is called with no parameters and makes the calls to create a root histogram, the single histogram acts as
+ an example\newline
+fill(self, $<$ array or class $>$), where the array or class contains the values to be plotted for each event. The example is an array, but it will work  with a class which has suitable {\it get() methods}.\newline
+histdo is called with no parameters and writes out all the histograms. The example shows writing out the single histogram
+ 
+ 
 \section*{Making a contribution}
 nuSIM is archived in the git repository \verb+longkr/nuSTORM+.
 To clone the code using
