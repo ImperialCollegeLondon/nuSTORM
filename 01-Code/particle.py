@@ -31,27 +31,32 @@ Class pion:
 
 Created on Tue 29Aug21;21:35: Version history:
 ----------------------------------------------
+ 2.0: 24Sep21: Unify all the particles and just distinguish with a pdg code
  1.1: 21Sep21: Add a constructor with the momentum vector
  1.0: 29Aug21: A straight copy of the pion class
 
 @author: PaulKyberd
 """
 
-import math
+import math, sys
 import numpy as np
 from copy import deepcopy
 import traceSpace
-import abc
+import MuonConst as mC
+import PionConst as piC
+
+muCnst  = mC.MuonConst()
+piCnst  = piC.PionConst()
     
 class particle:
     __Debug  = False
     
 #--------  "Built-in methods":
 #  Constructor with elementary variables
-#    def __init__(self, runNum, eventNum, s, x, y, z, px, py, pz, t, eventWeight, mass, PDG):
+#    def __init__(self, runNum, eventNum, s, x, y, z, px, py, pz, t, eventWeight, particleType):
     def __init__(self, *args):
 
-        if (len(args) == 13):
+        if (len(args) == 12):
 # Uunpack args
             runNum = args[0]
             eventNum = args[1]
@@ -64,20 +69,16 @@ class particle:
             pz = args[8]
             t = args[9]
             eventWeight = args[10]
-            mass = args[11]
-            PDG = args[12]
+            particleType = args[11]
+
 # fill variables
-            E = math.sqrt(px*px + py*py + pz*pz + mass*mass)
             p = np.array([px, py, pz])
-            self._p = np.array([E, np.array([px, py, pz])],dtype=object)
             self._TrcSpc = traceSpace.traceSpace(s, x, y, z, px/pz, py/pz)
             self._t = t
             self._eventWeight = eventWeight
-            self._mass = mass
             self._runNum = runNum
             self._eventNum = eventNum
-            self._PDG = PDG
-        elif (len(args) == 11):
+        elif (len(args) == 10):
 # Uunpack args
             runNum = args[0]
             eventNum = args[1]
@@ -88,29 +89,74 @@ class particle:
             p =args[6]
             t = args[7]
             eventWeight = args[8]
-            mass = args[9]
-            PDG = args[10]
+            particleType = args[9]
 # fill variables
             self._p = p
             self._TrcSpc = traceSpace.traceSpace(s, x, y, z, p[1][0]/p[1][2], p[1][1]/p[1][2])
             self._t = t
             self._eventWeight = eventWeight
-            self._mass = mass
             self._runNum = runNum
             self._eventNum = eventNum
-            self._PDG = PDG
+        else:
+            sys.exit("Number of arguments unrecognised " + str(len(args)))
+
+# fill mass pdgCode and lifetime depending on the particle type
+        if (particleType == "pi+"):
+            mass = piCnst.mass()/1000.0
+            lifetime = piCnst.lifetime()
+            pdgCode = 211
+        elif particleType == "pi-":
+            mass = piCnst.mass()/1000.0
+            lifetime = piCnst.lifetime()
+            pdgCode = -211
+        elif particleType == "mu-":
+            mass = muCnst.mass()/1000.0
+            lifetime = muCnst.lifetime()
+            pdgCode = 13
+        elif particleType == "mu+":
+            mass = muCnst.mass()/1000.0
+            lifetime = muCnst.lifetime()
+            pdgCode = -13
+        elif particleType == "mu-":
+            mass = 0.105
+            lifetime = 2.0*10E-06
+            pdgCode = 13
+        elif particleType == "e-":
+            mass = 0.00511
+            lifetime = math.inf
+            pdgCode = 11
+        elif particleType == "e+":
+            mass = 0.00511
+            lifetime = math.inf
+            pdgCode = -11
+        elif particleType == "nue":
+            mass = 0.0
+            lifetime = math.inf
+            pdgCode = 12
+        elif particleType == "nueBar":
+            mass = 0.0
+            lifetime = math.inf
+            pdgCode = -12
+        elif particleType == "numu":
+            mass = 0.0
+            lifetime = math.inf
+            pdgCode = 14
+        elif particleType == "numuBar":
+            mass = 0.0
+            lifetime = math.inf
+            pdgCode = -14
+        else:
+            sys.exit("Unrecognised particle type")
+
+        if (len(args) == 12):
+            E = math.sqrt(px*px + py*py + pz*pz + mass*mass)
+            self._p = np.array([E, p],dtype=object)
+
+        self._mass = mass
+        self._lifetime = lifetime
+        self._PDG = pdgCode
 
         return
-
-# Constructor which takes a p 4 array
-        self._p = p
-        self._TrcSpc = traceSpace.traceSpace(s, x, y, z, px/pz, py/pz)
-        self._t = t
-        self._eventWeight = eventWeight
-        self._mass = mass
-        self._runNum = runNum
-        self._eventNum = eventNum
-        self._PDG = PDG
 
     def __repr__(self):
         return "particle(x, y, z, s, px, py, pz, t, weight, mass)"
@@ -154,17 +200,14 @@ eventweight = %g, run = %g, event = %g, PDG=%g" % \
                 equals = False
             if (abs(self._eventWeight - comp._eventWeight) >delta):
                 equals = False
+            if (abs(self._lifetime - comp._lifetime) >delta):
+                equals = False
             if (self._runNum != comp._runNum):
                 equals = False
             if (self._eventNum != comp._eventNum):
                 equals = False
             if (self._PDG != comp._PDG):
                 equals = False
-
-#            if (self._p[0] == comp._p[0]) and (self._p[1][0] == comp._p[1][0]) and (self._p[1][1] == comp._p[1][1]) and \
-#               (self._p[1][2] == comp._p[1][2]) and (self._mass == comp._mass) and (self._t == comp._t)  and \
-#               (self._TrcSpc == comp._TrcSpc) and (self._eventWeight == comp._eventWeight) and (self._PDG == comp._PDG) and \
-#               (self._runNum == comp._runNum) and (self._eventNum == comp._eventNum):    
             return equals
         else:
             return False

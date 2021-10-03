@@ -19,3 +19,7 @@ Rudimentary, but, goal is one test script per class/package file in 01-Code.
 ## Dependencies:
  * Code and test scripts assume Python 3.  
  * Test scripts assume code directory (01-Code) is in PYTHON path.  A bash script "startup.bash" is provided to update the PYTHON path.
+
+## History
+ * 01 October 2021:  Introduce a pytest file particle_test.py in 02-Tests. Also a runTests.py module in 03-Integration-test.
+                     pytests recommended method of writing tests at present

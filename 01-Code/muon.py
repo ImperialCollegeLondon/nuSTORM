@@ -63,10 +63,9 @@ class muon(particle):
 # getting the mass from the muonConstant class and using it to call the particle
 # constructor.
 
-    def __init__(self, runNum, eventNum, s, x, y, z, px, py, pz, t, weight):
-        mass = muCnst.mass()/1000.
-        muonPDG = 13
-        particle.__init__(self, runNum, eventNum, s, x, y, z, px, py, pz, t, weight, mass,muonPDG)
+    def __init__(self, run, event, s, x, y, z, px, py, pz, t, weight):
+        partType = "mu-"
+        particle.__init__(self, run, event, s, x, y, z, px, py, pz, t, weight, partType)
 
     def __repr__(self):
         return "particle(runNum, eventNum, s, x, y, z, px, py, pz, t, weight, mass)"

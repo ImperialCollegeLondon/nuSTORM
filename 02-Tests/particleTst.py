@@ -17,6 +17,7 @@ Version history:
 """
 
 import sys
+import os
 import numpy as np
 import math as mt
 import particle as particle
@@ -40,9 +41,22 @@ descriptions.append(descString)
 
 print(testTitle, ": ",  descString)
 
-p = particle.particle(42, 125, 0.1, 0.15, -100.0, 0.0, 0.2, 0.22, 5.12, 0.00, 0.16, 0.99, -14)
+p = particle.particle(42, 125, 132.1, 0.1, 0.15, -100.0, 0.0, 0.2, 0.22, 5.12, 0.001, "pi+")
+#    def __init__(self, runNum, eventNum, s, x, y, z, px, py, pz, t, eventWeight, particleType):
+#  redirect standard out to a file
+restoreOut = sys.stdout
+sys.stdout = open("Scratch/particleTst.out","w")
 print("    __str__:", p)
 print("    --repr__", repr(p))
+sys.stdout.close()
+sys.stdout = restoreOut
+# compare the standard output to a reference file
+a = os.popen('diff Scratch/particleTst.out 02-Tests/particleTst.ref')
+output = a.read()
+if (output == ""):
+    pass
+else:
+    testFails = testFails + 1
 del p
 
 ##! Create particle and check get methods #############################################################################
@@ -63,11 +77,9 @@ py = 0.45
 pz = 4.67
 t = 24.5
 weight = 0.15
-mass = 0.99
-pdgCode = 211
 tSC = traceSpace.traceSpace(s, x, y, z, px/pz, py/pz)
 
-p = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz, t, weight, mass, pdgCode)
+p = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz, t, weight, "pi+")
 
 if p.run() != runNum:
     testFails = testFails + 1
@@ -77,6 +89,7 @@ if p.event() != eventNum:
     testFails = testFails + 1
     print ("p.event() is ", p.event(), "and should be ", eventNum)
 
+pdgCode = 211
 if p.pdgCode() != pdgCode:
     testFails = testFails + 1
     print ("p.pdgCode() is ", p.pdgCode(), "and should be ", pdgCode)
@@ -89,6 +102,7 @@ if p.weight() != weight:
     testFails = testFails + 1
     print ("p.weight() is ", p.weight(), "and should be ", weight)
 
+mass = 139.57061/1000.0
 if p.mass() != mass:
     testFails = testFails + 1
     print ("p.mass() is ", p.mass(), "and should be ", mass)
@@ -134,7 +148,7 @@ descString = "Checking equality for particles"
 descriptions.append(descString)
 print(testTitle, ": ",  descString)
 
-p1 = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz, t, weight, mass, pdgCode)
+p1 = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz, t, weight, "pi+")
 
 if (p == p1):
     pass
@@ -182,68 +196,63 @@ print(testTitle, ": ",  descString)
 
 tstFlag = True
 
-pa = particle.particle(runNum+1, eventNum, s, x, y, z, px, py, pz, t, weight, mass, pdgCode)
+pa = particle.particle(runNum+1, eventNum, s, x, y, z, px, py, pz, t, weight, "mu-")
 if (p != pa):
     pass
 else:
     tstFlag = False
-pb = particle.particle(runNum, eventNum+1, s, x, y, z, px, py, pz, t, weight, mass, pdgCode)
+pb = particle.particle(runNum, eventNum+1, s, x, y, z, px, py, pz, t, weight, "mu-")
 if (p != pb):
     pass
 else:
     tstFlag = False
-pc = particle.particle(runNum, eventNum, s+1.0, x, y, z, px, py, pz, t, weight, mass, pdgCode)
+pc = particle.particle(runNum, eventNum, s+1.0, x, y, z, px, py, pz, t, weight, "mu-")
 if (p != pc):
     pass
 else:
     tstFlag = False
-pd = particle.particle(runNum, eventNum, s, x+1.0, y, z, px, py, pz, t, weight, mass, pdgCode)
+pd = particle.particle(runNum, eventNum, s, x+1.0, y, z, px, py, pz, t, weight, "mu-")
 if (p != pd):
     pass
 else:
     tstFlag = False
-pe = particle.particle(runNum, eventNum, s, x, y+1.0, z, px, py, pz, t, weight, mass, pdgCode)
+pe = particle.particle(runNum, eventNum, s, x, y+1.0, z, px, py, pz, t, weight, "mu-")
 if (p != pe):
     pass
 else:
     tstFlag = False
-pf = particle.particle(runNum, eventNum, s, x, y, z+1.0, px, py, pz, t, weight, mass, pdgCode)
+pf = particle.particle(runNum, eventNum, s, x, y, z+1.0, px, py, pz, t, weight, "mu-")
 if (p != pf):
     pass
 else:
     tstFlag = False
-pg = particle.particle(runNum, eventNum, s, x, y, z, px+1.0, py, pz, t, weight, mass, pdgCode)
+pg = particle.particle(runNum, eventNum, s, x, y, z, px+1.0, py, pz, t, weight, "mu-")
 if (p != pg):
     pass
 else:
     tstFlag = False
-ph = particle.particle(runNum, eventNum, s, x, y, z, px, py+1.0, pz, t, weight, mass, pdgCode)
+ph = particle.particle(runNum, eventNum, s, x, y, z, px, py+1.0, pz, t, weight, "mu-")
 if (p != ph):
     pass
 else:
     tstFlag = False
-pi = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz+1.0, t, weight, mass, pdgCode)
+pi = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz+1.0, t, weight, "mu-")
 if (p != pi):
     pass
 else:
     tstFlag = False
-pj = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz, t+1.0, weight, mass, pdgCode)
+pj = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz, t+1.0, weight, "mu-")
 if (p != pj):
     pass
 else:
     tstFlag = False
-pk = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz, t, weight+1.0, mass, pdgCode)
+pk = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz, t, weight+1.0, "mu-")
 if (p != pk):
     pass
 else:
     tstFlag = False
-pl = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz, t, weight, mass+1.0, pdgCode)
+pl = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz, t, weight, "e-")
 if (p != pl):
-    pass
-else:
-    tstFlag = False
-pm = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz, t, weight, mass, pdgCode+1)
-if (p != pm):
     pass
 else:
     tstFlag = False
@@ -259,11 +268,15 @@ descString = "Checking new constructor"
 descriptions.append(descString)
 print(testTitle, ": ",  descString)
 
-part = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz, t, weight, mass, pdgCode)
+px = 1.02
+py = 2.04
+pz = 9.18
+part = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz, t, weight, "e+")
+mass = part.mass()
 E = mt.sqrt(mass*mass + px*px + py*py + pz*pz)
 p3 = np.array([px, py, pz])
 p4 = np.array([E, p3],dtype=object)
-altPart = particle.particle(runNum, eventNum, s, x, y, z, p4, t, weight, mass, pdgCode)
+altPart = particle.particle(runNum, eventNum, s, x, y, z, p4, t, weight, "e+")
 
 if (part == altPart):
     pass
@@ -275,4 +288,7 @@ else:
 print()
 print("========  particle:tests complete  ========")
 print ("\nNumber of tests is ", nTests, " number of fails is ", testFails)
-sys.exit(0)
+if testFails == 0:
+    sys.exit(0)
+else:
+    sys.exit(1)
