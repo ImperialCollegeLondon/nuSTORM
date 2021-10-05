@@ -308,37 +308,37 @@ class eventHistory:
 
 		pTar = particle.particle(self.atTarget.runNumber, self.atTarget.eventNumber, self.atTarget.s, 
 			self.atTarget.x, self.atTarget.y, self.atTarget.z, self.atTarget.px, self.atTarget.py, self.atTarget.pz, 
-			self.atTarget.t, self.atTarget.eventWeight, self.atTarget.mass, self.atTarget.pdgCode)
+			self.atTarget.t, self.atTarget.eventWeight, self.atTarget.pdgCode)
 		pPs = particle.particle(self.prodStrght.runNumber, self.prodStrght.eventNumber, self.prodStrght.s, 
 			self.prodStrght.x, self.prodStrght.y, self.prodStrght.z, self.prodStrght.px, self.prodStrght.py, self.prodStrght.pz, 
-			self.prodStrght.t, self.prodStrght.eventWeight, self.prodStrght.mass, self.prodStrght.pdgCode)
+			self.prodStrght.t, self.prodStrght.eventWeight, self.prodStrght.pdgCode)
 		pPiDcy = particle.particle(self.pionDecay.runNumber, self.pionDecay.eventNumber, self.pionDecay.s, 
 			self.pionDecay.x, self.pionDecay.y, self.pionDecay.z, self.pionDecay.px, self.pionDecay.py, self.pionDecay.pz, 
-			self.pionDecay.t, self.pionDecay.eventWeight, self.pionDecay.mass, self.pionDecay.pdgCode)
+			self.pionDecay.t, self.pionDecay.eventWeight, self.pionDecay.pdgCode)
 		pMuPrd = particle.particle(self.muonProduction.runNumber, self.muonProduction.eventNumber, self.muonProduction.s, 
 			self.muonProduction.x, self.muonProduction.y, self.muonProduction.z, self.muonProduction.px, self.muonProduction.py, self.muonProduction.pz, 
-			self.muonProduction.t, self.muonProduction.eventWeight, self.muonProduction.mass, self.muonProduction.pdgCode)
+			self.muonProduction.t, self.muonProduction.eventWeight, self.muonProduction.pdgCode)
 		pFlsNu = particle.particle(self.piFlashProd.runNumber, self.piFlashProd.eventNumber, self.piFlashProd.s, 
 			self.piFlashProd.x, self.piFlashProd.y, self.piFlashProd.z, self.piFlashProd.px, self.piFlashProd.py, self.piFlashProd.pz, 
-			self.piFlashProd.t, self.piFlashProd.eventWeight, self.piFlashProd.mass, self.piFlashProd.pdgCode)
+			self.piFlashProd.t, self.piFlashProd.eventWeight, self.piFlashProd.pdgCode)
 		pMuDcy = particle.particle(self.muonDecay.runNumber, self.muonDecay.eventNumber, self.muonDecay.s, 
 			self.muonDecay.x, self.muonDecay.y, self.muonDecay.z, self.muonDecay.px, self.muonDecay.py, self.muonDecay.pz, 
-			self.muonDecay.t, self.muonDecay.eventWeight, self.muonDecay.mass, self.muonDecay.pdgCode)
+			self.muonDecay.t, self.muonDecay.eventWeight, self.muonDecay.pdgCode)
 		pEPrd = particle.particle(self.eProduction.runNumber, self.eProduction.eventNumber, self.eProduction.s, 
 			self.eProduction.x, self.eProduction.y, self.eProduction.z, self.eProduction.px, self.eProduction.py, self.eProduction.pz, 
-			self.eProduction.t, self.eProduction.eventWeight, self.eProduction.mass, self.eProduction.pdgCode)
+			self.eProduction.t, self.eProduction.eventWeight, self.eProduction.pdgCode)
 		pNumuPrd = particle.particle(self.numuProduction.runNumber, self.numuProduction.eventNumber, self.numuProduction.s, 
 			self.numuProduction.x, self.numuProduction.y, self.numuProduction.z, self.numuProduction.px, self.numuProduction.py, self.numuProduction.pz, 
-			self.numuProduction.t, self.numuProduction.eventWeight, self.numuProduction.mass, self.numuProduction.pdgCode)
+			self.numuProduction.t, self.numuProduction.eventWeight, self.numuProduction.pdgCode)
 		pNuePrd = particle.particle(self.numuProduction.runNumber, self.numuProduction.eventNumber, self.nueProduction.s, 
 			self.nueProduction.x, self.nueProduction.y, self.nueProduction.z, self.nueProduction.px, self.nueProduction.py, self.nueProduction.pz, 
-			self.nueProduction.t, self.nueProduction.eventWeight, self.nueProduction.mass, self.nueProduction.pdgCode)
+			self.nueProduction.t, self.nueProduction.eventWeight, self.nueProduction.pdgCode)
 		pNumuDet = particle.particle(self.numuDetector.runNumber, self.numuDetector.eventNumber, self.numuDetector.s, 
 			self.numuDetector.x, self.numuDetector.y, self.numuDetector.z, self.numuDetector.px, self.numuDetector.py, self.numuDetector.pz, 
-			self.numuDetector.t, self.numuDetector.eventWeight, self.numuDetector.mass, self.numuDetector.pdgCode)
+			self.numuDetector.t, self.numuDetector.eventWeight, self.numuDetector.pdgCode)
 		pNueDet = particle.particle(self.nueDetector.runNumber, self.nueDetector.eventNumber, self.nueDetector.s, 
 			self.nueDetector.x, self.nueDetector.y, self.nueDetector.z, self.nueDetector.px, self.nueDetector.py, self.nueDetector.pz, 
-			self.nueDetector.t, self.nueDetector.eventWeight, self.nueDetector.mass, self.nueDetector.pdgCode)
+			self.nueDetector.t, self.nueDetector.eventWeight, self.nueDetector.pdgCode)
 
 		self.addParticle('target', pTar)
 		self.addParticle('productionStraight', pPs)
