@@ -70,9 +70,17 @@ class particle:
             t = args[9]
             eventWeight = args[10]
             particleType = args[11]
-
-# fill variables
+            if isinstance(particleType, str):
+                self._mass, self._lifetime, self._PDG = self.nameToCode(particleType)
+            elif isinstance(particleType, int):
+                self._mass, self._lifetime = self.codeToMass(particleType)
+                self._PDG = particleType
+            else:
+                sys.exit("Unrecognised particle type variable ")
+ # fill variables
             p = np.array([px, py, pz])
+            E = math.sqrt(px*px + py*py + pz*pz + self._mass*self._mass)
+            self._p = np.array([E, p],dtype=object)
             self._TrcSpc = traceSpace.traceSpace(s, x, y, z, px/pz, py/pz)
             self._t = t
             self._eventWeight = eventWeight
@@ -90,6 +98,14 @@ class particle:
             t = args[7]
             eventWeight = args[8]
             particleType = args[9]
+            if isinstance(particleType, str):
+                self._mass, self._lifetime, self._PDG = self.nameToCode(particleType)
+            elif isinstance(particleType, int):
+                self._mass, self._lifetime = self.codeToMass(particleType)
+                self._PDG = particleType
+            else:
+                sys.exit("Unrecognised particle type variable ")
+
 # fill variables
             self._p = p
             self._TrcSpc = traceSpace.traceSpace(s, x, y, z, p[1][0]/p[1][2], p[1][1]/p[1][2])
@@ -100,7 +116,9 @@ class particle:
         else:
             sys.exit("Number of arguments unrecognised " + str(len(args)))
 
-# fill mass pdgCode and lifetime depending on the particle type
+        return
+
+    def nameToCode(self,particleType):
         if (particleType == "pi+"):
             mass = piCnst.mass()/1000.0
             lifetime = piCnst.lifetime()
@@ -146,17 +164,32 @@ class particle:
             lifetime = math.inf
             pdgCode = -14
         else:
-            sys.exit("Unrecognised particle type")
+            sys.exit("Unrecognised particle type " + str(particleType))
 
-        if (len(args) == 12):
-            E = math.sqrt(px*px + py*py + pz*pz + mass*mass)
-            self._p = np.array([E, p],dtype=object)
+        return mass, lifetime, pdgCode
 
-        self._mass = mass
-        self._lifetime = lifetime
-        self._PDG = pdgCode
+    def codeToMass(self,particleType):
+        if (abs(particleType) == 211):
+            mass = piCnst.mass()/1000.0
+            lifetime = piCnst.lifetime()
+        elif (abs(particleType) == 13):
+            mass = muCnst.mass()/1000.0
+            lifetime = muCnst.lifetime()
+        elif (abs(particleType) == 11):
+            mass = 0.00511
+            lifetime = math.inf
+        elif (abs(particleType) == 12):
+            mass = 0.0
+            lifetime = math.inf
+        elif (abs(particleType) == 14):
+            mass = 0.0
+            lifetime = math.inf
+        else:
+            sys.exit("Unrecognised particle type " + str(particleType))
 
-        return
+        return mass, lifetime
+
+
 
     def __repr__(self):
         return "particle(x, y, z, s, px, py, pz, t, weight, mass)"
