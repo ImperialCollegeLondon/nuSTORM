@@ -93,7 +93,7 @@ testPnt = testPnt + 1
 # test pion
 testFile = '02-Tests/pionTst.py'
 testDesc.append(testFile)
-notes.append("__stre__ and __repr__ are printed out, but not checked")
+notes.append("On fail check Scratch/particleTst.out against 02-Tests/particleTst.ref")
 test = run(['python', testFile])
 
 if (test.returncode == 0):
@@ -243,19 +243,18 @@ testPnt = testPnt + 1
 # test truncatedmuon decay
 testFile = '02-Tests/eventHistoryTst.py'
 testDesc.append(testFile)
-notes.append("not run yet")
-#test = run(['python', testFile])
+notes.append("Not checked that names eg pi+, give same results as pdg Code")
+test = run(['python', testFile])
 
-#if (test.returncode == 0):
-#	print (testFile, " passes")
-#	print (notes[testPnt])
-#	testStatus.append("passes")
-#
-#else:
-#	print (testFile, " fails")
-#	testFails = testFails + 1
-#	testStatus.append("fails")
-testStatus.append("Not run")
+if (test.returncode == 0):
+	print (testFile, " passes")
+	print (notes[testPnt])
+	testStatus.append("passes")
+
+else:
+	print (testFile, " fails")
+	testFails = testFails + 1
+	testStatus.append("fails")
 
 testPnt = testPnt + 1
 #		Test 13
@@ -297,22 +296,21 @@ testStatus.append("Not run")
 
 testPnt = testPnt + 1
 #		Test 15
-# test truncatedmuon decay
+# test muon
 testFile = '02-Tests/muonTst.py'
 testDesc.append(testFile)
-notes.append("not run yet")
-#test = run(['python', testFile])
+notes.append("")
+test = run(['python', testFile])
 
-#if (test.returncode == 0):
-#	print (testFile, " passes")
-#	print (notes[testPnt])
-#	testStatus.append("passes")
-#
-#else:
-#	print (testFile, " fails")
-#	testFails = testFails + 1
-#	testStatus.append("fails")
-testStatus.append("Not run")
+if (test.returncode == 0):
+	print (testFile, " passes")
+	print (notes[testPnt])
+	testStatus.append("passes")
+
+else:
+	print (testFile, " fails")
+	testFails = testFails + 1
+	testStatus.append("fails")
 
 testPnt = testPnt + 1
 #		Test 16

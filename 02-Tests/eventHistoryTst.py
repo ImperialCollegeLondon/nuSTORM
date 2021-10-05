@@ -81,10 +81,9 @@ for instance in readDummy:
         pz = float(instance[9])
         t = float(instance[10])
         eventWeight = float(instance[11])
-        mass = float(instance[12])
-        pdgCode = int(instance[13])
+        pType = instance[12]
 
-        testParticle = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz, t, eventWeight, mass, pdgCode)
+        testParticle = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz, t, eventWeight, pType)
         obj.addParticle(loc, testParticle)
 #        obj.display()
 
@@ -92,7 +91,7 @@ for instance in readDummy:
 obj.write()
 obj.outFileClose()
 
-
+print("finished writing")
 objRd = eventHistory.eventHistory()
 objRd.inFile("testFile.root")
 
@@ -104,6 +103,8 @@ dummyData.seek(0)
 header=next(readDummy)
 
 testFlag = True
+
+print("start reading")
 # Now read the input from the csv file, create the eventHistory and com[are it to the one recovered from the root file
 #  get the first event fromnext event from root
 locRecord=[]
@@ -126,11 +127,10 @@ for instance in readDummy:
         pz = float(instance[9])
         t = float(instance[10])
         eventWeight = float(instance[11])
-        mass = float(instance[12])
-        pdgCode = int(instance[13])
+        pType = instance[12]
 
 #   we have the information for a particle at a location from the csv file use it to create a particle
-        csvPart = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz, t, eventWeight, mass, pdgCode)
+        csvPart = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz, t, eventWeight, pType)
 #   compare that particle with the particle from the corresponding location in the root event
         rootPart = objRd.findParticle(loc)
         locRecord.append(loc)
@@ -226,7 +226,7 @@ for pnt in range(len(locations)):
     nTests = nTests + 1
     print(testTitle, ": ",  descriptions[pnt+offset])
     obj = eventHistory.eventHistory()
-    testParticle = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, pdgCode)
+    testParticle = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, pdgCode)
     obj.addParticle(locations[pnt], testParticle)
     retPar = obj.findParticle(locations[pnt])
     if (retPar == testParticle):
@@ -247,17 +247,17 @@ nTests = nTests + 1
 print(testTitle, ": ",  descString)
 
 obj = eventHistory.eventHistory()
-testParticle = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, pdgCode)
-testParticle1 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, -pdgCode)
-testParticle2 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, pdgCode+10)
-testParticle3 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, pdgCode+15)
-testParticle4 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, 12)
-testParticle5 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, 21)
-testParticle6 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, -21)
-testParticle7 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, -12)
-testParticle8 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, 14)
-testParticle9 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, 16)
-testParticle10 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, -15)
+testParticle = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight,   "pi+")
+testParticle1 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight,  "pi-")
+testParticle2 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight,  "mu+")
+testParticle3 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight,  "mu-")
+testParticle4 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight,  "e+")
+testParticle5 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight,  "e-")
+testParticle6 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight,  "nue")
+testParticle7 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight,  "nueBar")
+testParticle8 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight,  "numu")
+testParticle9 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight,  "numuBar")
+testParticle10 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, "pi+")
 obj.addParticle("target", testParticle)
 obj.addParticle("productionStraight", testParticle1)
 obj.addParticle("pionDecay", testParticle2)
@@ -273,7 +273,6 @@ obj.addParticle("nueDetector", testParticle10)
 obj.display()
 
 del obj
-
 ##! tests complete ########################################################################################
 
 print()
