@@ -23,6 +23,7 @@ Test script for eventHistory class
 import sys
 
 from pathlib import Path            # checking for file existance
+import csv                          # so I can read a synthetic data file
 
 # nuStorm imports
 import eventHistory as eventHistory
@@ -38,33 +39,126 @@ testTitle = "eventHistory"
 
 print("========  ", testTitle, ": tests start  ========")
 
-##! Create instance, test built-in methods: #######################################################
-descString = "Create instance and test built in methods"
+##! rRead and write the event history tree: #######################################################
+descString = "Read and Write eventHistory tree"
 descriptions.append(descString)
 
 print(testTitle, ": ",  descString)
 
+# open the root output file
 obj = eventHistory.eventHistory()
-print("    __str__:", obj)
-print("    --repr__", repr(obj))
-del obj
+obj.outFile("testFile.root")
+obj.rootStructure()
 
-##! outFilename check #############################################################################
-descString = "Check output file is created"
+# open the file of dummy data
+s = 10.8
+px = 0.82
+py = 0.45
+pz = 4.67
+t = 24.5
+eventWeight = 0.15
+mass = 0.99
+pdgCode = 211
+
+dummyData = open('02-Tests/dummyData.csv')
+readDummy = csv.reader(dummyData)
+header=[]
+header=next(readDummy)
+
+for instance in readDummy:
+    loc = instance[0]
+    if loc == "endEvent":
+        obj.fill()
+    else:
+        runNum = int(instance[1])
+        eventNum = int(instance[2])
+        x = float(instance[3])
+        y = float(instance[4])
+        z = float(instance[5])
+        s = float(instance[6])
+        px = float(instance[7])
+        py = float(instance[8])
+        pz = float(instance[9])
+        t = float(instance[10])
+        eventWeight = float(instance[11])
+        pType = instance[12]
+
+        testParticle = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz, t, eventWeight, pType)
+        obj.addParticle(loc, testParticle)
+#        obj.display()
+
+# write out data and lose the outfile
+obj.write()
+obj.outFileClose()
+
+print("finished writing")
+objRd = eventHistory.eventHistory()
+objRd.inFile("testFile.root")
+
+nEvent = objRd.getEntries()
+
+#   rewind the input csv file and read it again
+dummyData.seek(0)
+#   first the header
+header=next(readDummy)
+
+testFlag = True
+
+print("start reading")
+# Now read the input from the csv file, create the eventHistory and com[are it to the one recovered from the root file
+#  get the first event fromnext event from root
+locRecord=[]
+locStatus=[]
+
+objRd.readNext()
+for instance in readDummy:
+    loc = instance[0]
+    if loc == "endEvent":
+        objRd.readNext()
+    else:
+        runNum = int(instance[1])
+        eventNum = int(instance[2])
+        x = float(instance[3])
+        y = float(instance[4])
+        z = float(instance[5])
+        s = float(instance[6])
+        px = float(instance[7])
+        py = float(instance[8])
+        pz = float(instance[9])
+        t = float(instance[10])
+        eventWeight = float(instance[11])
+        pType = instance[12]
+
+#   we have the information for a particle at a location from the csv file use it to create a particle
+        csvPart = particle.particle(runNum, eventNum, s, x, y, z, px, py, pz, t, eventWeight, pType)
+#   compare that particle with the particle from the corresponding location in the root event
+        rootPart = objRd.findParticle(loc)
+        locRecord.append(loc)
+        if (csvPart == rootPart):
+            locStatus.append(True)
+        else:
+            testFlag = False
+            locStatus.append(False)
+
+if testFlag == False:
+    print("testflag is ", testFlag)
+    testFails = testFails + 1
+
+for pnt in range(11):
+    print("status is ", locStatus[pnt], "     position is ", locRecord[pnt])
+
+
+del obj
+##! Create instance, test built-in methods: #######################################################
+descString = "Create instance and test built in methods"
 descriptions.append(descString)
 
 nTests = nTests + 1
 print(testTitle, ": ",  descString)
 
 obj = eventHistory.eventHistory()
-obj.outFile("testFile.root")
-obj.outFileClose()
-file = Path("testFile.root")
-if file.is_file():
-    pass
-else:
-    testFails = testFails + 1
-    print(descriptions[nTests], " ..... failed")
+print("    __str__:", obj)
+print("    --repr__", repr(obj))
 del obj
 
 ##! check addParticle with the different locations ########################################################################
@@ -113,9 +207,6 @@ locations.append('nueDetector')
 descString = "Check addParticle and findParticle - with '"+locations[-1]+"' location"
 descriptions.append(descString)
 
-print (locations)
-print (descriptions)
-
 runNum = 43
 eventNum = 67
 x = 1.4
@@ -135,7 +226,7 @@ for pnt in range(len(locations)):
     nTests = nTests + 1
     print(testTitle, ": ",  descriptions[pnt+offset])
     obj = eventHistory.eventHistory()
-    testParticle = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, pdgCode)
+    testParticle = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, pdgCode)
     obj.addParticle(locations[pnt], testParticle)
     retPar = obj.findParticle(locations[pnt])
     if (retPar == testParticle):
@@ -156,17 +247,17 @@ nTests = nTests + 1
 print(testTitle, ": ",  descString)
 
 obj = eventHistory.eventHistory()
-testParticle = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, pdgCode)
-testParticle1 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, -pdgCode)
-testParticle2 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, pdgCode+10)
-testParticle3 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, pdgCode+15)
-testParticle4 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, 12)
-testParticle5 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, 21)
-testParticle6 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, -21)
-testParticle7 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, -12)
-testParticle8 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, 14)
-testParticle9 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, 16)
-testParticle10 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, mass, -15)
+testParticle = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight,   "pi+")
+testParticle1 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight,  "pi-")
+testParticle2 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight,  "mu+")
+testParticle3 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight,  "mu-")
+testParticle4 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight,  "e+")
+testParticle5 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight,  "e-")
+testParticle6 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight,  "nue")
+testParticle7 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight,  "nueBar")
+testParticle8 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight,  "numu")
+testParticle9 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight,  "numuBar")
+testParticle10 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, "pi+")
 obj.addParticle("target", testParticle)
 obj.addParticle("productionStraight", testParticle1)
 obj.addParticle("pionDecay", testParticle2)
@@ -182,7 +273,6 @@ obj.addParticle("nueDetector", testParticle10)
 obj.display()
 
 del obj
-
 ##! tests complete ########################################################################################
 
 print()
