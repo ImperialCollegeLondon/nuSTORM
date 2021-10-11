@@ -1,0 +1,6 @@
+Parameter,Name,Value,Unit,Comment
+Length of transfer line,TrfLineLen,50,m,nuSIM-2021-01
+Momentum acceptance,pAcc,15,%,nuSIM-2021-01
+Transverse acceptance (2D),epsilon,1,pi mm rad,nuSIM-2021-01
+Transverse beta function,beta,25000,mm,nuSIM-2021-01
+Bunch length at target,delT,2,ns,nuSIM-2021-01
