@@ -23,7 +23,8 @@ Class nuSTORMPrdStrght:
                      _filename
   _Circumference   = Ring circumference (m)
   _ProdStrghtLen   = Production straight length (m)
-  _pAcc            = Momentum acceptance (%)
+  _piAcc           = pion Momentum acceptance (%)
+  _muAcc           = muon Momentum acceptance (%)
   _epsilon         = Representative emittance/acceptance (pi mm rad)
   _beta            = Representative beta function (mm)
   _ArcLen          = Arc Length (m)
@@ -40,7 +41,8 @@ Class nuSTORMPrdStrght:
       CdVrsn()     : Returns code version number.
       Circumference: Get circumference (m)
       ProdStrghtLen: Get production straight length (m)
-      pAcc         : Get momentum acceptance (%)
+      piAcc        : Get pion momentum acceptance (%)
+      muAcc        : Get muon momentum acceptance (%)
       epsilon      : Get acceptance/emittance (pi mm rad)
       beta         : Get beta function (mm)
       ArcLen       : Get (semi-circular) Arc Length (m)
@@ -59,6 +61,7 @@ Class nuSTORMPrdStrght:
   
 Created on Thu 21Feb21. Version history:
 ----------------------------------------
+ 1.2: 08Oct21: muon momentum acceptance and pion momentum acceptance different
  1.1: 10May21: Add runType
  1.0: 21Feb21: First implementation
 
@@ -84,14 +87,15 @@ class nuSTORMPrdStrght(object):
             cls._PrdStrghtParams = cls.GetProdStraightParams(filename)
             cls._Circumference   = cls._PrdStrghtParams.iat[0,2]
             cls._ProdStrghtLen   = cls._PrdStrghtParams.iat[1,2]
-            cls._pAcc            = cls._PrdStrghtParams.iat[2,2] / 100.
-            cls._epsilon         = cls._PrdStrghtParams.iat[3,2]
-            cls._beta            = cls._PrdStrghtParams.iat[4,2]
-            cls._HallWallDist    = cls._PrdStrghtParams.iat[5,2]
-            cls._DetHlfWdth      = cls._PrdStrghtParams.iat[6,2]
-            cls._DetLngth        = cls._PrdStrghtParams.iat[7,2]
-            cls._Hall2Det        = cls._PrdStrghtParams.iat[8,2]
-            cls._ArcLen          = cls._PrdStrghtParams.iat[9,2]
+            cls._piAcc           = cls._PrdStrghtParams.iat[2,2] / 100.
+            cls._muAcc           = cls._PrdStrghtParams.iat[3,2] / 100.
+            cls._epsilon         = cls._PrdStrghtParams.iat[4,2]
+            cls._beta            = cls._PrdStrghtParams.iat[5,2]
+            cls._HallWallDist    = cls._PrdStrghtParams.iat[6,2]
+            cls._DetHlfWdth      = cls._PrdStrghtParams.iat[7,2]
+            cls._DetLngth        = cls._PrdStrghtParams.iat[8,2]
+            cls._Hall2Det        = cls._PrdStrghtParams.iat[9,2]
+            cls._ArcLen          = cls._PrdStrghtParams.iat[10,2]
         return cls.__instance
 
     def __repr__(self):
@@ -99,16 +103,23 @@ class nuSTORMPrdStrght(object):
 
     def __str__(self):
         return "nuSTORMPrdStrght: version=%g, circumference=%g m, length of production straight=%g," \
-               "momentum acceptance=%g%%, transverse acceptance=%g pi mm rad, beta=%g mm. \n" \
+               "pi momentum acceptance=%g%%, mu momentum acceptance=%g%%, transverse acceptance=%g pi mm rad, beta=%g mm. \n" \
                "Production straight to hall wall=%g m, detector halfwidth=%g, detector length=%g, hall wall to detector=%g m, Length of Arc=%g m." % \
-               (self.CdVrsn(), self.Circumference(), self.ProdStrghtLen(), self.pAcc(), self.epsilon(), self.beta(), \
+               (self.CdVrsn(), self.Circumference(), self.ProdStrghtLen(), self.piAcc(), self.muAcc(), self.epsilon(), self.beta(), \
                 self.HallWallDist(), self.DetHlfWdth(), self.DetLngth(), self.Hall2Det(), self.ArcLen())
 
 #--------  Simulation methods:
-    def GenerateMmtm(self,p0):
+    def GeneratePiMmtm(self,p0):
         import Simulation as Simu
         p = -99.
-        dp = p0 * self._pAcc
+        dp = p0 * self._piAcc
+        p  = p0 + Simu.getParabolic(dp)
+        return p
+
+    def GenerateMuMmtm(self,p0):
+        import Simulation as Simu
+        p = -99.
+        dp = p0 * self._muAcc
         p  = p0 + Simu.getParabolic(dp)
         return p
 
@@ -142,8 +153,11 @@ class nuSTORMPrdStrght(object):
     def ProdStrghtLen(self):        
         return deepcopy(self._ProdStrghtLen)
 
-    def pAcc(self):        
-        return deepcopy(self._pAcc)
+    def piAcc(self):        
+        return deepcopy(self._piAcc)
+
+    def muAcc(self):        
+        return deepcopy(self._muAcc)
 
     def epsilon(self):        
         return deepcopy(self._epsilon)
