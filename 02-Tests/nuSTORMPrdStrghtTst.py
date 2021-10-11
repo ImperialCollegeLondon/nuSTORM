@@ -46,10 +46,76 @@ print("nuSTORMPrdStrghtTest:", nuSTORMPrdStrghtTest, " check get methods.")
 print("----> printParams() method; reports parameters loaded")
 nuPrdStrt.printParams()
 
-##! Check momentum, z, and transverse distributions:
+##! Check pi momentum, z, and transverse distributions:
 nuSTORMPrdStrghtTest = 4
 print()
-print("nuSTORMPrdStrghtTest:", nuSTORMPrdStrghtTest, " momentum distribution.")
+print("nuSTORMPrdStrghtTest:", nuSTORMPrdStrghtTest, " pi momentum distribution.")
+ppi = np.array([])
+npi = 0
+zpi = np.array([])
+xpi = np.array([])
+ypi = np.array([])
+xppi = np.array([])
+yppi = np.array([])
+print()
+for i in range(50000):
+  npi += 1
+  ppi = np.append(ppi, nuPrdStrt.GeneratePiMmtm(5.))
+  zpi = np.append(zpi, nuPrdStrt.Calculatez(50.*getRandom()))
+  x, y, xp, yp = nuPrdStrt.GenerateTrans(50.*getRandom())
+  xpi  = np.append(xpi, x)
+  ypi  = np.append(ypi, y)
+  xppi = np.append(xppi, xp)
+  yppi = np.append(yppi, yp)
+  if npi < 11:
+      print(npi, ppi[npi-1], zpi[npi-1], x, y, xp, yp)
+
+n, bins, patches = plt.hist(ppi, bins=50, color='y', range=(4.0,6.0))
+plt.xlabel('Momentum (GeV)')
+plt.ylabel('Entries')
+plt.title('momentum distribution')
+plt.savefig('Scratch/nuSTORMPrdStrghtTst_piMomentum.pdf')
+plt.close()
+
+n, bins, patches = plt.hist(zpi, bins=50, color='y', range=(0.,50.))
+plt.xlabel('z (m)')
+plt.ylabel('Entries')
+plt.title('z distribution')
+plt.savefig('Scratch/nuSTORMPrdStrghtTst_piZ.pdf')
+plt.close()
+
+n, bins, patches = plt.hist(xpi, bins=50, color='y', range=(-0.15,0.15))
+plt.xlabel('x (m)')
+plt.ylabel('Entries')
+plt.title('x distribution')
+plt.savefig('Scratch/nuSTORMPrdStrghtTst_piX.pdf')
+plt.close()
+
+n, bins, patches = plt.hist(ypi, bins=50, color='y', range=(-0.15,0.15))
+plt.xlabel('y (m)')
+plt.ylabel('Entries')
+plt.title('y distribution')
+plt.savefig('Scratch/nuSTORMPrdStrghtTst_piY.pdf')
+plt.close()
+
+n, bins, patches = plt.hist(xppi, bins=50, color='y', range=(-0.0075,0.0075))
+plt.xlabel('x^prime')
+plt.ylabel('Entries')
+plt.title('x^prime distribution')
+plt.savefig('Scratch/nuSTORMPrdStrghtTst_piXp.pdf')
+plt.close()
+
+n, bins, patches = plt.hist(yppi, bins=50, color='y', range=(-0.0075,0.0075))
+plt.xlabel('y^prime')
+plt.ylabel('Entries')
+plt.title('y^prime distribution')
+plt.savefig('Scratch/nuSTORMPrdStrghtTst_piYp.pdf')
+plt.close()  
+
+##! Check mu momentum, z, and transverse distributions:
+nuSTORMPrdStrghtTest = 5
+print()
+print("nuSTORMPrdStrghtTest:", nuSTORMPrdStrghtTest, " mu momentum distribution.")
 pmu = np.array([])
 nmu = 0
 zmu = np.array([])
@@ -60,7 +126,7 @@ ypmu = np.array([])
 print()
 for i in range(50000):
   nmu += 1
-  pmu = np.append(pmu, nuPrdStrt.GenerateMmtm(5.))
+  pmu = np.append(pmu, nuPrdStrt.GenerateMuMmtm(5.))
   zmu = np.append(zmu, nuPrdStrt.Calculatez(50.*getRandom()))
   x, y, xp, yp = nuPrdStrt.GenerateTrans(50.*getRandom())
   xmu  = np.append(xmu, x)
@@ -74,42 +140,42 @@ n, bins, patches = plt.hist(pmu, bins=50, color='y', range=(4.0,6.0))
 plt.xlabel('Momentum (GeV)')
 plt.ylabel('Entries')
 plt.title('momentum distribution')
-plt.savefig('Scratch/nuSTORMPrdStrghtTst_plot1.pdf')
+plt.savefig('Scratch/nuSTORMPrdStrghtTst_muMomentum.pdf')
 plt.close()
 
 n, bins, patches = plt.hist(zmu, bins=50, color='y', range=(0.,50.))
 plt.xlabel('z (m)')
 plt.ylabel('Entries')
 plt.title('z distribution')
-plt.savefig('Scratch/nuSTORMPrdStrghtTst_plot2.pdf')
+plt.savefig('Scratch/nuSTORMPrdStrghtTst_muZ.pdf')
 plt.close()
 
 n, bins, patches = plt.hist(xmu, bins=50, color='y', range=(-0.15,0.15))
 plt.xlabel('x (m)')
 plt.ylabel('Entries')
 plt.title('x distribution')
-plt.savefig('Scratch/nuSTORMPrdStrghtTst_plot3.pdf')
+plt.savefig('Scratch/nuSTORMPrdStrghtTst_muX.pdf')
 plt.close()
 
 n, bins, patches = plt.hist(ymu, bins=50, color='y', range=(-0.15,0.15))
 plt.xlabel('y (m)')
 plt.ylabel('Entries')
 plt.title('y distribution')
-plt.savefig('Scratch/nuSTORMPrdStrghtTst_plot4.pdf')
+plt.savefig('Scratch/nuSTORMPrdStrghtTst_muY.pdf')
 plt.close()
 
 n, bins, patches = plt.hist(xpmu, bins=50, color='y', range=(-0.0075,0.0075))
 plt.xlabel('x^prime')
 plt.ylabel('Entries')
 plt.title('x^prime distribution')
-plt.savefig('Scratch/nuSTORMPrdStrghtTst_plot5.pdf')
+plt.savefig('Scratch/nuSTORMPrdStrghtTst_muXp.pdf')
 plt.close()
 
 n, bins, patches = plt.hist(ypmu, bins=50, color='y', range=(-0.0075,0.0075))
 plt.xlabel('y^prime')
 plt.ylabel('Entries')
 plt.title('y^prime distribution')
-plt.savefig('Scratch/nuSTORMPrdStrghtTst_plot6.pdf')
+plt.savefig('Scratch/nuSTORMPrdStrghtTst_muYp.pdf')
 plt.close()  
 
 ##! Complete:
