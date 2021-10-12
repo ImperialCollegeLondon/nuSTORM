@@ -51,7 +51,7 @@ print("    --repr__", repr(p))
 sys.stdout.close()
 sys.stdout = restoreOut
 # compare the standard output to a reference file
-a = os.popen('diff Scratch/particleTst.out 02-Tests/particleTst.ref')
+a = os.popen('diff Scratch/particleTst.out 02-Tests/referenceOutput/particleTst.ref')
 output = a.read()
 if (output == ""):
     pass

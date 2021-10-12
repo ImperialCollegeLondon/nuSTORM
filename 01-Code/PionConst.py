@@ -27,6 +27,7 @@ Class PionConst:
       CdVrsn()  : Returns code version number.
       PDGref()  : Returns reference to version of PDG used for
                   constants.
+    pdgCode() : Returns the (absolute) value of the PDG code - 211
       mass()    : Mass (MeV)
       lifetime(): Lifetime (s)
       SoL()     : Speed of light (m/s)
@@ -71,6 +72,9 @@ class PionConst(object):
 
     def PDGref(self):
         return "M. Tanabashi et al. (Particle Data Group), Phys. Rev. D 98, 030001 (2018)"
+
+    def pdgCode(self):
+        return 211
     
     def mass(self):
         return 139.57061
@@ -85,6 +89,7 @@ class PionConst(object):
     def print(self):
         print("PionConst: version:", self.CdVrsn())
         print("PionConst: PDG reference:", self.PDGref())
+        print("MuonConst: PDG code", self.pdgCode())
         print("PionConst: mass (MeV):", self.mass())
         print("PionConst: lifetime (s):", self.lifetime())
         print("PionConst: speed of light (m/s):", self.SoL())

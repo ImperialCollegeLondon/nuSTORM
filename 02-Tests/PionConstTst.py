@@ -39,7 +39,7 @@ print(piCnst)
 sys.stdout.close()
 sys.stdout = restoreOut
 # compare the standard output to a reference file
-a = os.popen('diff Scratch/pionTst.out 02-Tests/pionTst.ref')
+a = os.popen('diff Scratch/pionTst.out 02-Tests/referenceOutput/pionTst.ref')
 output = a.read()
 if (output == ""):
     pass
@@ -53,9 +53,16 @@ print("PionConstTest:", PionConstTest, " check get methods.")
 print("----> print() method; tests all get methods")
 piCnst.print()
 
+##! Check get pdgCode:
+PionConstTest = 5
+if (piCnst.pdgCode() != 211):
+  testFails = testFails + 1
+
+
 ##! Complete:
 print()
 print("========  PionConst: tests complete  ========")
+print ("testFails is ", testFails)
 if (testFails == 0):
   sys.exit(0)
 else:
