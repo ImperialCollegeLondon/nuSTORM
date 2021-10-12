@@ -117,7 +117,7 @@ class PionEventInstance:
 #   Comment out this line for distribution
 #            Ppi = Ppi0
 #    Comment out this line and we get single energy
-            Ppi = nuStrt.GenerateMmtm(Ppi0)
+            Ppi = nuStrt.GeneratePiMmtm(Ppi0)
 #            print ("Ppi ", Ppi)
             Epi   = np.sqrt(Ppi**2 + PionEventInstance.__pimass**2)
             beta  = Ppi / Epi

@@ -417,7 +417,7 @@ class NeutrinoEventInstance:
         return 0.1*g(-(x+x0)*math.cos(k(1))-(y+y0)*math.sin(k(1)))+0.1*g(-(x+x0)*math.cos(k(2))-(y+y0)*math.sin(k(2)))+0.1*g(-(x+x0)*math.cos(k(3))-(y+y0)*math.sin(k(3)))
 
 
-      if (Mux*Mux/(0.05*0.05))+(Muxp*Muxp/(0.004*0.004)) < 1. and f(Muy, Muyp) < 1.0 and mucostheta < 0:
+      if (Mux*Mux/(0.05*0.05))+(Muxp*Muxp/(0.004*0.004)) < 1. and f(Muy, Muyp) < 1.0: 
             Absorbed = False
       else:
             Absorbed = True

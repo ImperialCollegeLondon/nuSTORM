@@ -81,7 +81,7 @@ print("NeutrinoEventInstanceTest:", NeutrinoEventInstanceTest, \
 nuEI = []
 piEI = []
 
-for i in range(10):
+for i in range(500):
 
     piEvt= piEvtInst.PionEventInstance(8)
     piEI.append(piEvt)
