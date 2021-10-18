@@ -9,6 +9,7 @@ Test script for "MuonConst" class ... initialisation and get methods
 """
 
 import MuonConst as mc
+import sys
 
 ##! Start:
 print("========  MuonConst: tests start  ========")
@@ -36,6 +37,11 @@ print()
 print("MuonConstTest:", MuonConstTest, " check get methods.")
 print("----> print() method; tests all get methods")
 muCnst.print()
+
+##! Check get pdgCode:
+MuonConstTest = 4
+if (muCnst.pdgCode() != 13):
+  sys.exit("wrong pdgcode")
 
 ##! Complete:
 print()

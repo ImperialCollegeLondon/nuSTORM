@@ -29,6 +29,7 @@ Class MuonConst:
       CdVrsn()  : Returns code version number.
       PDGref()  : Returns reference to version of PDG used for
                   constants.
+      pdgCode() : Returns the (absolute) value of the PDG code - 13
       mass()    : Mass (MeV)
       lifetime(): Lifetime (s)
       Michel()  : Michel parameters -- list, 3
@@ -37,6 +38,7 @@ Class MuonConst:
   
 Created on Thu 31Dec20;16:42: Version history:
 ----------------------------------------------
+ 1.1: 12Oct21: Add pdgcode (absolute value)
  1.0: 31Dec20: First implementation
 
 @author: kennethlong
@@ -75,7 +77,10 @@ class MuonConst(object):
 
     def PDGref(self):
         return "P.A. Zyla et al. (Particle Data Group), Prog. Theor. Exp. Phys. 2020, 083C01 (2020)."
-    
+
+    def pdgCode(self):
+        return 13
+
     def mass(self):
         return 105.6583745
 
@@ -92,6 +97,7 @@ class MuonConst(object):
     def print(self):
         print("MuonConst: version:", self.CdVrsn())
         print("MuonConst: PDG reference:", self.PDGref())
+        print("MuonConst: PDG code", self.pdgCode())
         print("MuonConst: mass (MeV):", self.mass())
         print("MuonConst: lifetime (s):", self.lifetime())
         print("MuonConst: SM Michel parameters [rho, eta, delta]:", self.Michel())
