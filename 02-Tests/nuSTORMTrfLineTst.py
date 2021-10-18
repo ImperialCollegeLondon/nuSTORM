@@ -72,30 +72,30 @@ for i in range(500):   #50000
       print(nmu, pmu[nmu-1], zmu[nmu-1], x, y, xp, yp)
 
 ##! Check generating pion distributions from scratch
-nuSTORMTrfLineTest = 5
-print()
-print("nuSTORMTrfLineTest:", nuSTORMTrfLineTest, " pion distributions.")
-pis = []
-Epi = np.array([])
-ppi = np.array([])
-xppi = np.array([])
-yppi = np.array([])
-sd = np.array([])
-p0 = 5.
-s_final=-50.
-runNum = 101
-eventNum = 0
-print()
-for i in range(500000):
-    eventNum +=1
-    s_decay, pi = nuTrfLine.GeneratePion(p0=p0,s_final=s_final,runNum=runNum,eventNum=eventNum)
-    pis.append(pi)
-    Epi = np.append(Epi,pi.p()[0])
-    sd = np.append(sd,s_decay)
-    if eventNum < 11:
-        print(eventNum,pi.run(),s_decay,pi.s(),pi.x(),pi.y(),pi.z(),pi.p()[1][0],pi.p()[1][1],pi.p()[1][2],pi.mass(),pi.t(),pi.weight())
-    elif eventNum%100000 == 0:
-        print(eventNum)
+#nuSTORMTrfLineTest = 5
+#print()
+#print("nuSTORMTrfLineTest:", nuSTORMTrfLineTest, " pion distributions.")
+#pis = []
+#Epi = np.array([])
+#ppi = np.array([])
+#xppi = np.array([])
+#yppi = np.array([])
+#sd = np.array([])
+#p0 = 5.
+#s_final=-50.
+#runNum = 101
+#eventNum = 0
+#print()
+#for i in range(500000):
+#    eventNum +=1
+#    s_decay, pi = nuTrfLine.GeneratePion(p0=p0,s_final=s_final,runNum=runNum,eventNum=eventNum)
+#    pis.append(pi)
+#    Epi = np.append(Epi,pi.p()[0])
+#    sd = np.append(sd,s_decay)
+#    if eventNum < 11:
+#        print(eventNum,pi.run(),s_decay,pi.s(),pi.x(),pi.y(),pi.z(),pi.p()[1][0],pi.p()[1][1],pi.p()[1][2],pi.mass(),pi.t(),pi.weight())
+#    elif eventNum%100000 == 0:
+#        print(eventNum)
 
 
 ##! PLOTTING
