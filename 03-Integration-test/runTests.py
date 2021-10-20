@@ -6,6 +6,15 @@ Class testDrive:
 
 runs the test scripts and picks up the return codes
 
+V1.2 							20 October 2021 						
+	Add RunSimulation.py
+
+V1.1 							20 October 2021 						
+	Add test for PionEventInstance.py
+
+Version 1.0 				A framework and some of the tests
+
+
 
 """
 from subprocess import run
@@ -39,7 +48,7 @@ testPnt = testPnt + 1
 # test pionConst
 testFile = '02-Tests/PionConstTst.py'
 testDesc.append(testFile)
-notes.append("for fail check Scratch/pionTst.out against 02-Tests/pionTst.ref")
+notes.append("for fail check Scratch/pionTst.out against 02-Tests/referenceOutput/pionTst.ref")
 test = run(['python', testFile])
 # This returns a 1 if it the class is not a singleton - else need to check the 
 # output
@@ -221,21 +230,20 @@ else:
 testPnt = testPnt + 1
 #		Test 11
 # test truncatedmuon decay
-testFile = '02-Tests/RunSimulationTst.py'
+testFile = '02-Tests/RunSimulation.py'
 testDesc.append(testFile)
-notes.append("not run yet")
-#test = run(['python', testFile])
+notes.append("Just runs RunSimulation ... no checks on output - need a RunSimulationTst.py")
+test = run(['python', testFile])
 
-#if (test.returncode == 0):
-#	print (testFile, " passes")
-#	print (notes[testPnt])
-#	testStatus.append("passes")
-#
-#else:
-#	print (testFile, " fails")
-#	testFails = testFails + 1
-#	testStatus.append("fails")
-testStatus.append("Not run")
+if (test.returncode == 0):
+	print (testFile, " passes")
+	print (notes[testPnt])
+	testStatus.append("passes")
+
+else:
+	print (testFile, " fails")
+	testFails = testFails + 1
+	testStatus.append("fails")
 
 
 testPnt = testPnt + 1
@@ -356,22 +364,18 @@ testPnt = testPnt + 1
 # test truncatedmuon decay
 testFile = '02-Tests/PionEventInstanceTst.py'
 testDesc.append(testFile)
-notes.append("not run yet")
-#test = run(['python', testFile])
+notes.append("Not all output is checked automatically")
+test = run(['python', testFile])
 
-#if (test.returncode == 0):
-#	print (testFile, " passes")
-#	print (notes[testPnt])
-#	testStatus.append("passes")
-#
-#else:
-#	print (testFile, " fails")
-#	testFails = testFails + 1
-#	testStatus.append("fails")
-testStatus.append("Not run")
+if (test.returncode == 0):
+	print (testFile, " passes")
+	print (notes[testPnt])
+	testStatus.append("passes")
 
-
-
+else:
+	print (testFile, " fails")
+	testFails = testFails + 1
+	testStatus.append("fails")
 
 
 

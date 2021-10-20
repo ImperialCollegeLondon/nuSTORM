@@ -50,6 +50,7 @@ Created on Tue 30Mar21;02:26: Version history:
  1.0: 30Mar21: First implementation - checked on 12 May that the decay length for a 6 GeV pion beam
  is as expected, by fitting the distribution of decay lengths
 
+ 1.1: 20Oct21: Correct problem created by adding different momentum distributions for pions and muons
 @author: kennethlong
 @auhtor: PaulKyberd
 """
@@ -114,7 +115,7 @@ class PionEventInstance:
 #   Comment out this line for distribution
 #            Ppi = Ppi0
 #    Comment out this line and we get single energy
-            Ppi = nuStrt.GenerateMmtm(Ppi0)
+            Ppi = nuStrt.GeneratePiMmtm(Ppi0)
 #            print ("Ppi ", Ppi)
             Epi   = np.sqrt(Ppi**2 + PionEventInstance.__pimass**2)
             beta  = Ppi / Epi

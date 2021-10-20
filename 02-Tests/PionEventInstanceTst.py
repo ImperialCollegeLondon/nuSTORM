@@ -10,6 +10,10 @@ Test script for "PionEventInstance" class
   large number of decays is executed.  Finally a set of reference plots
   are generated.
 
+  Version 1.1            Paul Kyberd                    20 October 2021
+
+  Add sys.exit("message ") to test 4
+
 """
 
 import MuonConst as muCnst
@@ -18,6 +22,7 @@ import PionEventInstance as piEvtInst
 import numpy as np
 import matplotlib.pyplot as plt
 import Simulation as Simu
+import sys
 
 mc = muCnst.MuonConst()
 pc = piCnst.PionConst()
@@ -29,7 +34,8 @@ print("========  PionEventInstance: tests start  ========")
 PionEventInstanceTest = 1
 print()
 print("PionEventInstanceTest:", PionEventInstanceTest, " Test built-in methods.")
-piEI = piEvtInst.PionEventInstance(8.)
+piMomentum = 8.
+piEI = piEvtInst.PionEventInstance(piMomentum)
 print("    __str__:", piEI)
 print("    --repr__", repr(piEI))
 
@@ -39,6 +45,9 @@ print()
 print("PionEventInstanceTest:", PionEventInstanceTest, \
       "Test get/set methods.")
 print("    Pion momentum (GeV):", piEI.getppi())
+if (piEI.getppi() != piMomentum):
+  sys.exit("getppi returns the wrong value")
+
 
 ##! Test methods by which neutrino-creation event is generated:
 PionEventInstanceTest = PionEventInstanceTest + 1

@@ -142,7 +142,7 @@ class NeutrinoEventInstance:
         Dcy = MuonDecay.MuonDecay()
 
         Pmu0             = self.getpmu()
-        PmuGen           = nuStrt.GenerateMmtm(Pmu0)
+        PmuGen           = nuStrt.GeneratePiMmtm(Pmu0)
         DcyCoord, DirCos = self.GenerateDcyPhaseSpace(Dcy, PmuGen, nuStrt)
 
         z  = DcyCoord[3]
