@@ -40,7 +40,7 @@ class hornPars():
     def __init__(self, pol = 1):
 
         # Current (kA)
-        self.I = 230.0
+        self.I = 219.0
         # Current polarity: +1 or -1
         self.pol = pol
         # Fluka current parameter file: fixed in Fluka/src/user/magfld.f

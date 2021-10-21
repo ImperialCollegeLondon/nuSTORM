@@ -267,7 +267,7 @@ if __name__ == '__main__':
     jobNum = 1
     nEvents = 10
     beamE = 100.0 # or 26 GeV
-    hornI = 230.0 # kA
+    hornI = 219.0 # kA
     hornPol = 1.0 # +1 or -1
     
     nArg = len(os.sys.argv)
