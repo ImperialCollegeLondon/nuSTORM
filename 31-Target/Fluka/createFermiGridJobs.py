@@ -38,7 +38,7 @@ if __name__ == '__main__':
     # Beam energy (GeV)
     beamE = 100.0
     # Horn current and polarity
-    hornI = 230.0
+    hornI = 219.0
     hornPol = 1.0
  
     nArg = len(os.sys.argv)

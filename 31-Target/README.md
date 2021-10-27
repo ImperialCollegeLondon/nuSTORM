@@ -9,6 +9,7 @@ It implements a 46 cm-long cylindrical Inconel target, with a radius of 6.3 mm, 
 the bore of a 2.2 m-long aluminium magnetic horn that is filled with argon gas. The horn
 has an inner conductor radius of 2 cm at the neck (2.5 mm thick), which increases to
 8.5 cm (5.0 cm) at the upstream (downstream) ends, and an outer conductor radius of 10 cm.
+The horn current is nominally set at 219 kA (from the Fermilab optimisation study).
 
 ### FLUKA
 
@@ -25,7 +26,7 @@ to be recompiled and linked. The field is `B = 0.02*I(kA)/r(cm) Tesla` for horn 
 `I` and radius `r`.
 3. [FieldPars.dat](Fluka/FieldPars.dat) contains 2 parameters: the horn current (kA) and
 whether the current direction is positive (1.0) or negative (-1.0). This is used by the
-`magfld.f` code.
+`magfld.f` code. The nominal current is 219 kA (from the Fermilab optimisation study).
 4. [mgdraw.f](Fluka/mgdraw.f) is a user routine to track pions and muons crossing the
 downstream end of the horn within the outer conductor horn radius. This file also needs
 to be placed in the `FlukaInstall/src/user` directory.
@@ -42,9 +43,9 @@ The Fluka simulation creates several output files. Assuming the Fluka input file
 and horn volumes (usrbin binary format).
 2. `nuSTORMTarget001_fort.22` is the energy deposition density (GeV/cc/proton) in the target
 only (usrbin binary format).
-3. `nuSTORMTarget001_evt.txt` is an ascii text file containing the energy deposition (GeV)
+3. `nuSTORMTarget001_evt.txt` is an ASCII text file containing the energy deposition (GeV)
 in each volume region for each individual event.
-4. `nuSTORMTarget001_output.txt` is an ascii text file containing the coordinates, momenta
+4. `nuSTORMTarget001_output.txt` is an ASCII text file containing the coordinates, momenta
 and other information for pions and muons crossing the downstream end of the horn, within
 the outer conductor aperture radius. This is performed by the `BXDRAW` subroutine in
 [mgdraw.f](Fluka/mgdraw.f). The data columns are event number, Fluka particle id, total
@@ -71,6 +72,12 @@ following variables (one entry per pion or muon):
 - The total momentum `p` (GeV)
 - The particle flight time `tns` (ns)
 - The particle `weight`
+
+The python script [asciiFromROOT.py](Fluka/asciiFromROOT.py) writes the pion and muon
+information from the previous ROOT TTree structure into a gzipped ASCII text file that
+can be used to specify the input beam distribution in
+[BDSIM](http://www.pp.rhul.ac.uk/bdsim/manual/model_control.html#userfile),
+where each row contains the variables `x y z px py pz PDGId totE`.
 
 #### FermiGrid job submission
 The python script [createFermiGridJobs.py](Fluka/createFermiGridJobs.py) creates a shell
