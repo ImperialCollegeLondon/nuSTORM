@@ -38,7 +38,7 @@ import PionConst as PionConst
 import NeutrinoEventInstance as nuEvtInst
 
 gROOT.ProcessLine(
-"struct atTarget {\
+"struct target {\
    Int_t				runNumber;\
    Int_t				eventNumber;\
    Int_t				pdgCode;\
@@ -55,7 +55,7 @@ gROOT.ProcessLine(
 };" );
 
 gROOT.ProcessLine(
-"struct prdStrght {\
+"struct productionStraight {\
    Int_t				runNumber;\
    Int_t				eventNumber;\
    Int_t				pdgCode;\
@@ -261,10 +261,10 @@ class eventHistory:
 		self._inTFile = TFile( self._inputFilename, 'READ', 'event History' )
 
 		self._eHTree = self._inTFile.Get("eventHistory")
-		self.atTarget = ROOT.atTarget()
-		self._eHTree.SetBranchAddress('atTarget', self.atTarget)
-		self.prodStrght = ROOT.prdStrght()
-		self._eHTree.SetBranchAddress('prodStrght', self.prodStrght)
+		self.target = ROOT.target()
+		self._eHTree.SetBranchAddress('target', self.target)
+		self.productionStraight = ROOT.productionStraight()
+		self._eHTree.SetBranchAddress('productionStraight', self.productionStraight)
 		self.pionDecay = ROOT.pionDecay()
 		self._eHTree.SetBranchAddress("pionDecay", self.pionDecay)
 		self.muonProduction = ROOT.muonProduction()
@@ -298,20 +298,20 @@ class eventHistory:
 
 #		for pnt in range(2):
 #			self._eHTree.GetEntry(pnt)
-#			print ("at target x ", self.atTarget.x)
-#			print ("production Straight x ", self.prodStrght.x)
+#			print ("at target x ", self.target.x)
+#			print ("production Straight x ", self.productionStraight.x)
 #			print ("pion Decay x ", self.pionDecay.x)
 #			print (self.pionDecay.runNumber)
 #			print (self.pionDecay.eventNumber)
 
 		self._eHTree.GetEntry(self._entryPnt)
 
-		pTar = particle.particle(self.atTarget.runNumber, self.atTarget.eventNumber, self.atTarget.s, 
-			self.atTarget.x, self.atTarget.y, self.atTarget.z, self.atTarget.px, self.atTarget.py, self.atTarget.pz, 
-			self.atTarget.t, self.atTarget.eventWeight, self.atTarget.pdgCode)
-		pPs = particle.particle(self.prodStrght.runNumber, self.prodStrght.eventNumber, self.prodStrght.s, 
-			self.prodStrght.x, self.prodStrght.y, self.prodStrght.z, self.prodStrght.px, self.prodStrght.py, self.prodStrght.pz, 
-			self.prodStrght.t, self.prodStrght.eventWeight, self.prodStrght.pdgCode)
+		pTar = particle.particle(self.target.runNumber, self.target.eventNumber, self.target.s, 
+			self.target.x, self.target.y, self.target.z, self.target.px, self.target.py, self.target.pz, 
+			self.target.t, self.target.eventWeight, self.target.pdgCode)
+		pPs = particle.particle(self.productionStraight.runNumber, self.productionStraight.eventNumber, self.productionStraight.s, 
+			self.productionStraight.x, self.productionStraight.y, self.productionStraight.z, self.productionStraight.px, self.productionStraight.py, 
+			self.productionStraight.pz, self.productionStraight.t, self.productionStraight.eventWeight, self.productionStraight.pdgCode)
 		pPiDcy = particle.particle(self.pionDecay.runNumber, self.pionDecay.eventNumber, self.pionDecay.s, 
 			self.pionDecay.x, self.pionDecay.y, self.pionDecay.z, self.pionDecay.px, self.pionDecay.py, self.pionDecay.pz, 
 			self.pionDecay.t, self.pionDecay.eventWeight, self.pionDecay.pdgCode)
@@ -355,10 +355,10 @@ class eventHistory:
 
 	def rootStructure(self):
 # Define the root data structure
-		self.atTarget = ROOT.atTarget()
-		self.evTree.Branch('atTarget', self.atTarget, 'run/I:event:pdgCode:x/F:y:z:s:px:py:pz:t:eventWeight:mass')
-		self.prodStrght = ROOT.prdStrght()
-		self.evTree.Branch('prodStrght', self.prodStrght, 'run/I:event:pdgCode:x/F:y:z:s:px:py:pz:t:eventWeight:mass')
+		self.target = ROOT.target()
+		self.evTree.Branch('target', self.target, 'run/I:event:pdgCode:x/F:y:z:s:px:py:pz:t:eventWeight:mass')
+		self.productionStraight = ROOT.productionStraight()
+		self.evTree.Branch('productionStraight', self.productionStraight, 'run/I:event:pdgCode:x/F:y:z:s:px:py:pz:t:eventWeight:mass')
 		self.pionDecay = ROOT.pionDecay()
 		self.evTree.Branch('pionDecay', self.pionDecay, 'run/I:event:pdgCode:x/F:y:z:s:px:py:pz:t:eventWeight:mass')
 		self.muonProduction = ROOT.muonProduction()
@@ -385,34 +385,34 @@ class eventHistory:
 	def fill(self):
 
 # target
-		self.atTarget.runNumber = self._particles[0].run()
-		self.atTarget.eventNumber = self._particles[0].event()
-		self.atTarget.pdgCode = self._particles[0].pdgCode()
-		self.atTarget.x = self._particles[0].x()
-		self.atTarget.y = self._particles[0].y()
-		self.atTarget.z = self._particles[0].z()
-		self.atTarget.s = self._particles[0].s()
-		self.atTarget.px = self._particles[0].p()[1][0]
-		self.atTarget.py = self._particles[0].p()[1][1]
-		self.atTarget.pz = self._particles[0].p()[1][2]
-		self.atTarget.t = self._particles[0].t()
-		self.atTarget.eventWeight = self._particles[0].weight()
-		self.atTarget.mass = self._particles[0].mass()
+		self.target.runNumber = self._particles[0].run()
+		self.target.eventNumber = self._particles[0].event()
+		self.target.pdgCode = self._particles[0].pdgCode()
+		self.target.x = self._particles[0].x()
+		self.target.y = self._particles[0].y()
+		self.target.z = self._particles[0].z()
+		self.target.s = self._particles[0].s()
+		self.target.px = self._particles[0].p()[1][0]
+		self.target.py = self._particles[0].p()[1][1]
+		self.target.pz = self._particles[0].p()[1][2]
+		self.target.t = self._particles[0].t()
+		self.target.eventWeight = self._particles[0].weight()
+		self.target.mass = self._particles[0].mass()
 
 # production straight
-		self.prodStrght.runNumber = self._particles[1].run()
-		self.prodStrght.eventNumber = self._particles[1].event()
-		self.prodStrght.pdgCode = self._particles[1].pdgCode()
-		self.prodStrght.x = self._particles[1].x()
-		self.prodStrght.y = self._particles[1].y()
-		self.prodStrght.z = self._particles[1].z()
-		self.prodStrght.s = self._particles[1].s()
-		self.prodStrght.px = self._particles[1].p()[1][0]
-		self.prodStrght.py = self._particles[1].p()[1][1]
-		self.prodStrght.pz = self._particles[1].p()[1][2]
-		self.prodStrght.t = self._particles[1].t()
-		self.prodStrght.eventWeight = self._particles[1].weight()
-		self.prodStrght.mass = self._particles[1].mass()
+		self.productionStraight.runNumber = self._particles[1].run()
+		self.productionStraight.eventNumber = self._particles[1].event()
+		self.productionStraight.pdgCode = self._particles[1].pdgCode()
+		self.productionStraight.x = self._particles[1].x()
+		self.productionStraight.y = self._particles[1].y()
+		self.productionStraight.z = self._particles[1].z()
+		self.productionStraight.s = self._particles[1].s()
+		self.productionStraight.px = self._particles[1].p()[1][0]
+		self.productionStraight.py = self._particles[1].p()[1][1]
+		self.productionStraight.pz = self._particles[1].p()[1][2]
+		self.productionStraight.t = self._particles[1].t()
+		self.productionStraight.eventWeight = self._particles[1].weight()
+		self.productionStraight.mass = self._particles[1].mass()
 
 # pion decay
 		self.pionDecay.runNumber = self._particles[2].run()
