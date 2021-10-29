@@ -155,41 +155,39 @@ testStatus.append("Not run")
 
 testPnt = testPnt + 1
 #		Test 7
-# test truncatedmuon decay
+# test production decay
 testFile = '02-Tests/nuSTORMPrdStrghtTst.py'
 testDesc.append(testFile)
-notes.append("not run yet")
-#test = run(['python', testFile])
+notes.append("need to look at plots to complete the test")
+test = run(['python', testFile])
 
-#if (test.returncode == 0):
-#	print (testFile, " passes")
-#	print (notes[testPnt])
-#	testStatus.append("passes")
-#
+if (test.returncode == 0):
+	print (testFile, " passes")
+	print (notes[testPnt])
+	testStatus.append("passes")
+
 #else:
-#	print (testFile, " fails")
-#	testFails = testFails + 1
-#	testStatus.append("fails")
-testStatus.append("Not run")
+	print (testFile, " fails")
+	testFails = testFails + 1
+	testStatus.append("fails")
 
 testPnt = testPnt + 1
 #		Test 8
 # test truncatedmuon decay
 testFile = '02-Tests/NeutrinoEventInstanceTst.py'
 testDesc.append(testFile)
-notes.append("not run yet")
-#test = run(['python', testFile])
+notes.append("Plots not checked - seems to fail as part of runTests, but not run independantly")
+test = run(['python', testFile])
 
-#if (test.returncode == 0):
-#	print (testFile, " passes")
-#	print (notes[testPnt])
-#	testStatus.append("passes")
-#
-#else:
-#	print (testFile, " fails")
-#	testFails = testFails + 1
-#	testStatus.append("fails")
-testStatus.append("Not run")
+if (test.returncode == 0):
+	print (testFile, " passes")
+	print (notes[testPnt])
+	testStatus.append("passes")
+
+else:
+	print (testFile, " fails")
+	testFails = testFails + 1
+	testStatus.append("fails")
 
 testPnt = testPnt + 1
 #		Test 9
