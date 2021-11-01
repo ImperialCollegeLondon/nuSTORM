@@ -236,7 +236,7 @@ class ntupleMake:
 		self.event.pnumuX = nuEvt.getnumu4mmtm()[1][0]
 		self.event.pnumuY = nuEvt.getnumu4mmtm()[1][1]
 		self.event.pnumuZ = nuEvt.getnumu4mmtm()[1][2]
-# get the 4 vector of the muon neutrino
+# get the 4 vector of the electron neutrino
 		self.event.Enue  = nuEvt.getnue4mmtm()[0]
 		self.event.pnueX = nuEvt.getnue4mmtm()[1][0]
 		self.event.pnueY = nuEvt.getnue4mmtm()[1][1]
