@@ -11,17 +11,17 @@ Class PionEventInstance:
   -----------------
   __MuonDecay: muon decay class
   --np       : numpy class
-      
+
   Instance attributes:
   --------------------
   _ppi      : Pion momentum: i/p argument at instance creation
-  _pmu      : Muon momentum; 
-  _TrcSpcCrd: Trace space (s, x, y, z, x', y') in numpy array at 
+  _pmu      : Muon momentum;
+  _TrcSpcCrd: Trace space (s, x, y, z, x', y') in numpy array at
               point of decay
   _pmuGen   : Generated pion momentum
   _P_mu     : Muon 4 momentum: (E, array(px, py, pz)), GeV
   _P_numu   : Muon-neuutrino 4 momentum: (E, array(px, py, pz)), GeV
-    
+
   Methods:
   --------
   Built-in methods __new__, __repr__ and __str__.
@@ -36,7 +36,7 @@ Class PionEventInstance:
     getppiGen         : Returns generated pion momentum (GeV)
     getmu4mmtm        : Returns muon 4 momentum: (E, array(px, py, pz)), GeV
     getnumu4mmtm      : Returns muon-neutrino 4 momentum: (E, array(px, py, pz)), GeV
-  
+
   General methods:
     CreateNeutrinos      : Manager for neutrino decay, returns z (m) of decay (real), P_e, P_nue, P_numu, RestFrame
                            Restframe contains a dump of the instance attributes of the MuonDecay class
@@ -64,7 +64,7 @@ import numpy as np
 muCnst = MuonConst.MuonConst()
 piCnst = PionConst.PionConst()
 nuStrt = nuPrdStrt.nuSTORMPrdStrght('11-Parameters/nuSTORM-PrdStrght-Params-v1.0.csv')
-    
+
 class PionEventInstance:
 
     __mumass = muCnst.mass()/1000.
@@ -72,7 +72,7 @@ class PionEventInstance:
     __sol    = muCnst.SoL()
 
     __Debug  = False
-    
+
 #--------  "Built-in methods":
     def __init__(self, ppi=6.):
 
@@ -93,12 +93,12 @@ class PionEventInstance:
             (self._ppi, self._TrcSpcCrd[0], self._TrcSpcCrd[3], self._ppiGen, \
              self._P_mu[0], self._P_mu[1][0],self._P_mu[1][1],self._P_mu[1][2], \
              self._P_numu[0], self._P_numu[1][0],self._P_numu[1][1],self._P_numu[1][2] )
-    
+
 #--------  Generation of neutrino-creation event:
 #.. Manager:
     def CreateMuon(self):
 #        print ("Starting create muon")
-        
+
         PrdStrghtLngth = 180.0
 #        #.. Prepare--get muon decay instance in pion rest frame:
         z = 2.* PrdStrghtLngth
@@ -108,13 +108,13 @@ class PionEventInstance:
         while z > PrdStrghtLngth:
             if isinstance(Dcy, PionDecay.PionDecay):
                 del Dcy
-            
+
             Ppi0 = self.getppi()
 #            print ("Ppi0 ", Ppi0)
 #   Comment out this line for distribution
 #            Ppi = Ppi0
 #    Comment out this line and we get single energy
-            Ppi = nuStrt.GenerateMmtm(Ppi0)
+            Ppi = nuStrt.GeneratePiMmtm(Ppi0)
 #            print ("Ppi ", Ppi)
             Epi   = np.sqrt(Ppi**2 + PionEventInstance.__pimass**2)
             beta  = Ppi / Epi
@@ -135,7 +135,7 @@ class PionEventInstance:
         if PionEventInstance.__Debug:
             print("PionEventInstance.CreatePion: decay at z =", z)
             print("----> Dcy:", Dcy.__str__())
-            
+
         #.. Boost to nuSTORM frame:
         if PionEventInstance.__Debug:
             print("PionEventInstance.CreateMuon: rotate and boost to nuSTORM rest frame:")
@@ -152,12 +152,12 @@ class PionEventInstance:
         coord = np.array([0., 0., 0., 0., 0., 0.])
         #.. longitudinal position, "s", z:
 #        coord[0] = self.GenerateLongiPos(Dcy, Ppi)
-# using  s = (beta*c) * (gamma*t) = p/E * c * E/m * lifetime = p*c*lifetime/m 
+# using  s = (beta*c) * (gamma*t) = p/E * c * E/m * lifetime = p*c*lifetime/m
         coord[0] =Ppi*PionEventInstance.__sol*Dcy.getLifetime()/PionEventInstance.__pimass
         # [3] is the z position which is calculated from the decay distance and information about the
         # beam trajectory. At present set to the valus of s
         coord[3] = coord[0]
-# here we set the Beam Twiss parameters and Energy spread 
+# here we set the Beam Twiss parameters and Energy spread
         x, y, xp, yp = nuStrt.GenerateTrans(coord[0])
         coord[1] = x
         coord[2] = y
@@ -169,13 +169,13 @@ class PionEventInstance:
 
 #.. Boost from muon rest frame to nuSTORM frame:
     def Boost2nuSTORM(self, Dcy, PPi):
-        ''' Present approximation is muon propagates along z axis, so, boost only 
+        ''' Present approximation is muon propagates along z axis, so, boost only
             in preparation for later, include rotation matrix to transform from
             nustorm frame to frame with z axis along muon momentum and back '''
 
 #        print ("PPi on Start boost to nuStorm", PPi)
 
-       
+
         EPi = np.sqrt(PPi**2 + PionEventInstance.__pimass**2)
         beta   = PPi / EPi
         gamma  = EPi / PionEventInstance.__pimass
@@ -202,35 +202,35 @@ class PionEventInstance:
             print("PionEventInstance.Boost2nuSTORM: nuSTORM frame P_mu:")
             print("----> P_mu (GeV):", P_mu)
             print("----> Dcy.get4vmu:", Dcy.get4vmu())
-        
+
         P_numu    = Dcy.get4vnumu()
         P_numu[0] = P_numu[0]/1000.
         P_numu[1] = P_numu[1]/1000.
         P_numu    = self.RotnBoost(P_numu, R, Rinv, gamma, beta)
-        
+
  #       print ("End boost to nuStorm")
 
         return P_mu, P_numu
-    
+
     def RotnBoost(self, P, R, Rinv, gamma, beta):
         if PionEventInstance.__Debug:
             print("PionEventInstance.RotnBoos:")
             print("----> P, R, Rinv, gamma, beta:", P, "\n", \
                   R, "\n", Rinv, "\n", gamma, beta)
-            
+
   #      print ("P[1] is ", P[1])
   #      print ("P is ", P)
         p3 = np.dot(R, P[1])
  #       print("    p3 is ", p3)
-        
+
         Ec = P[0]
         Pc = p3[2]
 #        print("    Ec is ", Ec, "   Pc is ", Pc)
-        
+
         Ef = gamma * (Ec + beta * Pc)
         Pf = gamma * (Pc + beta * Ec)
 #        print("    Ef is ", Ef, "   Pf is ", Pf)
-        
+
         p3[2] = Pf
         p3    = np.dot(Rinv, p3)
 #        print("    p3 is ", p3)
@@ -239,9 +239,9 @@ class PionEventInstance:
         Po[0] = Ef
         Po[1] = p3
 #        print("    Po is ", Po)
-        
+
         return Po
-    
+
 #--------  get/set methods:
     def getppi(self):
         return deepcopy(self._ppi)

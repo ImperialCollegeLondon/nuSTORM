@@ -22,7 +22,7 @@ Class nuSTORMTrfLine:
   _TrfLineParams   = Pandas dataframe containing specification in
                      _filename
   _TrfLineLen      = Production straight length (m)
-  _pAcc            = Momentum acceptance (%)
+  _piAcc           = Momentum acceptance (%)
   _epsilon         = Representative emittance/acceptance (pi mm rad)
   _beta            = Representative beta function (mm)
   _delT            = Bunch length at target (ns)
@@ -38,32 +38,69 @@ Class nuSTORMTrfLine:
   Get/set methods:
       CdVrsn()     : Returns code version number.
       TrfLineLen   : Get transfer line length (m)
-      pAcc         : Get momentum acceptance (%)
+      piAcc        : Get momentum acceptance (%)
       epsilon      : Get acceptance/emittance (pi mm rad)
       beta         : Get beta function (mm)
       delT         : Get bunch length (ns)
 
 
   Generation, calcution methods and utilities:
-      GenerateMmtm : Generates momentum centred on p0 (input float).
+      GeneratePiMmtm : Generates momentum centred around p0 (input float).
                      Parabolic distribution generated.
       GenerateTime : Generates time to enter transfer line; first particle leaves at t=0.
                      Uniform distribution generated.
-      Calculatez   : Calculate z of decay given s, p and transfer line
-                     and production-straight parameters.
-                     **This version: z=s** (m)
-      Calculatepz  : Calculate pz from px and py.
       GenerateTrans: Generate transverse phase space (x, y, xp, yp) given
                      representative emittance and beta.  Parabolic distributions
                      generated.
-      GeneratePion : Generate a pion instance
+      GenerateDcyTime: Generate time in the nuSTORM frame after which pion decays.
+      Calculatet   : Calculate t of particle at certain s_final, given initial s,
+                     t_i and v.
+      Calculatez   : Calculate z given s, p and transfer line
+                     and production-straight parameters.
+                     **This version: z=s** (m)
+      Calculatepz  : Calculate pz from px and py.
+      CalculateE   : Calculate E given p.
+      Calculatev   : Calculate v given p.
+      CalculateDcyPt : Calculate s of decay given gamma and v. It is also checked,
+                     whether pion decays already in transfer line, given original s,
+                     final s_final and intial t_i. If pion doesn't decay in transfer
+                     line, s_dcy = -100. [m] is returned.
+      GeneratePion : Generate two pion particle instances given an eventHistory instance,
+                     runNum, eventNum, weight, plus initialization specific arguments.
+                     These will be added to the eventHistory, which will then be returned.
+                     The pion instance can be initialized in two different ways:
+                     1. Pion is generated and initialized from scratch according to some
+                        predefined distributions (so far - t: uniform, p: parabolic).
+                        Additional argument needed is pion central momentum p0.
+                     2. Pion is generated and initialized with input parameters. This
+                        allows initialization with parameters from other simulations.
+                        Additional arguments needed are x, y, px, py, pz and t.
+                     The two pion instances are generated at target (s=-50m) and at
+                     the entrance of the production straight (s=0m). It is also checked
+                     whether the pion already decays in the transfer line. If so, the
+                     pion at the production straight entrance has runNum=-1 and there
+                     will be an additional pion, muon and neutrino at the decay point
+                     added to the eventHistory.
+      GenerateMuon : Generate a muon particle instance given runNum, eventNum, the
+                     decay coordinates (DcyCoord: s,x,y,z), the muon momentum
+                     (P_mu: px,py,pz), t and weight.
+      GenerateNu   : Generate a neutrino particle instance given runNum, eventNum,
+                     the decay coordinates (DcyCoord: s,x,y,z), the neutrino momentum
+                     (P_numu: px,py,pz), t and weight.
+      Boost2nuSTORM: Boots to nuSTORM rest frame -- i.e. boost to ppi.
+                     This differs from PionEventInstance's methods in not taking an instance
+                     of the PionDecay class as input but P_mu and P_numu in addition to ppi.
+      RotnBoost    : Operator; rotates and boosts rest-frame coordinates to nuSTORM frame
+      BoostBack2RestFrame: Boots to rest frame of pion decay -- i.e. inverting earlier boost
+                     to nuSTORM rest frame.
+      NegRotnBoost : Operator; rotates and boosts nuSTORM frame coordinates to rest-frame of pion
       getTrfLineParams: Read csv file and generate Pandas dataframe
       printParams  : Print all paramters
 
 
-Created on Tu 31Aug21. Version history:
+Created on Mo 01Nov21. Version history:
 ----------------------------------------
- 1.0: 15Oct21: First implementation
+ 1.0: 01Nov21: First implementation
 
 @author: MarvinPfaff
 based on nuSTORMPrdStrght class
@@ -102,7 +139,7 @@ class nuSTORMTrfLine(object):
             cls._filename        = filename
             cls._TrfLineParams   = cls.GetTrfLineParams(filename)
             cls._TrfLineLen      = cls._TrfLineParams.iat[0,2]
-            cls._pAcc            = cls._TrfLineParams.iat[1,2] / 100.
+            cls._piAcc            = cls._TrfLineParams.iat[1,2] / 100.
             cls._epsilon         = cls._TrfLineParams.iat[2,2]
             cls._beta            = cls._TrfLineParams.iat[3,2]
             cls._delT            = cls._TrfLineParams.iat[4,2]
@@ -113,24 +150,22 @@ class nuSTORMTrfLine(object):
         return "nuSTORMTrfLine()"
 
     def __str__(self):
-        return "nuSTORMTrfLine: version=%g, length of transfer line=%g m," \
+        return "nuSTORMTrfLine: version=%g, length of transfer line=%g m, " \
                "momentum acceptance=%g%%, transverse acceptance=%g pi mm rad, beta=%g mm, bunch length=%g ns. \n" % \
-               (self.CdVrsn(), self.TrfLineLen(), self.pAcc(), self.epsilon(), self.beta(), self.delT() )
+               (self.CdVrsn(), self.TrfLineLen(), self.piAcc(), self.epsilon(), self.beta(), self.delT() )
 
 #--------  Simulation methods:
-    def GenerateMmtm(self,p0):
-        #import Simulation as Simu
+    def GeneratePiMmtm(self,p0):
         p = -99.
-        dp = p0 * self._pAcc
+        dp = p0 * self._piAcc
         p  = p0 + Simu.getParabolic(dp)
         return p
 
     def GenerateTime(self):
-        t = Simu.getRandom() * self._delT
+        t = Simu.getRandom() * self._delT * 10**(-9)
         return t
 
     def GenerateTrans(self,s):
-        #import Simulation as Simu
         r  = np.sqrt(self._epsilon*self._beta) / 1000.
         rp = np.sqrt(self._epsilon/self._beta)
         x  = Simu.getParabolic(r)
@@ -141,9 +176,10 @@ class nuSTORMTrfLine(object):
 
     def GenerateDcyTime(self,gamma):
         t = np.random.exponential(scale=gamma*self.__piLifetime)
+        return t
 
-    def Calculatet(self,s,s_final,t,v):
-        t =  (np.abs(s) - np.abs(s_final))/v + t
+    def Calculatet(self,s,s_final,t_i,v):
+        t =  (np.abs(s) - np.abs(s_final))/v + t_i
         return t
 
     def Calculatez(self,s):
@@ -153,7 +189,7 @@ class nuSTORMTrfLine(object):
         pz = np.sqrt(p**2 - px**2 - py**2)
         return pz
 
-    def CalulateE(self,p):
+    def CalculateE(self,p):
         E = np.sqrt(p**2 + nuSTORMTrfLine.__pimass**2)
         return E
 
@@ -163,24 +199,21 @@ class nuSTORMTrfLine(object):
         v = beta * nuSTORMTrfLine.__sol
         return v
 
-    def CalculateDcyPt(self,s,s_final,t,v,gamma):
-        #t1 = time at entrance to production straight
-        t1 = self.Calculatet(s=s,s_final=s_final,t=t,v=v)
+    def CalculateDcyPt(self,s,s_final,t_i,v,gamma):
+        #t_f = time at entrance to production straight
+        t_f = self.Calculatet(s=s,s_final=s_final,t_i=t_i,v=v)
         t_dcy = self.GenerateDcyTime(gamma)
-        if t_dcy < (t1 - t):
-            s_dcy = v*t_dcy
+        if t_dcy < (t_f - t_i):
+            s_dcy = v*t_dcy - 50.
         else:
             s_dcy = -100.0
         return s_dcy
 
-    ## TODO: CHECK AGAIN THIS METHOD!!!
     def GeneratePion(self,**kwargs):
         eH = kwargs.get('eventHist')
         p0 = kwargs.get('p0')
-        s  = kwargs.get('s')
         x  = kwargs.get('x')
         y  = kwargs.get('y')
-        z  = kwargs.get('z')
         px = kwargs.get('px')
         py = kwargs.get('py')
         pz = kwargs.get('pz')
@@ -188,27 +221,20 @@ class nuSTORMTrfLine(object):
         weight = kwargs.get('weight')
         runNum = kwargs.get('runNum')
         eventNum = kwargs.get('eventNum')
+        s = -50.
         s_final = 0.
-        #s_dcy = kwargs.get('s_dcy')
-        #Dcy = kwargs.get('Dcy')
-
-
 
         ## 1 - Generating pion at target
 
-        #Adjust if statement --> also add weight to be mandatory!!!
-        #if (s_final == None || weight == None || (p0 == None && (runNum == None || eventNum == None || s == None || x == None || y == None || z == None || px == None || py == None || pz == None || t == None || weight == None) && s_dcy == None)):
-        #    print("Input to function not valid!")
-        #    return -200.0, pion.pion(0,0,0.,0.,0.,0.,0.,0.,0.,0.,0.)
-
-        #elif p0 == None:
-        if p0 == None:
+        if (eH == None or weight == None or runNum == None or eventNum == None or (p0 == None and (x == None or y == None or px == None or py == None or pz == None or t == None))):
+            print("Input to function not valid!")
+            return None
+        elif p0 == None:
             Ppi = np.sqrt(px**2 + py**2 + pz**2)
             v = self.Calculatev(Ppi)
+            z = self.Calculatez(s)
         else:
-            #s = s_final
-            #s_final = 0.
-            Ppi = self.GenerateMmtm(p0)
+            Ppi = self.GeneratePiMmtm(p0)
             x,y,xp,yp = self.GenerateTrans(s)
             z = self.Calculatez(s)
             px = xp*Ppi
@@ -218,36 +244,36 @@ class nuSTORMTrfLine(object):
             v = self.Calculatev(Ppi)
 
         pdg = self.__piPDG
-        mass = self.__pimass
-        pi = particle.particle(runNum,eventNum,s,x,y,z,px,py,pz,t,weight,mass,pdg)
-        eH.addParticle("atTarget",pi)
+        pi = particle.particle(runNum,eventNum,s,x,y,z,px,py,pz,t,weight,pdg)
+        eH.addParticle("target",pi)
 
 
-        ## 2 - Generating pion at production straight entrance or particles at pion decay point
+        ## 2 - Generating pion at production straight entrance and if pion decays in transfer line, also particles from pion decay at the decay point
 
-        E = self.CalulateE(Ppi)
+        E = self.CalculateE(Ppi)
         gamma = E / self.__pimass
-        s_dcy = self.CalculateDcyPt(s=s,s_final=s_final,t=t,v=v,gamma=gamma)
+        s_dcy = self.CalculateDcyPt(s=s,s_final=s_final,t_i=t,v=v,gamma=gamma)
 
         if s_dcy == -100.:
-            s = 0.
-            z = self.Generatez(s)
-            t = self.Calculatet(s,s_final,t,v)
-            pi_prd = particle.particle(runNum,eventNum,s,x,y,z,px,py,pz,t,weight,mass,pdg)
+            z_f = self.Calculatez(s_final)
+            t_f = self.Calculatet(s,s_final,t,v)
+            pi_prd = particle.particle(runNum,eventNum,s_final,x,y,z_f,px,py,pz,t_f,weight,pdg)
         else:
             z_dcy = self.Calculatez(s_dcy)
             t_dcy = self.Calculatet(s,s_dcy,t,v)
             DcyCoord = np.array([s_dcy,x,y,z_dcy])
-            # WARNING: Object of class PionDecay is generated but will be initialized with wrong Lifetime!!
             Dcy = PionDecay.PionDecay(ppi=Ppi)
-            P_mu, P_numu = PionEventInstance.Boost2nuSTORM(Dcy,Ppi)
-            pi_dcy = particle.particle(-1,eventNum,s_dcy,x,y,z_dcy,px,py,pz,t_dcy,weight,mass,pdg)
-            #Is runNum -1 for muon and nu also right?
-            muon = self.GenerateMuon(-1,eventNum,DcyCoord,P_mu,t_dcy,weight)
-            numu = self.GenerateNu(-1,eventNum,DcyCoord,P_numu,t_dcy,weight)
+            PEI = PionEventInstance.PionEventInstance(Ppi)
+            P_mu, P_numu = PEI.Boost2nuSTORM(Dcy,Ppi)
+            pi_dcy = particle.particle(runNum,eventNum,s_dcy,x,y,z_dcy,px,py,pz,t_dcy,weight,pdg)
+            muon = self.GenerateMuon(runNum,eventNum,DcyCoord,P_mu,t_dcy,weight)
+            numu = self.GenerateNu(runNum,eventNum,DcyCoord,P_numu,t_dcy,weight)
             eH.addParticle("pionDecay",pi_dcy)
             eH.addParticle("muonProduction",muon)
             eH.addParticle("piFlashNu",numu)
+            pi_prd = particle.particle(-1,0,0.,0.,0.,0.,0.,0.,1.,0.,0.,pdg)
+
+        eH.addParticle("productionStraight",pi_prd)
         return eH
 
     def GenerateMuon(self,runNum,eventNum,DcyCoord,P_mu,t,weight):
@@ -255,12 +281,11 @@ class nuSTORMTrfLine(object):
         x = DcyCoord[1]
         y = DcyCoord[2]
         z = DcyCoord[3]
-        px = P_mu[1]
-        py = P_mu[2]
-        pz = P_mu[3]
-        mass = self.__mumass
+        px = P_mu[1][0]
+        py = P_mu[1][1]
+        pz = P_mu[1][2]
         pdg = self.__muPDG
-        muon = particle.particle(runNum,eventNum,s,x,y,z,px,py,pz,t,weight,mass,pdg)
+        muon = particle.particle(runNum,eventNum,s,x,y,z,px,py,pz,t,weight,pdg)
         return muon
 
     def GenerateNu(self,runNum,eventNum,DcyCoord,P_numu,t,weight):
@@ -268,14 +293,100 @@ class nuSTORMTrfLine(object):
         x = DcyCoord[1]
         y = DcyCoord[2]
         z = DcyCoord[3]
-        px = P_numu[1]
-        py = P_numu[2]
-        pz = P_numu[3]
-        mass = 0.
-        #THIS STILL NEEDS TO BE CHANGED!!!
-        pdg = 0
-        numu = particle.particle(runNum,eventNum,s,x,y,z,px,py,pz,t,weight,mass,pdg)
+        px = P_numu[1][0]
+        py = P_numu[1][1]
+        pz = P_numu[1][2]
+        pdg = -14
+        numu = particle.particle(runNum,eventNum,s,x,y,z,px,py,pz,t,weight,pdg)
         return numu
+
+    def Boost2nuSTORM(self, PPi, P_mu, P_numu):
+        ''' Present approximation is muon propagates along z axis, so, boost only
+            in preparation for later, include rotation matrix to transform from
+            nustorm frame to frame with z axis along muon momentum and back '''
+
+        EPi = np.sqrt(PPi**2 + self.__pimass**2)
+        beta   = PPi / EPi
+        gamma  = EPi / self.__pimass
+
+        R    = np.array([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]])
+        Rinv = np.array([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]])
+
+        P_mu    = self.RotnBoost(P_mu, R, Rinv, gamma, beta)
+        P_numu    = self.RotnBoost(P_numu, R, Rinv, gamma, beta)
+
+        return P_mu, P_numu
+
+    def RotnBoost(self, P, R, Rinv, gamma, beta):
+
+        #print ("P[1] is ", P[1])
+        #print ("P is ", P)
+        p3 = np.dot(R, P[1])
+        #print("    p3 is ", p3)
+
+        Ec = P[0]
+        Pc = p3[2]
+        #print("    Ec is ", Ec, "   Pc is ", Pc)
+
+        Ef = gamma * (Ec + beta * Pc)
+        Pf = gamma * (Pc + beta * Ec)
+        #print("    Ef is ", Ef, "   Pf is ", Pf)
+
+        p3[2] = Pf
+        p3    = np.dot(Rinv, p3)
+        #print("    p3 is ", p3)
+
+        Po    = [0., np.array([0., 0., 0.])]
+        Po[0] = Ef
+        Po[1] = p3
+        #print("    Po is ", Po)
+
+        return Po
+
+    def BoostBack2RestFrame(self, PPi, P_mu, P_numu):
+        ''' Present approximation is muon propagates along z axis, so, boost only
+            in preparation for later, include rotation matrix to transform from
+            frame with z axis along muon momentum to nustorm frame and back '''
+
+        EPi = np.sqrt(PPi**2 + self.__pimass**2)
+        beta   = PPi / EPi
+        #print("beta: ",beta)
+        gamma  = EPi / self.__pimass
+        #print("gamma: ",gamma)
+
+        R    = np.array([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]])
+        Rinv = np.array([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]])
+
+        P_mu    = self.NegRotnBoost(P_mu, R, Rinv, gamma, beta)
+        P_numu    = self.NegRotnBoost(P_numu, R, Rinv, gamma, beta)
+
+        return P_mu, P_numu
+
+    def NegRotnBoost(self, P, R, Rinv, gamma, beta):
+
+        #print ("P[1] is ", P[1])
+        #print ("P is ", P)
+        p3 = np.dot(R, P[1])
+        #print("    p3 is ", p3)
+
+        Ec = P[0]
+        Pc = p3[2]
+        #print("    Ec is ", Ec, "   Pc is ", Pc)
+
+        Ef = gamma * (Ec - beta * Pc)
+        Pf = gamma * (Pc - beta * Ec)
+        #print("    Ef is ", Ef, "   Pf is ", Pf)
+
+        p3[2] = Pf
+        p3    = np.dot(Rinv, p3)
+        #print("    p3 is ", p3)
+
+        Po    = [0., np.array([0., 0., 0.])]
+        Po[0] = Ef
+        Po[1] = p3
+        #print("    Po is ", Po)
+
+        return Po
 
 #--------  I/o methods:
     def GetTrfLineParams(_filename):
@@ -291,8 +402,8 @@ class nuSTORMTrfLine(object):
     def TrfLineLen(self):
         return deepcopy(self._TrfLineLen)
 
-    def pAcc(self):
-        return deepcopy(self._pAcc)
+    def piAcc(self):
+        return deepcopy(self._piAcc)
 
     def epsilon(self):
         return deepcopy(self._epsilon)
