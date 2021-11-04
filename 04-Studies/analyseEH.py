@@ -29,7 +29,7 @@ import csv                          # so I can read a synthetic data file
 import eventHistory as eventHistory
 import particle as particle
 import histoManager
-
+import histsCreate
 
 ##! Start:
 nTests = 0
@@ -47,14 +47,58 @@ descriptions.append(descString)
 
 print(testTitle, ": ",  descString)
 
-
+# Create histogram manager
+hm = histoManager.histoManager()
+hC=histsCreate.histsCreate(hm)
 # book histograms
-hTitle = "x position at Detetor" 
+hTitle = "x position at Detector" 
 hBins  = 100
 hLower = -10.0
 hUpper = 10.0
-hm = histoManager.histoManager()
 h1 = hm.book(hTitle, hBins, hLower, hUpper)
+#
+hTitle = "s Prod Strght: no decay" 
+hBins  = 100
+hLower = -10.0
+hUpper = 100.0
+h2 = hm.book(hTitle, hBins, hLower, hUpper)
+#
+hTitle = "z Prod Strght: no decay" 
+hBins  = 100
+hLower = -10.0
+hUpper = 100.0
+h3 = hm.book(hTitle, hBins, hLower, hUpper)
+#
+hTitle = "t Prod Strght: no decay" 
+hBins  = 100
+hLower = -10.0
+hUpper = 100.0
+h4 = hm.book(hTitle, hBins, hLower, hUpper)
+#
+hTitle = "s Prod Strght: decay" 
+hBins  = 100
+hLower = -10.0
+hUpper = 100.0
+h5 = hm.book(hTitle, hBins, hLower, hUpper)
+#
+hTitle = "z Prod Strght: decay" 
+hBins  = 100
+hLower = -10.0
+hUpper = 100.0
+h6 = hm.book(hTitle, hBins, hLower, hUpper)
+#
+hTitle = "t Prod Strght: decay" 
+hBins  = 100
+hLower = -10.0
+hUpper = 100.0
+h7 = hm.book(hTitle, hBins, hLower, hUpper)
+#
+hTitle = "piPS weight" 
+hBins  = 100
+hLower = -1.0
+hUpper = 99.0
+h8 = hm.book(hTitle, hBins, hLower, hUpper)
+
 
 
 #  create an eventHistory object
@@ -64,6 +108,17 @@ objRd.inFile("norm.root")
 
 nEvent = objRd.getEntries()
 print ("number of entries is ", nEvent)
+
+
+hC.histAdd("target")
+hC.histAdd("productionStraight")
+hC.histAdd("pionDecay")
+hC.histAdd("piFlashNu")
+hC.histAdd("muonDecay")
+hC.histAdd("eProduction")
+hC.histAdd("numuProduction")
+hC.histAdd("nueProduction")
+
 
 testFlag = True
 
@@ -75,15 +130,26 @@ for pnt in range(nEvent):
 #  unpack required particles
     loc = "target"
     piTarget = objRd.findParticle(loc)
+    hC.histsFill(loc, piTarget)
     if piTarget.event() > 0:
         nTarget = nTarget + 1
     loc = "productionStraight"
     piPS = objRd.findParticle(loc)
+    hC.histsFill(loc, piPS)
+    h8.Fill(piPS.weight())
     if piPS.event() > 0:
         nProductionStraight = nProductionStraight + 1
+        h2.Fill(piPS.s())
+        h3.Fill(piPS.z())
+        h4.Fill(piPS.t())
+    else:
+        h5.Fill(piPS.s())
+        h6.Fill(piPS.z())
+        h7.Fill(piPS.t())
     loc = "pionDecay"
     piDecay = objRd.findParticle(loc)
-    if piDecay.event() > 0:
+    hC.histsFill(loc, piDecay)
+    if piPS.weight() > 0:
         nPionDecay = nPionDecay + 1
 
     loc = "numuDetector"

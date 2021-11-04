@@ -21,7 +21,6 @@ Model for calculating normalised numbers
 import os, sys
 import numpy as np
 import math as math
-import nuSTORMPrdStrght as nuPrdStrt
 import PionEventInstance as piEvtInst
 import NeutrinoEventInstance as nuEvtInst
 import traceSpace as trSp
@@ -29,7 +28,6 @@ import particle as particle
 import PionDecay as PionDecay
 import PionConst as PC
 import eventHistory as eventHistory
-import plane as plane
 
 # calculate where in the ring, the decay occurred
 def ring(pathLength):
@@ -89,18 +87,6 @@ rootfilename = os.path.join(nuSIMPATH, 'Scratch/normalisation.root')
 
 if (printFlg): print(".... file names set up")
 
-# Define the distance of the downstream plane where the flux is calculated
-#  parameters length of straight; distance from end of straight of plane.
-nuStrt       = nuPrdStrt.nuSTORMPrdStrght(filename)
-fluxPlane = plane.plane(nuStrt.ProdStrghtLen(), nuStrt.HallWallDist())
-#  size of the detector .. assumed symmetrical in x and y
-semiSizeX = nuStrt.DetHlfWdth()
-semiSizeY = nuStrt.DetHlfWdth()
-if (printFlg): print(".... semi szie in x ", semiSizeX)
-if (printFlg): print(".... semi size in x ", semiSizeY)
-if (printFlg): print(".... fluxplane set up")
-
-
 #  Loop over events
 
 piCnst  = PC.PionConst()
@@ -128,7 +114,7 @@ eH.addParticle("numuDetector", testParticle)
 eH.addParticle("nueDetector", testParticle)
 
 crossSection = 50
-eventWeight = crossSection/nEvents
+eventWeight = crossSection
 #   Set the pion momentum
 pionMom=6.0
 nPass = 0
@@ -153,7 +139,7 @@ for event in range(nEvents):
     pz = np.sqrt(pPion*pPion - px**2 - py**2)
     t = 0.0
 #  pion at target has the same x,y, xp, yp as those at decay - but the s and z should be different 
-    pionTarget = particle.particle(runNumber, event, 0.0, x, y, -100.0, px, py, pz, t, eventWeight, "pi+")
+    pionTarget = particle.particle(runNumber, event, 0.0, x, y, -transferLine, px, py, pz, t, eventWeight, "pi+")
     eH.addParticle('target', pionTarget)
 #
 
@@ -162,19 +148,28 @@ for event in range(nEvents):
     Dcy = PionDecay.PionDecay()
     lifetime = Dcy.getLifetime()
     pathLength = lifetime*pPion*c/piMass
+    if (event < 2):
+        print ("lifetim is ", lifetime)
+        print ("pathLength is ", pathLength)
+        print ("c is ", c)
+        print ("pPion is ", pPion)
     if (pathLength < transferLine):
 # decays at present just set the productionStraight particle with a weight of zero - but updated s and z (small value of pz
 # for tracespace calculation)
-      noParticle = particle.particle(runNumber, event, transferLine, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0, "pi+")
+      noParticle = particle.particle(runNumber, event, transferLine, x, y, 0.0, px, py, px, 0.0, 0.0, "pi+")
       eH.addParticle("productionStraight", noParticle)
-# add a pion decay particle
-      pionTLDecay = particle.particle(runNumber, event, s, x, y, z, px, py, pz, t, 0.0, "pi+")
+# add a pion decay particle - set the time to the decay lifetime
+      t = lifetime*10E9
+      s = s + pathLength
+      z = z + pathLength
+      pionTLDecay = particle.particle(runNumber, event, s, x, y, z, px, py, pz, t, eventWeight, "pi+")
       eH.addParticle("pionDecay", pionTLDecay)
       nDecay = nDecay + 1
     else:
 # pion reaches end of transfer line just write out a new pion with altered s and z
-      s = 100.0
+      s = 50.0
       z = 0.0
+      t = 10E9*s*piMass/(c*pPion)
       pionPS = particle.particle(runNumber, event, s, x, y, z, px, py, pz, t, eventWeight, "pi+")
       eH.addParticle("productionStraight", pionPS)
       nPass = nPass + 1
@@ -205,80 +200,9 @@ for event in range(nEvents):
 # decay the muon
       pbeam = 5.0
       nuEvt = nuEvtInst.NeutrinoEventInstance(pbeam)
-# muon decay point
-      s = nuEvt.getTraceSpaceCoord()[0]
-      x = nuEvt.getTraceSpaceCoord()[1]
-      y = nuEvt.getTraceSpaceCoord()[2]
-      z = nuEvt.getTraceSpaceCoord()[3]
-      xp = nuEvt.getTraceSpaceCoord()[4]
-      yp = nuEvt.getTraceSpaceCoord()[5]
-      pBeam = nuEvt.getPb()
-      px = pBeam[0]
-      py = pBeam[1]
-      pz = pBeam[2]
-      t = -100.0
-      eventWeight = -100.0
-      muDecay = particle.particle(runNumber, event, s, x, y, z, px, py, pz, t, eventWeight, "mu+")
-      eH.addParticle("muonDecay", muDecay)
-# electron production information - s, x, y, z are the same - as is t and eventWeight
-      px = nuEvt.gete4mmtm()[1][0]
-      py = nuEvt.gete4mmtm()[1][1]
-      pz = nuEvt.gete4mmtm()[1][2]
-      eProduction = particle.particle(runNumber, event, s, x, y, z, px, py, pz, t, eventWeight, "e+")
-      eH.addParticle("eProduction", eProduction)
-# numu production information - s, x, y, z are the same - as is t and eventWeight
-      px = nuEvt.getnumu4mmtm()[1][0]
-      py = nuEvt.getnumu4mmtm()[1][1]
-      pz = nuEvt.getnumu4mmtm()[1][2]
-      numuProduction = particle.particle(runNumber, event, s, x, y, z, px, py, pz, t, eventWeight, "numuBar")
-      eH.addParticle("numuProduction", numuProduction)
-# nue production information - s, x, y, z are the same - as is t and eventWeight
-      px = nuEvt.getnue4mmtm()[1][0]
-      py = nuEvt.getnue4mmtm()[1][1]
-      pz = nuEvt.getnue4mmtm()[1][2]
-      nueProduction = particle.particle(runNumber, event, s, x, y, z, px, py, pz, t, eventWeight, "nue")
-      eH.addParticle("nueProduction", nueProduction)
 
-#  Check intersection with downstream plane
-      hitE,hitMu=fluxPlane.findHitPositionMuEvt(nuEvt)
-#  create hit for numu, but check the x and y positions for passage through the detector
-      x = hitMu[0]
-      y = hitMu[1]
-      if ((abs(x) < semiSizeX) and (abs(y) < semiSizeY)):
-        z = hitMu[2]
-        xp = hitMu[5]/hitMu[7]
-        yp = hitMu[6]/hitMu[7]
-        px = hitMu[5]
-        py = hitMu[6]
-        pz = hitMu[7]
-        t = -100.0
-        eventWeight = -100.0
-        eventNumber = event
-        print ("numu    x is ", x, "   y is ", y)
-      else:
-# everything should be set to zero, so only need to set the eventNumber to -1
-        eventNumber = -1
-      numuDetector = particle.particle(runNumber, eventNumber, s, x, y, z, px, py, pz, t, eventWeight, "numuBar")
-      eH.addParticle("numuDetector", numuDetector)
-#  create hit for nue - eventWeight unchanged - as are run number and event number
-      x = hitE[0]
-      y = hitE[1]
-      if ((abs(x) < semiSizeX) and (abs(y) < semiSizeY)):
-        z = hitE[2]
-        xp = hitE[5]/hitE[7]
-        yp = hitE[6]/hitE[7]
-        px = hitE[5]
-        py = hitE[6]
-        pz = hitE[7]
-        t = -100.0
-        eventWeight = -100.0
-        eventNumber = event
-        print ("nue    x is ", x, "   y is ", y)
-      else:
-# everything should be set to zero, so only need to set the eventNumber to -1
-        eventNumber = -1
-      nueDetector = particle.particle(runNumber, eventNumber, s, x, y, z, px, py, pz, t, eventWeight, "mu+")
-      eH.addParticle("nueDetector", nueDetector)
+
+# now find the decay point in the ring
     eH.fill()
 # Make sure there is a structure - having zeroed the history after filling
     eH.addParticle("target", testParticle)
