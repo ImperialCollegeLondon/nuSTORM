@@ -71,8 +71,8 @@ h3 = hm.book(hTitle, hBins, hLower, hUpper)
 #
 hTitle = "t Prod Strght: no decay" 
 hBins  = 100
-hLower = -10.0
-hUpper = 100.0
+hLower = 20.0
+hUpper = 60.0
 h4 = hm.book(hTitle, hBins, hLower, hUpper)
 #
 hTitle = "s Prod Strght: decay" 
@@ -89,8 +89,8 @@ h6 = hm.book(hTitle, hBins, hLower, hUpper)
 #
 hTitle = "t Prod Strght: decay" 
 hBins  = 100
-hLower = -10.0
-hUpper = 100.0
+hLower = 20.0
+hUpper = 60.0
 h7 = hm.book(hTitle, hBins, hLower, hUpper)
 #
 hTitle = "piPS weight" 
@@ -118,8 +118,7 @@ hC.histAdd("muonDecay")
 hC.histAdd("eProduction")
 hC.histAdd("numuProduction")
 hC.histAdd("nueProduction")
-
-
+hm.setParams("m")
 testFlag = True
 
 nTarget = 0
@@ -137,7 +136,7 @@ for pnt in range(nEvent):
     piPS = objRd.findParticle(loc)
     hC.histsFill(loc, piPS)
     h8.Fill(piPS.weight())
-    if piPS.event() > 0:
+    if piPS.weight() > 0:
         nProductionStraight = nProductionStraight + 1
         h2.Fill(piPS.s())
         h3.Fill(piPS.z())
@@ -151,6 +150,12 @@ for pnt in range(nEvent):
     hC.histsFill(loc, piDecay)
     if piPS.weight() > 0:
         nPionDecay = nPionDecay + 1
+    loc = "piFlashNu"
+    nuMuFlash = objRd.findParticle(loc)
+    hC.histsFill(loc, nuMuFlash)
+
+
+
 
     loc = "numuDetector"
     numu = objRd.findParticle(loc)
