@@ -13,8 +13,7 @@ The latest release can be downloaded from the
 \section*{Dependencies and required packages}
 nuSIM requires the following packages:
 \begin{itemize}
-  \item Python modules: \verb+scipy+, \verb+matplotlib+, and
-    \verb+pandas+;
+  \item Python modules: \verb+scipy+, \verb+matplotlib+, \verb+pandas+, and \verb+iminuit+;
   \item CERN programme library: \verb+pyroot+ (which may be installed
     using the standard \verb+root+ installers, see the documentation
     at \href{https://root.cern/install/}{\underline{\color{blue}https://root.cern/install/}}).
@@ -29,7 +28,7 @@ and installing root, execute the following commands:
         related to the virtual environment.
     \end{itemize}
   \item \verb+source venv/bin/activate+
-  \item \verb+python -m pip install pandas scipy matplotlib+
+  \item \verb+python -m pip install pandas scipy matplotlib iminuit+
 \end{enumerate}
 To exit from the virtual environment, execute the command
 \verb+deactivate+. \\
@@ -60,6 +59,12 @@ presented is:
   \item\verb+02-Tests+: contains self-contained test scripts that
     run the various methods and simulation packages defined in the
     code directory.
+  \item\verb+03-Integration-Tests+: contains more complex tests which check
+    the full operation of the code, as well as a runTests.py which will run all the
+    tests in 02-Tests and deliver a summary of the results {\it (at present this is only
+    partially implemented)}.
+  \item\verb+04-Studies+: Code which produces results for official publications. Code which is
+   used to produce results for official publications and talks should be stored here.
   \item\verb+11-Parameters+: contains the parameter set used in
     \verb+02-Tests/RunSimulation.py+ to generate muon decays in
     the production straight.
@@ -80,6 +85,22 @@ filename  = os.path.join(nuSIMPATH, '11-Parameters/nuSTORM-PrdStrght-Params-v1.0
 Smltn = Simu.Simulation(5000, 6., filename, rootfilename)
 \end{itemize}
 \hfill\newline
+
+The file in 04-Studies/normalisation.py - is the current status of the code to create a normalisation 
+to tie the number of neutrinos in the detector to the number of protons on target.
+It is currently under development by Paul Kyberd. It will always run, but it only produces
+partial results at present\newline
+
+\noindent The file {\bf normalisation.py} contains:
+\begin{itemize}
+\item the definition of the root output file for the generated dataset \newline
+rootfilename = os.path.join(nuSIMPATH, 'Scratch/normalisation.root')
+\item the definition of csv  input file to control the running of the Simulation \newline
+filename  = os.path.join(nuSIMPATH, '11-Parameters/nuSTORM-PrdStrght-Params-v1.0.csv')
+\item it produces a root file containing the eventHistory structure
+\end{itemize}
+
+\hfil\newline
 \noindent Most of the entries for the file {\bf nuSTORM-PrdStrght-Params-v1.0.csv} are self explanatory but it is worth noting:
 \begin{itemize}
 \item Run Type, rType, 1, i, numSim-2021-01\newline
