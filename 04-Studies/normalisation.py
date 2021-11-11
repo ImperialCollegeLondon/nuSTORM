@@ -92,26 +92,14 @@ if (printFlg): print(".... file names set up")
 piCnst  = PC.PionConst()
 c = piCnst.SoL()
 piMass = piCnst.mass()/1000.0
-transferLine = 50.00                   # Transfer line length
+transferLine = 50.00                    # Transfer line length
+productionStraight = 180.0              # Production straight length
 runNumber = 50
 nEvents = 6000
 # set up the event history
 eH = eventHistory.eventHistory()
 eH.outFile("norm.root")
 eH.rootStructure()
-#  make sure the data structure is complete
-testParticle = particle.particle(runNumber, -1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0,   "pi+")
-eH.addParticle("target", testParticle)
-eH.addParticle("productionStraight", testParticle)
-eH.addParticle("pionDecay", testParticle)
-eH.addParticle("muonProduction", testParticle)
-eH.addParticle("piFlashNu", testParticle)
-eH.addParticle("muonDecay", testParticle)
-eH.addParticle("eProduction", testParticle)
-eH.addParticle("numuProduction", testParticle)
-eH.addParticle("nueProduction", testParticle)
-eH.addParticle("numuDetector", testParticle)
-eH.addParticle("nueDetector", testParticle)
 
 crossSection = 50
 eventWeight = crossSection
@@ -153,6 +141,9 @@ for event in range(nEvents):
         print ("pathLength is ", pathLength)
         print ("c is ", c)
         print ("pPion is ", pPion)
+#
+#  pion decay in the transferLine complex
+#
     if (pathLength < transferLine):
 # decays at present just set the productionStraight particle with a weight of zero - but updated s and z (small value of pz
 # for tracespace calculation)
@@ -173,19 +164,23 @@ for event in range(nEvents):
       if (event < 2): print("numu is ", numu)
       nuFlash = particle.particle(runNumber, event, s, x, y, z, pxnu, pynu, pznu, t, eventWeight, "numu")
       eH.addParticle("piFlashNu", nuFlash)
-
     else:
 # pion reaches end of transfer line just write out a new pion with altered s and z
-      s = 50.0
+      s = transferLine
       z = 0.0
       t = 10E9*s*piMass/(c*pPion)
       pionPS = particle.particle(runNumber, event, s, x, y, z, px, py, pz, t, eventWeight, "pi+")
       eH.addParticle("productionStraight", pionPS)
       nPass = nPass + 1
+#
+#  pion decay after the end of the production straight
+#
+    if (pathLength > transferLine + productionStraight):
+
      
 # now to find where in the ring the decay point occurred.
       deltaX, zpos, direction = ring(pathLength)
-      s = 100.0+pathLength
+      s = pathLength
       z = zpos
       x = x + deltaX
       pionDecay = particle.particle(runNumber, event, s, x, y, z, px, py, pz, t, eventWeight, "pi+")
@@ -209,20 +204,9 @@ for event in range(nEvents):
 # decay the muon
 #      pbeam = 5.0
 #      nuEvt = nuEvtInst.NeutrinoEventInstance(pbeam)
-
+#  fill the root structure ... this also resets the history
     eH.fill()
-# Make sure there is a structure - having zeroed the history after filling
-    eH.addParticle("target", testParticle)
-    eH.addParticle("productionStraight", testParticle)
-    eH.addParticle("pionDecay", testParticle)
-    eH.addParticle("muonProduction", testParticle)
-    eH.addParticle("piFlashNu", testParticle)
-    eH.addParticle("muonDecay", testParticle)
-    eH.addParticle("eProduction", testParticle)
-    eH.addParticle("numuProduction", testParticle)
-    eH.addParticle("nueProduction", testParticle)
-    eH.addParticle("numuDetector", testParticle)
-    eH.addParticle("nueDetector", testParticle)
+
 
 
 print ("pions which exit the transfer line ", nPass, "   those that decay ", nDecay, "  decay percent is ", nDecay/nEvents)

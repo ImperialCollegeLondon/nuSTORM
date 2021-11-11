@@ -165,8 +165,7 @@ if (test.returncode == 0):
 	print (testFile, " passes")
 	print (notes[testPnt])
 	testStatus.append("passes")
-
-#else:
+else:
 	print (testFile, " fails")
 	testFails = testFails + 1
 	testStatus.append("fails")
@@ -183,7 +182,6 @@ if (test.returncode == 0):
 	print (testFile, " passes")
 	print (notes[testPnt])
 	testStatus.append("passes")
-
 else:
 	print (testFile, " fails")
 	testFails = testFails + 1
