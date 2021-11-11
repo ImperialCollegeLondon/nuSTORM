@@ -92,7 +92,7 @@ if (printFlg): print(".... file names set up")
 piCnst  = PC.PionConst()
 c = piCnst.SoL()
 piMass = piCnst.mass()/1000.0
-transferLine = 100.00                   # Transfer line length
+transferLine = 50.00                   # Transfer line length
 runNumber = 50
 nEvents = 6000
 # set up the event history
@@ -114,7 +114,7 @@ eH.addParticle("numuDetector", testParticle)
 eH.addParticle("nueDetector", testParticle)
 
 crossSection = 50
-eventWeight = crossSection/nEvents
+eventWeight = crossSection
 #   Set the pion momentum
 pionMom=6.0
 nPass = 0
@@ -127,10 +127,10 @@ for event in range(nEvents):
     if (event < 2): print ("pi is ", pi)
     tSC = pi.getTraceSpaceCoord()
     if (event < 2): print ("tSC is ", tSC)
-    s = tSC[0]
+    s = 0.0
     x = tSC[1]
     y = tSC[2]
-    z = tSC[3]
+    z = -transferLine
     xp = tSC[4]
     yp = tSC[5]
     pPion = pi.getppiGen()
@@ -139,7 +139,7 @@ for event in range(nEvents):
     pz = np.sqrt(pPion*pPion - px**2 - py**2)
     t = 0.0
 #  pion at target has the same x,y, xp, yp as those at decay - but the s and z should be different 
-    pionTarget = particle.particle(runNumber, event, 0.0, x, y, -100.0, px, py, pz, t, eventWeight, "pi+")
+    pionTarget = particle.particle(runNumber, event, s, x, y, z, px, py, pz, t, eventWeight, "pi+")
     eH.addParticle('target', pionTarget)
 #
 
@@ -148,23 +148,41 @@ for event in range(nEvents):
     Dcy = PionDecay.PionDecay()
     lifetime = Dcy.getLifetime()
     pathLength = lifetime*pPion*c/piMass
+    if (event < 2):
+        print ("lifetime is ", lifetime)
+        print ("pathLength is ", pathLength)
+        print ("c is ", c)
+        print ("pPion is ", pPion)
     if (pathLength < transferLine):
 # decays at present just set the productionStraight particle with a weight of zero - but updated s and z (small value of pz
 # for tracespace calculation)
-      noParticle = particle.particle(runNumber, event, transferLine, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0, "pi+")
+      noParticle = particle.particle(runNumber, event, transferLine, x, y, 0.0, px, py, px, 0.0, 0.0, "pi+")
       eH.addParticle("productionStraight", noParticle)
-# add a pion decay particle
-      pionTLDecay = particle.particle(runNumber, event, s, x, y, z, px, py, pz, t, 0.0, "pi+")
+# add a pion decay particle - set the time to the decay lifetime
+      t = lifetime*10E9
+      s = s + pathLength
+      z = z + pathLength
+      pionTLDecay = particle.particle(runNumber, event, s, x, y, z, px, py, pz, t, eventWeight, "pi+")
       eH.addParticle("pionDecay", pionTLDecay)
       nDecay = nDecay + 1
+# add the pion flash neutrino
+      numu = pi.getnumu4mmtm()
+      pxnu = numu[1][0]
+      pynu = numu[1][1]
+      pznu = numu[1][2]
+      if (event < 2): print("numu is ", numu)
+      nuFlash = particle.particle(runNumber, event, s, x, y, z, pxnu, pynu, pznu, t, eventWeight, "numu")
+      eH.addParticle("piFlashNu", nuFlash)
+
     else:
 # pion reaches end of transfer line just write out a new pion with altered s and z
-      s = 100.0
+      s = 50.0
       z = 0.0
+      t = 10E9*s*piMass/(c*pPion)
       pionPS = particle.particle(runNumber, event, s, x, y, z, px, py, pz, t, eventWeight, "pi+")
       eH.addParticle("productionStraight", pionPS)
       nPass = nPass + 1
-
+     
 # now to find where in the ring the decay point occurred.
       deltaX, zpos, direction = ring(pathLength)
       s = 100.0+pathLength
@@ -173,27 +191,25 @@ for event in range(nEvents):
       pionDecay = particle.particle(runNumber, event, s, x, y, z, px, py, pz, t, eventWeight, "pi+")
       eH.addParticle("pionDecay", pionDecay)
 # add the muon
-      mu = pi.getmu4mmtm()
-      if (event < 2): print("mu is ", mu)
-      px = mu[1][0]
-      py = mu[1][1]
-      py = mu[1][2]
-      muProd = particle.particle(runNumber, event, s, x, y, z, px, py, pz, t, eventWeight, "mu+")
-      eH.addParticle("muonProduction", muProd)
+#      mu = pi.getmu4mmtm()
+#      if (event < 2): print("mu is ", mu)
+#      px = mu[1][0]
+#      py = mu[1][1]
+#      py = mu[1][2]
+#      muProd = particle.particle(runNumber, event, s, x, y, z, px, py, pz, t, eventWeight, "mu+")
+#      eH.addParticle("muonProduction", muProd)
 # add the pion flash neutrino
-      numu = pi.getnumu4mmtm()
-      px = numu[1][0]
-      py = numu[1][1]
-      py = numu[1][2]
-      if (event < 2): print("numu is ", numu)
-      nuFlash = particle.particle(runNumber, event, s, x, y, z, px, py, pz, t, eventWeight, "numu")
-      eH.addParticle("piFlashNu", nuFlash)
+#      numu = pi.getnumu4mmtm()
+#      px = numu[1][0]
+#      py = numu[1][1]
+#      py = numu[1][2]
+#      if (event < 2): print("numu is ", numu)
+#      nuFlash = particle.particle(runNumber, event, s, x, y, z, px, py, pz, t, eventWeight, "numu")
+#      eH.addParticle("piFlashNu", nuFlash)
 # decay the muon
-      pbeam = 5.0
-      nuEvt = nuEvtInst.NeutrinoEventInstance(pbeam)
+#      pbeam = 5.0
+#      nuEvt = nuEvtInst.NeutrinoEventInstance(pbeam)
 
-
-# now find the decay point in the ring
     eH.fill()
 # Make sure there is a structure - having zeroed the history after filling
     eH.addParticle("target", testParticle)
