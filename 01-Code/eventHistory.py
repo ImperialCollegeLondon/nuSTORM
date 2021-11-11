@@ -11,8 +11,11 @@ Class: eventHistory:
 
     @author  Paul Kyberd
 
-    @version     1.0
-    @date        16 September 2021
+    @version     1.1
+    @date        11 November 2021
+
+Version 1.1										11/11/2021
+After writing out 
 
 Version 1.0										16/09/2021
 Initial version
@@ -250,6 +253,23 @@ class eventHistory:
 
 
 #	methods
+#  Create an empty structure to be filled by the user with add particle - at present the
+#  the particles in the empty structure are all pi+
+	def makeHistory(self):
+#  make sure the data structure is complete
+		testParticle = particle.particle(-1, -1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, "pi+")
+		self.addParticle("target", testParticle)
+		self.addParticle("productionStraight", testParticle)
+		self.addParticle("pionDecay", testParticle)
+		self.addParticle("muonProduction", testParticle)
+		self.addParticle("piFlashNu", testParticle)
+		self.addParticle("muonDecay", testParticle)
+		self.addParticle("eProduction", testParticle)
+		self.addParticle("numuProduction", testParticle)
+		self.addParticle("nueProduction", testParticle)
+		self.addParticle("numuDetector", testParticle)
+		self.addParticle("nueDetector", testParticle)
+
 #  Name and open a file for output
 	def outFile(self, fileName ):
 		self._outputFilename = fileName
@@ -377,6 +397,8 @@ class eventHistory:
 		self.evTree.Branch('numuDetector', self.numuDetector, 'run/I:event:pdgCode:x/F:y:z:s:px:py:pz:t:eventWeight:mass')
 		self.nueDetector = ROOT.nueDetector()
 		self.evTree.Branch('nueDetector', self.nueDetector, 'run/I:event:pdgCode:x/F:y:z:s:px:py:pz:t:eventWeight:mass')
+# and create the history array
+		self.makeHistory()
 
 #  Close the output file
 	def outFileClose(self ):
@@ -553,8 +575,11 @@ class eventHistory:
 		self.evTree.Fill()
 
 # empty the eventHistory once it has been written out
-		for pnt in range(11):
-			self._particles[pnt] = None
+# don't zero, overwrite
+#		for pnt in range(11):
+#			self._particles[pnt] = None
+		self.makeHistory()
+
 
 #  Write the root structure out to the file
 	def write(self):

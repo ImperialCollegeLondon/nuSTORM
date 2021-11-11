@@ -86,10 +86,17 @@ Smltn = Simu.Simulation(5000, 6., filename, rootfilename)
 \end{itemize}
 \hfill\newline
 
+The file in 01-Code/eventHistory.py stores the history of the event from the pion production until it crosses
+or misses the detector.
+
+When the eventHistory for an event is written out, the contents are cleared and the history is filled
+with a dummy particle. This particle has run number -1; event number -1; particle type $\pi^+$; everything
+else is zero except $p_z$ which is  given a very small value so that calculation which produces x' and y', (the angles
+of the trajectory px/pz and py/pz), do not cause a problem.
+
 The file in 04-Studies/normalisation.py - is the current status of the code to create a normalisation 
 to tie the number of neutrinos in the detector to the number of protons on target.
-It is currently under development by Paul Kyberd. It will always run, but it only produces
-partial results at present\newline
+It is currently under development by Paul Kyberd (to whom any queries should be directed). It will always run, but it only produces partial results at present\newline
 
 \noindent The file {\bf normalisation.py} contains:
 \begin{itemize}
