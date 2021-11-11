@@ -184,12 +184,12 @@ for event in range(nEvents):
       nPass = nPass + 1
      
 # now to find where in the ring the decay point occurred.
-#      deltaX, zpos, direction = ring(pathLength)
-#      s = 100.0+pathLength
-#      z = zpos
-#      x = x + deltaX
-#      pionDecay = particle.particle(runNumber, event, s, x, y, z, px, py, pz, t, eventWeight, "pi+")
-#      eH.addParticle("pionDecay", pionDecay)
+      deltaX, zpos, direction = ring(pathLength)
+      s = 100.0+pathLength
+      z = zpos
+      x = x + deltaX
+      pionDecay = particle.particle(runNumber, event, s, x, y, z, px, py, pz, t, eventWeight, "pi+")
+      eH.addParticle("pionDecay", pionDecay)
 # add the muon
 #      mu = pi.getmu4mmtm()
 #      if (event < 2): print("mu is ", mu)
