@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Class nuSTORMTrfLine:
+Class nuSTORMTrfLineCmplx:
 =======================
 
   Defines the parameters of the nuSTORM transfer line and
@@ -21,11 +21,13 @@ Class nuSTORMTrfLine:
                      nuSTORM transfer line specification
   _TrfLineParams   = Pandas dataframe containing specification in
                      _filename
-  _TrfLineLen      = Production straight length (m)
+  _TrfLineCmplxLen = Production straight length (m)
   _piAcc           = Momentum acceptance (%)
   _epsilon         = Representative emittance/acceptance (pi mm rad)
   _beta            = Representative beta function (mm)
-  _delT            = Bunch length at target (ns)
+  _delT0           = Bunch length at target (ns)
+  _delT1           = Bunch spacing at target (ns)
+  _delT2           = Extraction length (us)
 
   Methods:
   --------
@@ -41,14 +43,18 @@ Class nuSTORMTrfLine:
       piAcc        : Get momentum acceptance (%)
       epsilon      : Get acceptance/emittance (pi mm rad)
       beta         : Get beta function (mm)
-      delT         : Get bunch length (ns)
+      delT0        : Get bunch length (ns)
+      delT1        : Get bunch spacing (ns)
+      delT2        : Get extraction length (us)
 
 
   Generation, calcution methods and utilities:
       GeneratePiMmtm : Generates momentum centred around p0 (input float).
                      Parabolic distribution generated.
       GenerateTime : Generates time to enter transfer line; first particle leaves at t=0.
-                     Uniform distribution generated.
+                     Uniform distribution generated over bunch length, with certain bunch
+                     spacing between bunches. Overall duration is defined as extraction
+                     length.
       GenerateTrans: Generate transverse phase space (x, y, xp, yp) given
                      representative emittance and beta.  Parabolic distributions
                      generated.
@@ -100,6 +106,8 @@ Class nuSTORMTrfLine:
 
 Created on Mo 01Nov21. Version history:
 ----------------------------------------
+ 1.1: 22Nov21: Update to accommodate multiple bunches by importing PionTimeDistribution class,
+               generating bunch structure over certain extraction length.
  1.0: 01Nov21: First implementation
 
 @author: MarvinPfaff
@@ -113,6 +121,7 @@ import PionConst as PionConst
 import MuonConst as MuonConst
 import PionDecay as PionDecay
 import PionEventInstance as PionEventInstance
+import PionTimeDistribution as PionTimeDistribution
 import particle as particle
 import Simulation as Simu
 import eventHistory as eventHistory
@@ -121,7 +130,7 @@ piCnst = PionConst.PionConst()
 muCnst = MuonConst.MuonConst()
 
 
-class nuSTORMTrfLine(object):
+class nuSTORMTrfLineCmplx(object):
     __instance = None
     __pimass = piCnst.mass()/1000.
     __mumass = muCnst.mass()/1000.
@@ -133,26 +142,28 @@ class nuSTORMTrfLine(object):
 #--------  "Built-in methods":
     def __new__(cls, filename):
         if cls.__instance is None:
-            print('nuSTORMTrfLine.__new__: creating the nuSTORMTrfLine object')
-            cls.__instance = super(nuSTORMTrfLine, cls).__new__(cls)
+            print('nuSTORMTrfLineCmplx.__new__: creating the nuSTORMTrfLineCmplx object')
+            cls.__instance = super(nuSTORMTrfLineCmplx, cls).__new__(cls)
             print('instance okay')
             cls._filename        = filename
             cls._TrfLineParams   = cls.GetTrfLineParams(filename)
-            cls._TrfLineLen      = cls._TrfLineParams.iat[0,2]
-            cls._piAcc            = cls._TrfLineParams.iat[1,2] / 100.
+            cls._TrfLineCmplxLen = cls._TrfLineParams.iat[0,2]
+            cls._piAcc           = cls._TrfLineParams.iat[1,2] / 100.
             cls._epsilon         = cls._TrfLineParams.iat[2,2]
             cls._beta            = cls._TrfLineParams.iat[3,2]
-            cls._delT            = cls._TrfLineParams.iat[4,2]
+            cls._delT0           = cls._TrfLineParams.iat[4,2]
+            cls._delT1           = cls._TrfLineParams.iat[5,2]
+            cls._delT2           = cls._TrfLineParams.iat[6,2]
             print('creation of new object: okay')
         return cls.__instance
 
     def __repr__(self):
-        return "nuSTORMTrfLine()"
+        return "nuSTORMTrfLineCmplx()"
 
     def __str__(self):
-        return "nuSTORMTrfLine: version=%g, length of transfer line=%g m, " \
-               "momentum acceptance=%g%%, transverse acceptance=%g pi mm rad, beta=%g mm, bunch length=%g ns. \n" % \
-               (self.CdVrsn(), self.TrfLineLen(), self.piAcc(), self.epsilon(), self.beta(), self.delT() )
+        return "nuSTORMTrfLineCmplx: version=%g, length of transfer line complex=%g m, " \
+               "momentum acceptance=%g%%, transverse acceptance=%g pi mm rad, beta=%g mm, bunch length=%g ns, bunch spacing=%g ns, extraction length=%g us. \n" % \
+               (self.CdVrsn(), self.TrfLineCmplxLen(), self.piAcc(), self.epsilon(), self.beta(), self.delT0(), self.delT1(), self.delT2() )
 
 #--------  Simulation methods:
     def GeneratePiMmtm(self,p0):
@@ -162,7 +173,8 @@ class nuSTORMTrfLine(object):
         return p
 
     def GenerateTime(self):
-        t = Simu.getRandom() * self._delT * 10**(-9)
+        ptd= PionTimeDistribution.PionTimeDistribution(self._delT0,self._delT1,self._delT2)
+        t = ptd.GenerateTime()
         return t
 
     def GenerateTrans(self,s):
@@ -179,24 +191,24 @@ class nuSTORMTrfLine(object):
         return t
 
     def Calculatet(self,s,s_final,t_i,v):
-        t =  (np.abs(s) - np.abs(s_final))/v + t_i
+        t =  (np.abs(s_final) - np.abs(s))/v + t_i
         return t
 
     def Calculatez(self,s):
-        return s
+        return s - self._TrfLineCmplxLen
 
     def Calculatepz(self,p,px,py):
         pz = np.sqrt(p**2 - px**2 - py**2)
         return pz
 
     def CalculateE(self,p):
-        E = np.sqrt(p**2 + nuSTORMTrfLine.__pimass**2)
+        E = np.sqrt(p**2 + nuSTORMTrfLineCmplx.__pimass**2)
         return E
 
     def Calculatev(self,p):
         E = self.CalculateE(p)
         beta = p/E
-        v = beta * nuSTORMTrfLine.__sol
+        v = beta * nuSTORMTrfLineCmplx.__sol
         return v
 
     def CalculateDcyPt(self,s,s_final,t_i,v,gamma):
@@ -204,7 +216,7 @@ class nuSTORMTrfLine(object):
         t_f = self.Calculatet(s=s,s_final=s_final,t_i=t_i,v=v)
         t_dcy = self.GenerateDcyTime(gamma)
         if t_dcy < (t_f - t_i):
-            s_dcy = v*t_dcy - 50.
+            s_dcy = v*t_dcy
         else:
             s_dcy = -100.0
         return s_dcy
@@ -221,8 +233,8 @@ class nuSTORMTrfLine(object):
         weight = kwargs.get('weight')
         runNum = kwargs.get('runNum')
         eventNum = kwargs.get('eventNum')
-        s = -50.
-        s_final = 0.
+        s = 0.
+        s_final = self._TrfLineCmplxLen
 
         ## 1 - Generating pion at target
 
@@ -234,6 +246,7 @@ class nuSTORMTrfLine(object):
             v = self.Calculatev(Ppi)
             z = self.Calculatez(s)
         else:
+
             Ppi = self.GeneratePiMmtm(p0)
             x,y,xp,yp = self.GenerateTrans(s)
             z = self.Calculatez(s)
@@ -243,7 +256,7 @@ class nuSTORMTrfLine(object):
             t = self.GenerateTime()
             v = self.Calculatev(Ppi)
 
-        pdg = self.__piPDG
+        pdg = -self.__piPDG
         pi = particle.particle(runNum,eventNum,s,x,y,z,px,py,pz,t,weight,pdg)
         eH.addParticle("target",pi)
 
@@ -271,7 +284,7 @@ class nuSTORMTrfLine(object):
             eH.addParticle("pionDecay",pi_dcy)
             eH.addParticle("muonProduction",muon)
             eH.addParticle("piFlashNu",numu)
-            pi_prd = particle.particle(-1,0,0.,0.,0.,0.,0.,0.,1.,0.,0.,pdg)
+            pi_prd = particle.particle(-1,0,0.,0.,0.,0.,0.,0.,.01,0.,0.,pdg)
 
         eH.addParticle("productionStraight",pi_prd)
         return eH
@@ -284,7 +297,7 @@ class nuSTORMTrfLine(object):
         px = P_mu[1][0]
         py = P_mu[1][1]
         pz = P_mu[1][2]
-        pdg = self.__muPDG
+        pdg = -self.__muPDG
         muon = particle.particle(runNum,eventNum,s,x,y,z,px,py,pz,t,weight,pdg)
         return muon
 
@@ -296,7 +309,7 @@ class nuSTORMTrfLine(object):
         px = P_numu[1][0]
         py = P_numu[1][1]
         pz = P_numu[1][2]
-        pdg = -14
+        pdg = 14
         numu = particle.particle(runNum,eventNum,s,x,y,z,px,py,pz,t,weight,pdg)
         return numu
 
@@ -399,8 +412,8 @@ class nuSTORMTrfLine(object):
     def CdVrsn(self):
         return 1.0
 
-    def TrfLineLen(self):
-        return deepcopy(self._TrfLineLen)
+    def TrfLineCmplxLen(self):
+        return deepcopy(self._TrfLineCmplxLen)
 
     def piAcc(self):
         return deepcopy(self._piAcc)
@@ -411,8 +424,14 @@ class nuSTORMTrfLine(object):
     def beta(self):
         return deepcopy(self._beta)
 
-    def delT(self):
-        return deepcopy(self._delT)
+    def delT0(self):
+        return deepcopy(self._delT0)
+
+    def delT1(self):
+        return deepcopy(self._delT1)
+
+    def delT2(self):
+        return deepcopy(self._delT2)
 
     def printParams(self):
         print(self._TrfLineParams)
