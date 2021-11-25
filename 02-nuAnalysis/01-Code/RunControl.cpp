@@ -2,7 +2,8 @@
 
 #include <cstdlib>
 #include <iostream>
-#include <filesystem>
+#include <fstream>
+#include "sys/stat.h"
 
 #include "RunControl.hpp"
 
@@ -32,19 +33,25 @@ void RunControl::print() {
 }
 
 void DumpHelp() {
-  std::cout << "RunControl help: explanation of arguments:" << std::endl;
-  std::cout << "\t -h \t\t Generates this help printout to show use of flags etc." << std::endl;
-  std::cout << "\t -d \t\t Sets debug flag: RunControl::Debug = true" << std::endl;
-  std::cout << "\t -f <filename> \t Sets ROOT <filename> to be read (single file)." << std::endl;
-  std::cout << "\t\t\t If -f is specified, <filename> must exist or execution is" << std::endl;
-  std::cout << "\t\t\t terminated" << std::endl;
-  std::cout << "\t -c <dir name> \t Sets directory containing ROOT files to be chained."
+  std::cout << "RunControl help: explanation of arguments:"
 	    << std::endl;
-  std::cout << "\t\t\t If -c is specified, <dir name> must exist or execution is" << std::endl;
-  std::cout << "\t\t\t terminated" << std::endl;
-  std::cout << "\t Note that -f and -c can be used together, all files will be read."
+  std::cout << "\t -h \t\t Generates this help printout to show use of flags"
+            << " etc." << std::endl;
+  std::cout << "\t -d \t\t Sets debug flag: RunControl::Debug = true"
 	    << std::endl;
-
+  std::cout << "\t -f <filename> \t Sets ROOT <filename> to be read "
+	    << "(single file)." << std::endl;
+  std::cout << "\t\t\t If -f is specified, <filename> must exist or "
+	    << "execution is" << std::endl;
+  std::cout << "\t\t\t terminated" << std::endl;
+  std::cout << "\t -c <dir name> \t Sets directory containing ROOT "
+	    << "files to be chained."
+	    << std::endl;
+  std::cout << "\t\t\t If -c is specified, <dir name> must exist or "
+	    << "execution is" << std::endl;
+  std::cout << "\t\t\t terminated" << std::endl;
+  std::cout << "\t Note that -f and -c can be used together, all files "
+	    << "will be read." << std::endl;
   std::exit(EXIT_SUCCESS);
 }
 
@@ -74,8 +81,10 @@ void RunControl::ParseArgs(int nArgs, char *ArgV[]){
 		<< " value: " << ArgV[i] << "\n" ;
     }
   }
-  bool File = std::filesystem::exists(ROOTfilename);
-  bool Dir  = std::filesystem::exists(CHAINdirname);
+  std::ifstream f(ROOTfilename);
+  bool File = f.good();
+  struct stat db;
+  bool Dir  = (stat(CHAINdirname.c_str(), &db) == 0);
   if ( FileFlag and !File ) {
     std::cout << " Error! File "
 	      << ROOTfilename << " does not exist; stop." << std::endl;
