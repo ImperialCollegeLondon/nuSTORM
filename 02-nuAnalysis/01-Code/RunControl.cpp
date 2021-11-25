@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
+#include <string.h>
 #include "sys/stat.h"
 
 #include "RunControl.hpp"
@@ -63,15 +64,15 @@ void RunControl::ParseArgs(int nArgs, char *ArgV[]){
   ChainFlag = false;
   for (int i = 0 ; i < nArgs ; i++) {
     Arg = ArgV[i];
-    if ( std::strcmp(Arg, "-d") == 0 )
+    if ( strcmp(Arg, "-d") == 0 )
       Debug = true;
-    else if ( std::strcmp(Arg, "-f") == 0 ) {
+    else if ( strcmp(Arg, "-f") == 0 ) {
       FileFlag     = true;
       ROOTfilename = ArgV[i+1]; }
-    else if ( std::strcmp(Arg, "-c") == 0 ) {
+    else if ( strcmp(Arg, "-c") == 0 ) {
       ChainFlag    = true;
       CHAINdirname = ArgV[i+1]; }
-    else if ( std::strcmp(Arg, "-h") == 0 ) 
+    else if ( strcmp(Arg, "-h") == 0 ) 
       DumpHelp();
   }
   if ( Debug == true) {
