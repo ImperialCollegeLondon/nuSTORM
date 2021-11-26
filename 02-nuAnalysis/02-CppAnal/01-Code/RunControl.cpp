@@ -53,7 +53,6 @@ void DumpHelp() {
   std::cout << "\t\t\t terminated" << std::endl;
   std::cout << "\t Note that -f and -c can be used together, all files "
 	    << "will be read." << std::endl;
-  std::exit(EXIT_SUCCESS);
 }
 
 void RunControl::ParseArgs(int nArgs, char *ArgV[]){

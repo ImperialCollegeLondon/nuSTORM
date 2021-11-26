@@ -30,8 +30,27 @@ int main(int nArgs, char *ArgV[]){
   // Test parsing of input arguments:
   std::cout << "    Test " << i << ": test parsing of input arguments:"
 	    << std::endl;
-  RC->ParseArgs(nArgs, ArgV);
+  std::cout << "    ----> Number of input arguments: "
+	    << nArgs << std::endl;
+
+  std::string Hlp = "-h";
+  const char* cHlp = Hlp.c_str();
+  char *ArgVPlus[2];
+  int nArgsPlus;
+  if ( nArgs == 1 ){
+    std::cout << "    ----> No arguments given, set -h, help flag."
+	      << std::endl;
+    ArgVPlus[0] = ArgV[0]; 
+    ArgVPlus[1] = const_cast<char *>(cHlp);
+    std::cout << "; ArgPlus: " << ArgVPlus[nArgs] << std::endl;
+    nArgsPlus = nArgs + 1;
+    std::cout << "        ----> Updated: nArgs, ArgV: "
+	      << nArgsPlus << ": " << ArgVPlus << std::endl;
+    RC->ParseArgs(nArgsPlus, ArgVPlus);
+  }
+  else {
+    RC->ParseArgs(nArgs, ArgV);
+  }
   std::cout << "    ----> RunControl parameters:" << std::endl;
   RC->print();
-
 }
