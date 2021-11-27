@@ -30,14 +30,18 @@ private:
   ~RunControl() { };
   
 public:
+  //--> Getters:
+  bool                  getDebug(){ return Debug; };
+  bool               getFileFlag(){ return FileFlag; };
+  bool              getChainFlag(){ return ChainFlag; };
+  std::string    getROOTfilename(){ return ROOTfilename; }
+  std::string    getCHAINdirname(){ return CHAINdirname; }
   static RunControl* getInstance();
 
-  bool               getDebug(){ return Debug; };
-  std::string getROOTfilename(){ return ROOTfilename; }
-  std::string getCHAINdirname(){ return CHAINdirname; }
-  
+  //--> Dumpers:
   void print();
 
+  //--> Dumpers:
   void ParseArgs(int nArgs, char *ArgV[]);
-  
+
 };
