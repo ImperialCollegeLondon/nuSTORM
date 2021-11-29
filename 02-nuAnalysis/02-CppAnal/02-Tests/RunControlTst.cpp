@@ -1,6 +1,7 @@
 /* Tests of RunControl class */
 
 #include <iostream>
+#include <string.h>
 
 #include "RunControl.hpp"
 
