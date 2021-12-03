@@ -134,6 +134,7 @@ class plane:
         return hitE, hitMu
 
 # Find the intercept of the particle with plane and store it along with the energy for pion flash events
+
     def findHitPositionPiEvt(self, piEvt):
 #  Decay point information
         DecayPntX = piEvt.getTraceSpaceCoord()[1]
@@ -145,8 +146,39 @@ class plane:
         pMu = piEvt.getnumu4mmtm()[1]       # 3 vector
 
 #  Distance to the plane
-#        deltaZ = self.zPos - DecayPntZ
-        deltaZ = self.zPos
+        deltaZ = self.zPos - DecayPntZ
+#  Position of the numu hit               # need to check by hand - no test
+        hitMu=[]
+        xPnt = (DecayPntX + pMu[0]*deltaZ/pMu[2])
+        yPnt = (DecayPntY + pMu[1]*deltaZ/pMu[2])
+        if (xPnt < -200.0):
+            print ("xPnt is ", xPnt, "   yPnt is ", yPnt)
+            print ("piEvt is ", piEvt)
+        hitMu.append(xPnt)                                 # x
+        hitMu.append(yPnt)                                 # y
+        hitMu.append(self.zPos)                            # z
+        hitMu.append(np.sqrt(xPnt*xPnt + yPnt*yPnt))       # R
+        hitMu.append(math.atan2(yPnt, xPnt))               # phi
+        hitMu.append(pMu[0])                               # px
+        hitMu.append(pMu[1])                               # py
+        hitMu.append(pMu[2])                               # pz
+        hitMu.append(eMu)                                  # E
+
+
+        if self.__Debug: print (" hit: x, y, R, phi, E ", hitMu[0], " ", hitMu[1], " ", hitMu[2], " ", hitMu[3], " ", hitMu[4])
+
+        return hitMu
+    def findHitPositionPiFlash(self, nuFlash):
+
+#  Decay point information
+        DecayPntX = nuFlash.x()
+        DecayPntY = nuFlash.y()
+        DecayPntZ = nuFlash.z()
+        pMu = nuFlash.p()[1]
+        eMu = nuFlash.p()[0]
+
+#  Distance to the plane
+        deltaZ = self.zPos - DecayPntZ
         if self.__Debug: print ("path length is ", deltaZ)
 
 #  Position of the numu hit               # need to check by hand - no test
@@ -155,7 +187,7 @@ class plane:
         yPnt = (DecayPntY + pMu[1]*deltaZ/pMu[2])
         if (xPnt < -200.0):
             print ("xPnt is ", xPnt, "   yPnt is ", yPnt)
-            print ("piEvt is ", piEvt)
+            print ("nuFlash is ", nuFlash)
         hitMu.append(xPnt)                                 # x
         hitMu.append(yPnt)                                 # y
         hitMu.append(self.zPos)                            # z

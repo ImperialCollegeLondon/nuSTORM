@@ -52,7 +52,10 @@ Created on Tue 30Mar21;02:26: Version history:
 
  1.1: 20Oct21: Correct problem created by adding different momentum distributions for pions and muons
 @author: kennethlong
-@auhtor: PaulKyberd
+@author: PaulKyberd
+
+ 1.2: 23Nov21: Pion decay cut on production straightLength causes normalisation problems. Modify to take all decays
+@author: PaulKyberd
 """
 
 from copy import deepcopy
@@ -80,6 +83,7 @@ class PionEventInstance:
         self._ppi = ppi
         self._phi=-10.0
         self._costheta=-10.0
+        self._lifetime = 0.0
         self._TrcSpcCrd, self._ppiGen, self._P_mu, self._P_numu = self.CreateMuon()
 
         return
@@ -102,37 +106,39 @@ class PionEventInstance:
 
         PrdStrghtLngth = 180.0
 #        #.. Prepare--get muon decay instance in pion rest frame:
-        z = 2.* PrdStrghtLngth
-        Dcy = 0
-        if PionEventInstance.__Debug:
-            print("PionEventInstance.CreatePion: find valid decay")
-        while z > PrdStrghtLngth:
-            if isinstance(Dcy, PionDecay.PionDecay):
-                del Dcy
+#        z = 2.* PrdStrghtLngth
+#        Dcy = 0
+#        if PionEventInstance.__Debug:
+#            print("PionEventInstance.CreatePion: find valid decay")
+#        while z > PrdStrghtLngth:
+#            if isinstance(Dcy, PionDecay.PionDecay):
+#                del Dcy
 
-            Ppi0 = self.getppi()
-#            print ("Ppi0 ", Ppi0)
+        Ppi0 = self.getppi()
 #   Comment out this line for distribution
 #            Ppi = Ppi0
 #    Comment out this line and we get single energy
-            Ppi = nuStrt.GeneratePiMmtm(Ppi0)
-#            print ("Ppi ", Ppi)
-            Epi   = np.sqrt(Ppi**2 + PionEventInstance.__pimass**2)
-            beta  = Ppi / Epi
-            gamma = Epi / PionEventInstance.__pimass
-            v    = beta * PionEventInstance.__sol
-            Tmax = nuStrt.ProdStrghtLen() / (gamma * v)
+        Ppi = nuStrt.GeneratePiMmtm(Ppi0)
+        Epi   = np.sqrt(Ppi**2 + PionEventInstance.__pimass**2)
+        beta  = Ppi / Epi
+        gamma = Epi / PionEventInstance.__pimass
+        v    = beta * PionEventInstance.__sol
 
-            Dcy = PionDecay.PionDecay(Tmax=Tmax)
-            self._phi = Dcy.getphi()
-            self._costheta = Dcy.getcostheta()
-#            print("PionEventInstance.CreatePion: Dcy ", Dcy)
-            DcyCoord, ppiGen = self.GenerateDcyPhaseSpace(Dcy,Ppi)
-#            print("PionEventInstance.CreatePion: ppiGen ", ppiGen)
-#            print("PionEventInstance.CreatePion: DcyCoord ", DcyCoord)
-            z = DcyCoord[3]
-        if z > PrdStrghtLngth:
-            print("PionEventInstance.CreatePion Alarm:", z)
+# no TMax at present
+#        Tmax = nuStrt.ProdStrghtLen() / (gamma * v)
+#        Dcy = PionDecay.PionDecay(Tmax=Tmax)
+        Dcy = PionDecay.PionDecay()
+        self._phi = Dcy.getphi()
+        self._costheta = Dcy.getcostheta()
+        if (self.__Debug): print("PionEventInstance.CreatePion: Dcy ", Dcy)
+        DcyCoord, ppiGen = self.GenerateDcyPhaseSpace(Dcy,Ppi)
+        self._lifetime = Dcy.getLifetime()
+        if (self.__Debug): print("PionEventInstance.CreatePion: ppiGen ", ppiGen)
+        if (self.__Debug): print("PionEventInstance.CreatePion: DcyCoord ", DcyCoord)
+        z = DcyCoord[3]
+#  This test is no longer valid - may re-introduce
+#        if z > PrdStrghtLngth:
+#            print("PionEventInstance.CreatePion Alarm:", z)
         if PionEventInstance.__Debug:
             print("PionEventInstance.CreatePion: decay at z =", z)
             print("----> Dcy:", Dcy.__str__())
@@ -244,6 +250,9 @@ class PionEventInstance:
         return Po
 
 #--------  get/set methods:
+    def getLifetime(self):
+        return deepcopy(self._lifetime)
+
     def getppi(self):
         return deepcopy(self._ppi)
 
