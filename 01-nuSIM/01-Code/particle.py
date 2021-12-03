@@ -31,6 +31,7 @@ Class pion:
 
 Created on Tue 29Aug21;21:35: Version history:
 ----------------------------------------------
+ 2.1: 12Nov21: Add a 'none' particle to help with the eventHistory
  2.0: 24Sep21: Unify all the particles and just distinguish with a pdg code
  1.1: 21Sep21: Add a constructor with the momentum vector
  1.0: 29Aug21: A straight copy of the pion class
@@ -163,6 +164,10 @@ class particle:
             mass = 0.0
             lifetime = math.inf
             pdgCode = -14
+        elif particleType == "none":
+            mass = 0.0
+            lifetime = math.inf
+            pdgCode = 0
         else:
             sys.exit("Unrecognised particle type " + str(particleType))
 
@@ -184,8 +189,11 @@ class particle:
         elif (abs(particleType) == 14):
             mass = 0.0
             lifetime = math.inf
-        else:
-            sys.exit("Unrecognised particle type " + str(particleType))
+        elif (abs(particleType) == 0):
+            mass = 0.0
+            lifetime = math.inf
+        else:            
+            sys.exit("particle.codeToMass): Unrecognised particle pdg code " + str(particleType))
 
         return mass, lifetime
 
