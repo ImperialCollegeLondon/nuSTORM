@@ -24,7 +24,8 @@ int main(int nArgs, char *ArgV[]){
 
   // Initialise run control singleton class:
   RunControl* RC = RunControl::getInstance();
-  if ( Debug ) std::cout  << "    ----> Initial RunControl instance: " << RC << std::endl;
+  if ( Debug ) std::cout  << "    ----> Initial RunControl instance: "
+			  << RC << std::endl;
   if ( Debug ) RC->print();
   RunControl* RC1 = RunControl::getInstance();
   if ( Debug ) std::cout  << "    ----> Second RunControl instance: " << RC1 << std::endl;
@@ -68,13 +69,17 @@ int main(int nArgs, char *ArgV[]){
   bool        Dbg = RC->getDebug();
   bool        FlF = RC->getFileFlag();
   bool        ChF = RC->getChainFlag();
+  bool        OPF = RC->getOutPutFlag();
   std::string FlN = RC->getROOTfilename();
   std::string ChN = RC->getCHAINdirname();
+  std::string OPN = RC->getOUTPUTdirname();
   if ( Debug ) std::cout  << "RunControl initialised with parameters:" << std::endl;
   if ( Debug ) std::cout  << "                Debug: " << Dbg << std::endl;
   if ( Debug ) std::cout  << "             FileFlag: " << FlF << std::endl;
   if ( Debug ) std::cout  << "            ChainFlag: " << ChF << std::endl;
+  if ( Debug ) std::cout  << "           OutPutFlag: " << OPF << std::endl;
   if ( Debug ) std::cout  << "       ROOT file name: " << FlN << std::endl;
   if ( Debug ) std::cout  << " ROOT chain directory: " << ChN << std::endl;
+  if ( Debug ) std::cout  << "     OutPut directory: " << OPN << std::endl;
   
 }
