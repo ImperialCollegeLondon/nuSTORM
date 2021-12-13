@@ -10,10 +10,12 @@ echo "    " $nuSIMPATH
 export nuSIMPATH
 
 add="/01-Code"
+add2="/12-examples"
 #echo $add
 dir="$stm$add"
+dir2="$stm$add2"
 #echo $dir
 echo "Set PYTHON path:"
-PYTHONPATH="${PYTHONPATH}:$dir"
+PYTHONPATH="${PYTHONPATH}:$dir:$dir2"
 echo "    " $PYTHONPATH
 export PYTHONPATH

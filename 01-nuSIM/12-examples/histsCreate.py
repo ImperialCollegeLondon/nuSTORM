@@ -44,15 +44,15 @@ class histsCreate():
         self._tLower = {"target": 0.0, "productionStraight": 0.0, "pionDecay": 0.0, "muonProduction": 0.0,"piFlashNu": 0.0,
                 "muonDecay": 0.0, "eProduction": 0.0, "numuProduction":0, "nueProduction": 0.0, "numuDetector": 0.0, "nueDetector": 0.0}
         self._tHigher = {"target": 500.0, "productionStraight": 500.0, "pionDecay": 1000.0, "muonProduction": 500.0,"piFlashNu": 60.0,
-                "muonDecay": 60000.0, "eProduction": 60000.0, "numuProduction": 60000.0, "nueProduction": 60000.0, "numuDetector": 60000.0, 
+                "muonDecay": 60000.0, "eProduction": 60000.0, "numuProduction": 60000.0, "nueProduction": 60000.0, "numuDetector": 60000.0,
                 "nueDetector": 60000.0}
         self._sLower = {"target":-1.0, "productionStraight": -1.0, "pionDecay": -1.0, "muonProduction": -1.0,"piFlashNu": -10.0,
                 "muonDecay": 0.0, "eProduction": 0.0, "numuProduction":0.0, "nueProduction": 0.0, "numuDetector": 0.0, "nueDetector": 0.0}
         self._sHigher = {"target":400.0, "productionStraight": 400.0, "pionDecay": 1000.0, "muonProduction": 400.0,"piFlashNu": 70.0,
-                "muonDecay": 60000.0, "eProduction": 60000.0, "numuProduction":40000.0, "nueProduction": 40000.0, 
+                "muonDecay": 60000.0, "eProduction": 60000.0, "numuProduction":40000.0, "nueProduction": 40000.0,
                 "numuDetector": 80000.0, "nueDetector": 80000.0}
         self._bins = {"target": 100, "productionStraight": 100, "pionDecay": 100, "muonProduction": 100,"piFlashNu": 100,
-                "muonDecay": 50, "eProduction": 1000, "numuProduction":40000.0, "nueProduction": 40000.0, 
+                "muonDecay": 50, "eProduction": 1000, "numuProduction":40000.0, "nueProduction": 40000.0,
                 "numuDetector": 40000.0, "nueDetector": 40000.0}
 
 
@@ -64,7 +64,7 @@ class histsCreate():
         self._locs.append(eventType)
 #        print ("locStart is ", self._locsStart)
 #        print ("locs ", self._locs)
-        hTitle = eventType + ":x" 
+        hTitle = eventType + ":x"
         hBins  = 100
         hLower = self._xLower[eventType]
         hUpper = self._xHigher[eventType]
@@ -72,13 +72,13 @@ class histsCreate():
 
         hLower = self._yLower[eventType]
         hUpper = self._yHigher[eventType]
-        hTitle = eventType + ":y" 
+        hTitle = eventType + ":y"
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
         hLower = self._zLower[eventType]
         hUpper = self._zHigher[eventType]
-        hTitle = eventType + ":z" 
+        hTitle = eventType + ":z"
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
-        hTitle = eventType + ":weight" 
+        hTitle = eventType + ":weight"
         hLower = -10.0
         hUpper = 100.0
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
@@ -92,26 +92,29 @@ class histsCreate():
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
         hLower = self._tLower[eventType]
         hUpper = self._tHigher[eventType]
-        hTitle = eventType + ":t" 
+        hTitle = eventType + ":t"
         if eventType == "muonDecay" or eventType == "eProduction":
             hBins = 50
+        elif eventType == "target":
+            hbins = 70
+            hUpper = 70.
         else:
             hBins = 100
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
         hBins = 100
-        hTitle = eventType + ":px" 
+        hTitle = eventType + ":px"
         hLower = self._pxLower[eventType]
         hUpper = self._pxHigher[eventType]
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
-        hTitle = eventType + ":py" 
+        hTitle = eventType + ":py"
         hLower = self._pyLower[eventType]
         hUpper = self._pyHigher[eventType]
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
-        hTitle = eventType + ":pz" 
+        hTitle = eventType + ":pz"
         hLower = self._pzLower[eventType]
         hUpper = self._pzHigher[eventType]
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
-        hTitle = eventType + ":E_v_t" 
+        hTitle = eventType + ":E_v_t"
         self._hists.append(self._hm.book2(hTitle, 50, 0.0, 5.0, 50, 10000.0, 11000.0))
 
 
@@ -155,7 +158,7 @@ class histsCreate():
                  self._count = self._count + 1
 
             if (location == "pionDecay"):
-                if (s < 230.0): 
+                if (s < 230.0):
                     self._hists[hPnt+0].Fill(x)
                     self._hists[hPnt+1].Fill(y)
                     self._hists[hPnt+2].Fill(z)

@@ -77,6 +77,7 @@ class PionTimeDistribution:
             t_mod = math.fmod(t,self._tb+self._ts)
             if t_mod < self._tb:
                 check = True
+        #print("time within bunch ", t_mod*1E9)
         return t
 
 #--------  "Get methods" only; version, reference, and constants
