@@ -106,6 +106,7 @@ class PionEventInstance:
 
         PrdStrghtLngth = 180.0
 #        #.. Prepare--get muon decay instance in pion rest frame:
+<<<<<<< HEAD:01-nuSIM/01-Code/PionEventInstance.py
 #        z = 2.* PrdStrghtLngth
 #        Dcy = 0
 #        if PionEventInstance.__Debug:
@@ -139,6 +140,39 @@ class PionEventInstance:
 #  This test is no longer valid - may re-introduce
 #        if z > PrdStrghtLngth:
 #            print("PionEventInstance.CreatePion Alarm:", z)
+=======
+        z = 2.* PrdStrghtLngth
+        Dcy = 0
+        if PionEventInstance.__Debug:
+            print("PionEventInstance.CreatePion: find valid decay")
+        while z > PrdStrghtLngth:
+            if isinstance(Dcy, PionDecay.PionDecay):
+                del Dcy
+
+            Ppi0 = self.getppi()
+#            print ("Ppi0 ", Ppi0)
+#   Comment out this line for distribution
+#            Ppi = Ppi0
+#    Comment out this line and we get single energy
+            Ppi = nuStrt.GeneratePiMmtm(Ppi0)
+#            print ("Ppi ", Ppi)
+            Epi   = np.sqrt(Ppi**2 + PionEventInstance.__pimass**2)
+            beta  = Ppi / Epi
+            gamma = Epi / PionEventInstance.__pimass
+            v    = beta * PionEventInstance.__sol
+            Tmax = nuStrt.ProdStrghtLen() / (gamma * v)
+
+            Dcy = PionDecay.PionDecay(Tmax=Tmax)
+            self._phi = Dcy.getphi()
+            self._costheta = Dcy.getcostheta()
+#            print("PionEventInstance.CreatePion: Dcy ", Dcy)
+            DcyCoord, ppiGen = self.GenerateDcyPhaseSpace(Dcy,Ppi)
+#            print("PionEventInstance.CreatePion: ppiGen ", ppiGen)
+#            print("PionEventInstance.CreatePion: DcyCoord ", DcyCoord)
+            z = DcyCoord[3]
+        if z > PrdStrghtLngth:
+            print("PionEventInstance.CreatePion Alarm:", z)
+>>>>>>> timestructure:01-Code/PionEventInstance.py
         if PionEventInstance.__Debug:
             print("PionEventInstance.CreatePion: decay at z =", z)
             print("----> Dcy:", Dcy.__str__())
