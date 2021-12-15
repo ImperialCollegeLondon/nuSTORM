@@ -42,7 +42,7 @@ testStatus=[]
 print("========  analysing the eventHistory start  ========")
 
 objRd = eventHistory.eventHistory()
-objRd.inFile("norm.root")
+objRd.inFile("Scratch/normalisation102.root")
 
 nEvent = objRd.getEntries()
 print ("number of entries is ", nEvent)
@@ -203,7 +203,7 @@ for pnt in range(nEvent):
 #hm.histdo()
 hm.histOutRoot()
 # write plots to individual .pdf files
-#hm.histdo() 
+#hm.histdo()
 hm.texCreate()
 hC.summary()
 

@@ -24,7 +24,7 @@ import numpy as np
 import math as math
 import PionConst as PC
 import nuSTORMPrdStrght as nuPrdStrt
-import nuSTORMTrfLine as nuTrfLine
+import nuSTORMTrfLineCmplx as nuTrfLineCmplx
 import PionEventInstance as piEvtInst
 import NeutrinoEventInstance as nuEvtInst
 import plane as plane
@@ -49,7 +49,7 @@ class normalisation:
     def tltoGlbl(self, xl, yl, zl, pxl, pyl, pzl):
 
         xg = xl - zl*self._sth
-        yg = yl 
+        yg = yl
         zg = zl*self._cth
 
         pxg = pxl*self._cth + pzl*self._sth
@@ -80,7 +80,7 @@ class normalisation:
       pydl = pPion*ypd
       pzdl = np.sqrt(pPion*pPion - pxdl**2 - pydl**2)
       pi.getLifetime()
-      td = lifetime*10E9
+      td = lifetime*1E9 + t
       zdl = zdl - tlCmplxLength
 # Now we need to move to the global co-ordinates from the transfer line local
       xd, yd, zd, pxd, pyd, pzd = self.tltoGlbl(xdl, ydl, zdl, pxdl, pydl, pzdl)
@@ -114,8 +114,8 @@ class normalisation:
       numuZ = hitMu[2]
       dsNumu = math.sqrt((xd-numuX)**2 + (yd-numuY)**2 + (zd-numuZ)**2)
       sNumu = sd + dsNumu
-      tNumu = td + dsNumu*10E9/c
-      if (self._tlDcyCount < 5): print ( "sNumu is ", sNumu, "    dsNumu is ", dsNumu, "     tNumu is ", tNumu, "    c is ", c) 
+      tNumu = td + dsNumu*1E9/c + t
+      if (self._tlDcyCount < 5): print ( "sNumu is ", sNumu, "    dsNumu is ", dsNumu, "     tNumu is ", tNumu, "    c is ", c)
       if ((abs(numuX) < 2.5) and (abs(numuY) < 2.5)):
           eW = eventWeight
       else:
@@ -141,7 +141,7 @@ class normalisation:
       pxd = 0.0
       pyd = 0.0
       pzd = 0.01
-      td = pi.getLifetime()*10E9
+      td = pi.getLifetime()*1E9 + t
       if (self._byndPSCount < 5): print ("pi in beyondPS: decayLength ", sd)
       pionLostDecay = particle.particle(runNumber, event, sd, xd, yd, zd, pxd, pyd, pzd, td, eventWeight, "pi+")
       eH.addParticle("pionDecay", pionLostDecay)
@@ -157,7 +157,7 @@ class normalisation:
       return
 
 ##
-# calculate where in the ring, the decay occurred given the path length in the ring 
+# calculate where in the ring, the decay occurred given the path length in the ring
 #
     def ring(self, pathLength):
 
@@ -182,7 +182,7 @@ class normalisation:
         deltaX = -2*arcRadius
         direction = math.pi
       elif (sectionPnt == 1):
-        theta = decayPnt/arcRadius - 0.5*math.pi 
+        theta = decayPnt/arcRadius - 0.5*math.pi
         zpos = 180.0 + arcRadius*math.cos(theta)
         deltaX = 0.0 - arcRadius - arcRadius*math.sin(theta)
         direction = 2.0*math.pi - decayPnt/arcRadius
@@ -207,7 +207,7 @@ class normalisation:
       xpd = tsc[4]
       ypd = tsc[5]
       pi.getLifetime()
-      td = lifetime*10E9
+      td = lifetime*1E9 + t
       pPion =pi.getppiGen()
       zd = sd - tlCmplxLength
       pPion = pi.getppiGen()
@@ -240,13 +240,13 @@ class normalisation:
 #
     def decayMuons(self):
 
-# get the muon momentum 
+# get the muon momentum
       mu = pi.getmu4mmtm()
       pxMu = mu[1][0]
       pyMu = mu[1][1]
       pzMu = mu[1][2]
       pMu = math.sqrt(pxMu*pxMu + pyMu*pyMu + pzMu*pzMu)
-# and decay the muon 
+# and decay the muon
       nuEvt = nuEvtInst.NeutrinoEventInstance(pMu)
 
 # ... We can allow any muon which is created in the production straight to decay without worrying about
@@ -282,7 +282,7 @@ class normalisation:
         pzDcy = nuEvt.getpmu()
         pxDcy = muTSC[4]*pzDcy
         pyDcy = muTSC[5]*pzDcy
-        tDcy = (pi.getLifetime()+nuEvt.getLifeTime())*10E9
+        tDcy = (pi.getLifetime()+nuEvt.getLifeTime())*1E9 + t
         muDecay = particle.particle(runNumber, event, sDcy, xDcy, yDcy, zDcy, pxDcy, pyDcy, pzDcy, tDcy, eventWeight, "mu+")
         eH.addParticle("muonDecay", muDecay)
         if (self._muDcyCount < 5): print ("muDecay is ", muDecay)
@@ -323,8 +323,8 @@ class normalisation:
         numuZ = hitMu[2]
         dsNumu = math.sqrt((xDcy-numuX)**2 + (yDcy-numuY)**2 + (zDcy-numuZ)**2)
         sNumu = sDcy + dsNumu
-        tNumu = tDcy + sNumu/c
-        if (self._muDcyCount < 5): print ( "sNumu is ", sNumu, "    dsNumu is ", dsNumu, "     tNumu is ", tNumu) 
+        tNumu = tDcy + sNumu/c + t
+        if (self._muDcyCount < 5): print ( "sNumu is ", sNumu, "    dsNumu is ", dsNumu, "     tNumu is ", tNumu)
         if ((abs(numuX) < 2.50) and (abs(numuY) < 2.50)):
             eW = eventWeight
         else:
@@ -338,7 +338,7 @@ class normalisation:
         nueZ = hitE[2]
         dsNue = math.sqrt((xDcy-nueX)**2 + (yDcy-nueY)**2 + (zDcy-nueZ)**2)
         sNue = sDcy + dsNue
-        tNue = tDcy + sNue/c
+        tNue = tDcy + sNue/c + t
         if ((abs(nueX) < 2.50) and (abs(nueY) < 2.50)):
             eW = eventWeight
         else:
@@ -364,29 +364,29 @@ if __name__ == "__main__" :
     c = piCnst.SoL()
     piMass = piCnst.mass()/1000.0
 
-# Get the nuSIM path name and use it to set names for the inputfile and the outputFile
-    nuSIMPATH = os.getenv('nuSIMPATH')
-    filename  = os.path.join(nuSIMPATH, '11-Parameters/nuSTORM-PrdStrght-Params-v1.0.csv')
-    rootFilename = os.path.join(nuSIMPATH, 'Scratch/normalisation.root')
-    trfCmplxFile = os.path.join(nuSIMPATH, '11-Parameters/nuSTORM-TrfLineCmplx-Params-v1.0.csv')
-    print ("numSIMPATH, filename, rootfilename, trfCmplxFile \n", nuSIMPATH, "\n", filename, "\n", rootFilename,
-         "\n", trfCmplxFile)
-    outFilename = "norm.root"
-# Get machine and run parameters
-    nuStrt = nuPrdStrt.nuSTORMPrdStrght(filename)
-    psLength = nuStrt.ProdStrghtLen()
-    nuTrLn = nuTrfLine.nuSTORMTrfLine(trfCmplxFile)
-    nuTrLn.TrfLineLen()
-    tlCmplxLength = nuTrLn.TrfLineLen()
-    detectorPosZ = nuStrt.HallWallDist()
-# set up the detector front face
-    fluxPlane = plane.plane(psLength, detectorPosZ)
 # initialise run number, number of events to generate, central pion momentum, and event weight
-    runNumber = 50
-    pionMom = 5.2
+    runNumber = 102
+    pionMom = 5.0
     crossSection = 50
     nEvents = 200000
     eventWeight = crossSection
+
+# Get the nuSIM path name and use it to set names for the inputfile and the outputFile
+    nuSIMPATH = os.getenv('nuSIMPATH')
+    filename  = os.path.join(nuSIMPATH, '11-Parameters/nuSTORM-PrdStrght-Params-v1.0.csv')
+    rootFilename = os.path.join(nuSIMPATH, 'Scratch/normalisation'+str(runNumber)+'.root')
+    trfCmplxFile = os.path.join(nuSIMPATH, '11-Parameters/nuSTORM-TrfLineCmplx-Params-v1.0.csv')
+    print ("numSIMPATH, filename, rootfilename, trfCmplxFile \n", nuSIMPATH, "\n", filename, "\n", rootFilename,
+         "\n", trfCmplxFile)
+    outFilename = rootFilename#"norm.root"
+# Get machine and run parameters
+    nuStrt = nuPrdStrt.nuSTORMPrdStrght(filename)
+    psLength = nuStrt.ProdStrghtLen()
+    nuTrLnCmplx = nuTrfLineCmplx.nuSTORMTrfLineCmplx(trfCmplxFile)
+    tlCmplxLength = nuTrLnCmplx.TrfLineCmplxLen()
+    detectorPosZ = nuStrt.HallWallDist()
+# set up the detector front face
+    fluxPlane = plane.plane(psLength, detectorPosZ)
 # set up the event history - instantiate
     eH = eventHistory.eventHistory()
     eH.outFile(outFilename)
@@ -410,8 +410,8 @@ for event in range(nEvents):
     px = pPion*xp
     py = pPion*yp
     pz = np.sqrt(pPion*pPion - px**2 - py**2)
-    t = 0.0
-#  pion at target is a point source but with a momentum spread 
+    t = nuTrLnCmplx.GenerateTime()*1E9
+#  pion at target is a point source but with a momentum spread
     pionTarget = particle.particle(runNumber, event, s, x, y, z, px, py, pz, t, eventWeight, "pi+")
     eH.addParticle('target', pionTarget)
     tsc = pi.getTraceSpaceCoord()
@@ -425,9 +425,9 @@ for event in range(nEvents):
       normInst.tlDecay()
     else:
 # pion reaches end of transfer line just write out a new pion with altered s and z - all other pions must do this
-      se = 50.0
+      se = tlCmplxLength
       ze = 0.0
-      te = 10E9*se*piMass/(c*pPion)
+      te = 1E9*se*piMass/(c*pPion)+t
       pionPS = particle.particle(runNumber, event, se, x, y, ze, px, py, pz, te, eventWeight, "pi+")
       eH.addParticle("productionStraight", pionPS)
 # decay beyond the end of the production straight
@@ -438,14 +438,14 @@ for event in range(nEvents):
     if ((psFlag) and (pathLength >= tlCmplxLength) and (pathLength <= tlCmplxLength + psLength)):
         normInst.decayPiInPS()
 # decay the muons
-        if (muDcyFlag): normInst.decayMuons()   
+        if (muDcyFlag): normInst.decayMuons()
 
 
 
 #  write to the root structure
     eH.fill()
 # tell the user what is happening
-    if (event < 10): 
+    if (event < 10):
         print ("event number is ", event)
         print (pi)
         print (tsc)
@@ -464,4 +464,3 @@ eH.outFileClose()
 ##! Complete:
 print()
 print("========  Normalisation run : complete  ========")
-
