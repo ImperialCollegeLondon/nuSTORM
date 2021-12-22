@@ -14,6 +14,32 @@ Class: eventHistory:
     @version     1.1
     @date        11 November 2021
 
+Methods:
+  --------
+  Built-in methods __init__, __repr__ and __str__.
+      __init__: Initialisation of 
+      __repr__: One liner with call.
+      __str__ : Summary
+
+  Get/set methods:
+ 
+   	makeHistory()		: Create an empty structure (all pi+) to be filled by the user with add particle 
+		getEntries()		: total number of entries in the root file (for reading)
+		readNext()			: read next entry in the root file
+		addParticle(location, par): add particle par at location to the history
+		findParticle(location, par): return particle par at location from the history
+
+  Generation, calcution methods and utilities:
+
+   	outFile(fileName)	: Name and open a file for output
+   	inFile(fileName)	: Name and open a file for input
+		readNext()			: read next entry in the root file
+		addParticle(location, par): add particle par at location to the history
+		findParticle(location, par): return particle par at location from the history
+
+
+
+
 Version 1.1										11/11/2021
 After writing out 
 
