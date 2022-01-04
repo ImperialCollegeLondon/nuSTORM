@@ -365,10 +365,10 @@ if __name__ == "__main__" :
     piMass = piCnst.mass()/1000.0
 
 # initialise run number, number of events to generate, central pion momentum, and event weight
-    runNumber = 102
+    runNumber = 103
     pionMom = 5.0
     crossSection = 50
-    nEvents = 200000
+    nEvents = 100000
     eventWeight = crossSection
 
 # Get the nuSIM path name and use it to set names for the inputfile and the outputFile
@@ -401,18 +401,20 @@ for event in range(nEvents):
     pi = piEvtInst.PionEventInstance(pionMom)
 # set its values
     s = 0.0
-    x = 0.0
-    y = 0.0
-    z = -tlCmplxLength
-    xp = 0.0
-    yp = 0.0
+    xl = 0.0
+    yl = 0.0
+    zl = -tlCmplxLength
+    xpl = 0.0
+    ypl = 0.0
     pPion = pi.getppiGen()
-    px = pPion*xp
-    py = pPion*yp
-    pz = np.sqrt(pPion*pPion - px**2 - py**2)
+    pxl = pPion*xpl
+    pyl = pPion*ypl
+    pzl = np.sqrt(pPion*pPion - pxl**2 - pyl**2)
     t = nuTrLnCmplx.GenerateTime()*1E9
+# transform to the global system
+    xg, yg, zg, pxg, pyg, pzg = normInst.tltoGlbl(xl, yl, zl, pxl, pyl, pzl)
 #  pion at target is a point source but with a momentum spread
-    pionTarget = particle.particle(runNumber, event, s, x, y, z, px, py, pz, t, eventWeight, "pi+")
+    pionTarget = particle.particle(runNumber, event, s, xg, yg, zg, pxg, pyg, pzg, t, eventWeight, "pi+")
     eH.addParticle('target', pionTarget)
     tsc = pi.getTraceSpaceCoord()
 
@@ -425,10 +427,13 @@ for event in range(nEvents):
       normInst.tlDecay()
     else:
 # pion reaches end of transfer line just write out a new pion with altered s and z - all other pions must do this
+# the magnets bend the beam so that the local co-ordinates are now the global ones
       se = tlCmplxLength
       ze = 0.0
-      te = 1E9*se*piMass/(c*pPion)+t
-      pionPS = particle.particle(runNumber, event, se, x, y, ze, px, py, pz, te, eventWeight, "pi+")
+# t = d/(beta*c)
+      te = 1E9*se*math.sqrt(pPion**2 + piMass**2)/(c*pPion)+t
+# x local is the same as before. 
+      pionPS = particle.particle(runNumber, event, se, xl, yl, ze, pxl, pyl, pzl, te, eventWeight, "pi+")
       eH.addParticle("productionStraight", pionPS)
 # decay beyond the end of the production straight
     if ((lstFlag) and (pathLength > tlCmplxLength + psLength)):
