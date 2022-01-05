@@ -116,7 +116,7 @@ class normalisation:
       sNumu = sd + dsNumu
       tNumu = td + dsNumu*1E9/c + t
       if (self._tlDcyCount < 5): print ( "sNumu is ", sNumu, "    dsNumu is ", dsNumu, "     tNumu is ", tNumu, "    c is ", c)
-      if ((abs(numuX) < 2.5) and (abs(numuY) < 2.5)):
+      if ((abs(numuX) < 100) and (abs(numuY) < 100)):
           eW = eventWeight
       else:
           eW = 0.0
@@ -365,10 +365,10 @@ if __name__ == "__main__" :
     piMass = piCnst.mass()/1000.0
 
 # initialise run number, number of events to generate, central pion momentum, and event weight
-    runNumber = 103
+    runNumber = 104
     pionMom = 5.0
     crossSection = 50
-    nEvents = 100000
+    nEvents = 10000
     eventWeight = crossSection
 
 # Get the nuSIM path name and use it to set names for the inputfile and the outputFile
@@ -431,7 +431,7 @@ for event in range(nEvents):
       se = tlCmplxLength
       ze = 0.0
 # t = d/(beta*c)
-      te = 1E9*se*math.sqrt(pPion**2 + piMass**2)/(c*pPion)+t
+      te = t + 1E9*se*math.sqrt(pPion**2 + piMass**2)/(c*pPion)
 # x local is the same as before. 
       pionPS = particle.particle(runNumber, event, se, xl, yl, ze, pxl, pyl, pzl, te, eventWeight, "pi+")
       eH.addParticle("productionStraight", pionPS)
