@@ -17,40 +17,40 @@ class histsCreate():
         self._zeroWeight = {"target":0, "productionStraight": 0, "pionDecay": 0, "muonProduction": 0,"piFlashNu": 0,
                 "muonDecay": 0, "eProduction": 0, "numuProduction":0, "nueProduction": 0, "numuDetector": 0, "nueDetector": 0}
 
-        self._xLower = {"target":-0.5, "productionStraight":-1.0, "pionDecay":-2.0, "muonProduction":-1.0,"piFlashNu":-2.0,
-                "muonDecay":-1.0, "eProduction":-1.0, "numuProduction":-1.0, "nueProduction":-1.0, "numuDetector":-50.0, "nueDetector":-10.0}
-        self._xHigher = {"target": 0.5, "productionStraight": 1.0, "pionDecay": 100.0, "muonProduction": 1.0,"piFlashNu": 100.0,
-                "muonDecay": 1.0, "eProduction": 1.0, "numuProduction":0, "nueProduction": 1.0, "numuDetector": 150.0, "nueDetector": 10.0}
+        self._xLower = {"target":-50.0, "productionStraight":-1.0, "pionDecay":-1.0, "muonProduction":-1.0,"piFlashNu":-2.0,
+                "muonDecay":-1.0, "eProduction":-1.0, "numuProduction":-1.0, "nueProduction":-1.0, "numuDetector":-25.0, "nueDetector":-25.0}
+        self._xHigher = {"target": 100.0, "productionStraight": 1.0, "pionDecay": 10.0, "muonProduction": 10.0,"piFlashNu": 100.0,
+                "muonDecay": 1.0, "eProduction": 1.0, "numuProduction":0, "nueProduction": 1.0, "numuDetector": 24.5, "nueDetector": 24.5}
         self._yLower = {"target":-0.5, "productionStraight":-1.0, "pionDecay":-1.0, "muonProduction":-1.0,"piFlashNu":-1.0,
-                "muonDecay": -1.0, "eProduction":-1.0, "numuProduction":0, "nueProduction":-1.0, "numuDetector":-100.0, "nueDetector":-10.0}
+                "muonDecay": -1.0, "eProduction":-1.0, "numuProduction":0, "nueProduction":-1.0, "numuDetector":-25.0, "nueDetector":-10.0}
         self._yHigher = {"target":0.5, "productionStraight": 1.0, "pionDecay": 1.0, "muonProduction": 1.0,"piFlashNu": 1.0,
-                "muonDecay": 1.0, "eProduction": 1.0, "numuProduction":0, "nueProduction": 1.0, "numuDetector": 100.0, "nueDetector": 10.0}
-        self._zLower = {"target": -60.0, "productionStraight": 0.0, "pionDecay": -60.0, "muonProduction": -100.0,"piFlashNu": -80.0,
+                "muonDecay": 1.0, "eProduction": 1.0, "numuProduction":0, "nueProduction": 1.0, "numuDetector": 24.5, "nueDetector": 10.0}
+        self._zLower = {"target": -600.0, "productionStraight": 0.0, "pionDecay": 0.0, "muonProduction": -100.0,"piFlashNu": -80.0,
                 "muonDecay": -100.0, "eProduction": -100.0, "numuProduction": -100.0, "nueProduction": -100.0, "numuDetector": 0.0, "nueDetector":-1.0}
-        self._zHigher = {"target":-40.0, "productionStraight": 100.0, "pionDecay": 200.0, "muonProduction": 500.0,"piFlashNu": 50.0,
+        self._zHigher = {"target":-560.0, "productionStraight": 100.0, "pionDecay": 300.0, "muonProduction": 500.0,"piFlashNu": 50.0,
                 "muonDecay": 400.0, "eProduction": 400.0, "numuProduction": 400.0, "nueProduction": 400.0, "numuDetector": 500.0, "nueDetector": 500.0}
-        self._pxLower = {"target":-0.2, "productionStraight":-0.2, "pionDecay":-1.0, "muonProduction":-1.0,"piFlashNu":-10.0,
-                "muonDecay":-1.0, "eProduction":-1.0, "numuProduction":-1.0, "nueProduction":-1.0, "numuDetector":-10.0, "nueDetector":-10.0}
-        self._pxHigher = {"target": 0.2, "productionStraight": 0.2, "pionDecay": 1.0, "muonProduction": 1.0,"piFlashNu": -20.0,
-                "muonDecay": 1.0, "eProduction": 1.0, "numuProduction":0, "nueProduction": 1.0, "numuDetector": 10.0, "nueDetector": 10.0}
+        self._pxLower = {"target":0.0, "productionStraight":-0.2, "pionDecay":-1.0, "muonProduction":-1.0,"piFlashNu":-10.0,
+                "muonDecay":-1.0, "eProduction":-1.0, "numuProduction":-1.0, "nueProduction":-1.0, "numuDetector":-2.0, "nueDetector":-10.0}
+        self._pxHigher = {"target": 1.0, "productionStraight": 0.2, "pionDecay": 1.0, "muonProduction": 1.0,"piFlashNu": -20.0,
+                "muonDecay": 1.0, "eProduction": 1.0, "numuProduction":0, "nueProduction": 1.0, "numuDetector": 2.0, "nueDetector": 10.0}
         self._pyLower = {"target":-0.2, "productionStraight":-0.2, "pionDecay":-1.0, "muonProduction":-1.0,"piFlashNu": 20.0,
-                "muonDecay":-1.0, "eProduction":-1.0, "numuProduction":-1.0, "nueProduction":-1.0, "numuDetector":-10.0, "nueDetector":-10.0}
+                "muonDecay":-1.0, "eProduction":-1.0, "numuProduction":-1.0, "nueProduction":-1.0, "numuDetector":-2.0, "nueDetector":-10.0}
         self._pyHigher = {"target": 0.2, "productionStraight": 0.2, "pionDecay": 1.0, "muonProduction": 1.0,"piFlashNu": 1.0,
-                "muonDecay": 1.0, "eProduction": 1.0, "numuProduction":0, "nueProduction": 1.0, "numuDetector": 10.0, "nueDetector": 10.0}
-        self._pzLower = {"target": 0.0, "productionStraight": 0.0, "pionDecay":-1.0, "muonProduction":-1.0,"piFlashNu":-1.0,
-                "muonDecay":-1.0, "eProduction":-6.0, "numuProduction":-6.0, "nueProduction":-6.0, "numuDetector":-10.0, "nueDetector":-10.0}
-        self._pzHigher = {"target": 7.0, "productionStraight": 7.0, "pionDecay": 7.0, "muonProduction": 7.0,"piFlashNu": 7.0,
-                "muonDecay": 7.0, "eProduction": 6.0, "numuProduction": 6.0, "nueProduction": 6.0, "numuDetector": 10.0, "nueDetector": 10.0}
+                "muonDecay": 1.0, "eProduction": 1.0, "numuProduction":0, "nueProduction": 1.0, "numuDetector": 0.0, "nueDetector": 10.0}
+        self._pzLower = {"target": 4.0, "productionStraight": 4.0, "pionDecay":4.0, "muonProduction":-1.0,"piFlashNu":0.0,
+                "muonDecay":-1.0, "eProduction":-6.0, "numuProduction":-6.0, "nueProduction":-6.0, "numuDetector":0.0, "nueDetector":-10.0}
+        self._pzHigher = {"target": 6.0, "productionStraight": 6.0, "pionDecay": 6.0, "muonProduction": 7.0,"piFlashNu": 5.0,
+                "muonDecay": 7.0, "eProduction": 6.0, "numuProduction": 6.0, "nueProduction": 6.0, "numuDetector": 5.0, "nueDetector": 10.0}
         self._tLower = {"target": 0.0, "productionStraight": 0.0, "pionDecay": 0.0, "muonProduction": 0.0,"piFlashNu": 0.0,
-                "muonDecay": 0.0, "eProduction": 0.0, "numuProduction":0, "nueProduction": 0.0, "numuDetector": 0.0, "nueDetector": 0.0}
-        self._tHigher = {"target": 500.0, "productionStraight": 500.0, "pionDecay": 1000.0, "muonProduction": 500.0,"piFlashNu": 60.0,
-                "muonDecay": 60000.0, "eProduction": 60000.0, "numuProduction": 60000.0, "nueProduction": 60000.0, "numuDetector": 60000.0,
+                "muonDecay": 0.0, "eProduction": 0.0, "numuProduction":0, "nueProduction": 0.0, "numuDetector": 900.0, "nueDetector": 0.0}
+        self._tHigher = {"target": 500.0, "productionStraight": 300.0, "pionDecay": 1000.0, "muonProduction": 500.0,"piFlashNu": 60.0,
+                "muonDecay": 60000.0, "eProduction": 60000.0, "numuProduction": 60000.0, "nueProduction": 60000.0, "numuDetector": 1500.0,
                 "nueDetector": 60000.0}
-        self._sLower = {"target":-1.0, "productionStraight": -1.0, "pionDecay": -1.0, "muonProduction": -1.0,"piFlashNu": -10.0,
+        self._sLower = {"target":-1.0, "productionStraight": 0.0, "pionDecay": 0.0, "muonProduction": -1.0,"piFlashNu": -10.0,
                 "muonDecay": 0.0, "eProduction": 0.0, "numuProduction":0.0, "nueProduction": 0.0, "numuDetector": 0.0, "nueDetector": 0.0}
-        self._sHigher = {"target":400.0, "productionStraight": 400.0, "pionDecay": 1000.0, "muonProduction": 400.0,"piFlashNu": 70.0,
+        self._sHigher = {"target":400.0, "productionStraight": 100.0, "pionDecay": 300.0, "muonProduction": 400.0,"piFlashNu": 70.0,
                 "muonDecay": 60000.0, "eProduction": 60000.0, "numuProduction":40000.0, "nueProduction": 40000.0,
-                "numuDetector": 80000.0, "nueDetector": 80000.0}
+                "numuDetector": 500.0, "nueDetector": 80000.0}
         self._bins = {"target": 100, "productionStraight": 100, "pionDecay": 100, "muonProduction": 100,"piFlashNu": 100,
                 "muonDecay": 50, "eProduction": 1000, "numuProduction":40000.0, "nueProduction": 40000.0,
                 "numuDetector": 40000.0, "nueDetector": 40000.0}
@@ -150,22 +150,23 @@ class histsCreate():
             self._hists[hPnt+5].Fill(t)
             self._hists[hPnt+6].Fill(px)
             self._hists[hPnt+7].Fill(py)
-            self._hists[hPnt+8].Fill(pz)
             self._hists[hPnt+9].Fill(pz,t)
+
+            self._hists[hPnt+0].Fill(x)
+            self._hists[hPnt+1].Fill(y)
+            self._hists[hPnt+2].Fill(z)
 
             if (location == 'productionStraight'):
 # plots with non-zero weight - for production straight
                  self._count = self._count + 1
 
-            if (location == "pionDecay"):
-                if (s < 230.0):
-                    self._hists[hPnt+0].Fill(x)
-                    self._hists[hPnt+1].Fill(y)
-                    self._hists[hPnt+2].Fill(z)
+            if (location == 'numuDetector'):
+                if ((abs(x) < 2.5) and (abs(y) < 2.5)):
+                        self._hists[hPnt+8].Fill(pz)
             else:
-                self._hists[hPnt+0].Fill(x)
-                self._hists[hPnt+1].Fill(y)
-                self._hists[hPnt+2].Fill(z)
+                self._hists[hPnt+8].Fill(pz)
+
+
 
     def summary(self):
 
