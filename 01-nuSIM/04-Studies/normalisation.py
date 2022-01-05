@@ -120,7 +120,7 @@ class normalisation:
           eW = eventWeight
       else:
           eW = 0.0
-      numuDetector = particle.particle(runNumber, event, sNumu, numuX, numuY, numuZ, pxmu, pymu, pzmu, tNumu, eW, "numu")
+      numuDetector = particle.particle(runNumber, event, sNumu, numuX, numuY, numuZ, pxnu, pynu, pnmu, tNumu, eW, "numu")
       eH.addParticle("numuDetector", numuDetector)
       if (self._tlDcyCount < 5): print ("numu at detector")
 
@@ -234,6 +234,24 @@ class normalisation:
       nuFlash = particle.particle(runNumber, event, sd, xd, yd, zd, pxnu, pynu, pznu, td, eventWeight, "numu")
       eH.addParticle("piFlashNu", nuFlash)
       if (self._PSDcyCount < 5):  print ("piFlashNu PS")
+# extrapolate the neutrino the the detector plane
+      hitMu = fluxPlane.findHitPositionPiFlash(nuFlash)
+      if (self._PSDcyCount < 5): print ("hit position of neutrino ", hitMu)
+#  fill the event History
+      numuX = hitMu[0]
+      numuY = hitMu[1]
+      numuZ = hitMu[2]
+      dsNumu = math.sqrt((xd-numuX)**2 + (yd-numuY)**2 + (zd-numuZ)**2)
+      sNumu = sd + dsNumu
+      tNumu = td + dsNumu*1E9/c + t
+      if (self._PSDcyCount < 5): print ( "sNumu is ", sNumu, "    dsNumu is ", dsNumu, "     tNumu is ", tNumu, "    c is ", c)
+      if ((abs(numuX) < 10.0) and (abs(numuY) < 10.0)):
+          eW = eventWeight
+      else:
+          eW = 0.0
+      numuDetector = particle.particle(runNumber, event, sNumu, numuX, numuY, numuZ, pxnu, pynu, pznu, tNumu, eW, "numu")
+      eH.addParticle("numuDetector", numuDetector)
+      if (self._PSDcyCount < 5): print ("numu at detector")
 
 #
 # Muon decays -------------------------------------------------
@@ -354,8 +372,8 @@ if __name__ == "__main__" :
     print()
     normInst = normalisation()
 
-    tlFlag = True
-    psFlag = False
+    tlFlag = False
+    psFlag = True
     lstFlag = False
     muDcyFlag = False
 
@@ -365,10 +383,10 @@ if __name__ == "__main__" :
     piMass = piCnst.mass()/1000.0
 
 # initialise run number, number of events to generate, central pion momentum, and event weight
-    runNumber = 103
+    runNumber = 105
     pionMom = 5.0
     crossSection = 50
-    nEvents = 100000
+    nEvents = 10000
     eventWeight = crossSection
 
 # Get the nuSIM path name and use it to set names for the inputfile and the outputFile
@@ -431,7 +449,7 @@ for event in range(nEvents):
       se = tlCmplxLength
       ze = 0.0
 # t = d/(beta*c)
-      te = 1E9*se*math.sqrt(pPion**2 + piMass**2)/(c*pPion)+t
+      te = t + 1E9*se*math.sqrt(pPion**2 + piMass**2)/(c*pPion)
 # x local is the same as before. 
       pionPS = particle.particle(runNumber, event, se, xl, yl, ze, pxl, pyl, pzl, te, eventWeight, "pi+")
       eH.addParticle("productionStraight", pionPS)
