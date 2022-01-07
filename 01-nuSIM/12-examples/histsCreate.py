@@ -1,4 +1,17 @@
+"""
+Model for calculating normalised numbers
+========================================
+
+@date: 05 Jan 2022
+@author: Paul Kyberd
+@version: 2.0
+
+@description: read in a the dictionary with the histogram values in from an external file
+
+"""
+
 from pathlib import Path
+import json
 
 class histsCreate():
 
@@ -17,44 +30,10 @@ class histsCreate():
         self._zeroWeight = {"target":0, "productionStraight": 0, "pionDecay": 0, "muonProduction": 0,"piFlashNu": 0,
                 "muonDecay": 0, "eProduction": 0, "numuProduction":0, "nueProduction": 0, "numuDetector": 0, "nueDetector": 0}
 
-        self._xLower = {"target":-50.0, "productionStraight":-1.0, "pionDecay":-1.0, "muonProduction":-1.0,"piFlashNu":-2.0,
-                "muonDecay":-1.0, "eProduction":-1.0, "numuProduction":-1.0, "nueProduction":-1.0, "numuDetector":-25.0, "nueDetector":-25.0}
-        self._xHigher = {"target": 100.0, "productionStraight": 1.0, "pionDecay": 10.0, "muonProduction": 10.0,"piFlashNu": 100.0,
-                "muonDecay": 1.0, "eProduction": 1.0, "numuProduction":0, "nueProduction": 1.0, "numuDetector": 24.5, "nueDetector": 24.5}
-        self._yLower = {"target":-0.5, "productionStraight":-1.0, "pionDecay":-1.0, "muonProduction":-1.0,"piFlashNu":-1.0,
-                "muonDecay": -1.0, "eProduction":-1.0, "numuProduction":0, "nueProduction":-1.0, "numuDetector":-25.0, "nueDetector":-10.0}
-        self._yHigher = {"target":0.5, "productionStraight": 1.0, "pionDecay": 1.0, "muonProduction": 1.0,"piFlashNu": 1.0,
-                "muonDecay": 1.0, "eProduction": 1.0, "numuProduction":0, "nueProduction": 1.0, "numuDetector": 24.5, "nueDetector": 10.0}
-        self._zLower = {"target": -600.0, "productionStraight": 0.0, "pionDecay": 0.0, "muonProduction": -100.0,"piFlashNu": -80.0,
-                "muonDecay": -100.0, "eProduction": -100.0, "numuProduction": -100.0, "nueProduction": -100.0, "numuDetector": 0.0, "nueDetector":-1.0}
-        self._zHigher = {"target":-560.0, "productionStraight": 100.0, "pionDecay": 300.0, "muonProduction": 500.0,"piFlashNu": 50.0,
-                "muonDecay": 400.0, "eProduction": 400.0, "numuProduction": 400.0, "nueProduction": 400.0, "numuDetector": 500.0, "nueDetector": 500.0}
-        self._pxLower = {"target":0.0, "productionStraight":-0.2, "pionDecay":-1.0, "muonProduction":-1.0,"piFlashNu":-10.0,
-                "muonDecay":-1.0, "eProduction":-1.0, "numuProduction":-1.0, "nueProduction":-1.0, "numuDetector":-2.0, "nueDetector":-10.0}
-        self._pxHigher = {"target": 1.0, "productionStraight": 0.2, "pionDecay": 1.0, "muonProduction": 1.0,"piFlashNu": -20.0,
-                "muonDecay": 1.0, "eProduction": 1.0, "numuProduction":0, "nueProduction": 1.0, "numuDetector": 2.0, "nueDetector": 10.0}
-        self._pyLower = {"target":-0.2, "productionStraight":-0.2, "pionDecay":-1.0, "muonProduction":-1.0,"piFlashNu": 20.0,
-                "muonDecay":-1.0, "eProduction":-1.0, "numuProduction":-1.0, "nueProduction":-1.0, "numuDetector":-2.0, "nueDetector":-10.0}
-        self._pyHigher = {"target": 0.2, "productionStraight": 0.2, "pionDecay": 1.0, "muonProduction": 1.0,"piFlashNu": 1.0,
-                "muonDecay": 1.0, "eProduction": 1.0, "numuProduction":0, "nueProduction": 1.0, "numuDetector": 0.0, "nueDetector": 10.0}
-        self._pzLower = {"target": 4.0, "productionStraight": 4.0, "pionDecay":4.0, "muonProduction":-1.0,"piFlashNu":0.0,
-                "muonDecay":-1.0, "eProduction":-6.0, "numuProduction":-6.0, "nueProduction":-6.0, "numuDetector":0.0, "nueDetector":-10.0}
-        self._pzHigher = {"target": 6.0, "productionStraight": 6.0, "pionDecay": 6.0, "muonProduction": 7.0,"piFlashNu": 5.0,
-                "muonDecay": 7.0, "eProduction": 6.0, "numuProduction": 6.0, "nueProduction": 6.0, "numuDetector": 5.0, "nueDetector": 10.0}
-        self._tLower = {"target": 0.0, "productionStraight": 0.0, "pionDecay": 0.0, "muonProduction": 0.0,"piFlashNu": 0.0,
-                "muonDecay": 0.0, "eProduction": 0.0, "numuProduction":0, "nueProduction": 0.0, "numuDetector": 900.0, "nueDetector": 0.0}
-        self._tHigher = {"target": 500.0, "productionStraight": 300.0, "pionDecay": 1000.0, "muonProduction": 500.0,"piFlashNu": 60.0,
-                "muonDecay": 60000.0, "eProduction": 60000.0, "numuProduction": 60000.0, "nueProduction": 60000.0, "numuDetector": 1500.0,
-                "nueDetector": 60000.0}
-        self._sLower = {"target":-1.0, "productionStraight": 0.0, "pionDecay": 0.0, "muonProduction": -1.0,"piFlashNu": -10.0,
-                "muonDecay": 0.0, "eProduction": 0.0, "numuProduction":0.0, "nueProduction": 0.0, "numuDetector": 0.0, "nueDetector": 0.0}
-        self._sHigher = {"target":400.0, "productionStraight": 100.0, "pionDecay": 300.0, "muonProduction": 400.0,"piFlashNu": 70.0,
-                "muonDecay": 60000.0, "eProduction": 60000.0, "numuProduction":40000.0, "nueProduction": 40000.0,
-                "numuDetector": 500.0, "nueDetector": 80000.0}
-        self._bins = {"target": 100, "productionStraight": 100, "pionDecay": 100, "muonProduction": 100,"piFlashNu": 100,
-                "muonDecay": 50, "eProduction": 1000, "numuProduction":40000.0, "nueProduction": 40000.0,
-                "numuDetector": 40000.0, "nueDetector": 40000.0}
-
+#  read in the dictionaries
+        plotsFile = "04-Studies/plotsOne.dict"
+        with open(plotsFile) as plotsFile:
+            self._plotsInfo = json.load(plotsFile)
 
     def __repr__(self):
         return "create a set of histograms for a particle at a location in the event History"
@@ -66,32 +45,38 @@ class histsCreate():
 #        print ("locs ", self._locs)
         hTitle = eventType + ":x"
         hBins  = 100
-        hLower = self._xLower[eventType]
-        hUpper = self._xHigher[eventType]
+
+        hLower = self._plotsInfo['xLower'][eventType]
+        hUpper = self._plotsInfo['xHigher'][eventType]
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
 
-        hLower = self._yLower[eventType]
-        hUpper = self._yHigher[eventType]
+        hLower = self._plotsInfo['yLower'][eventType]
+        hUpper = self._plotsInfo['yHigher'][eventType]
         hTitle = eventType + ":y"
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
-        hLower = self._zLower[eventType]
-        hUpper = self._zHigher[eventType]
+
+        hLower = self._plotsInfo['zLower'][eventType]
+        hUpper = self._plotsInfo['zHigher'][eventType]
         hTitle = eventType + ":z"
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
+
+
         hTitle = eventType + ":weight"
         hLower = -10.0
         hUpper = 100.0
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
-        hLower = self._sLower[eventType]
-        hUpper = self._sHigher[eventType]
+
+        hLower = self._plotsInfo["sLower"][eventType]
+        hUpper = self._plotsInfo["sHigher"][eventType]
         hTitle = eventType + ":s"
         if eventType == "muonDecay" or eventType == "eProduction":
             hBins = 50
         else:
             hBins = 100
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
-        hLower = self._tLower[eventType]
-        hUpper = self._tHigher[eventType]
+
+        hLower = self._plotsInfo["tLower"][eventType]
+        hUpper = self._plotsInfo["tHigher"][eventType]
         hTitle = eventType + ":t"
         if eventType == "muonDecay" or eventType == "eProduction":
             hBins = 50
@@ -101,19 +86,23 @@ class histsCreate():
         else:
             hBins = 100
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
+
         hBins = 100
         hTitle = eventType + ":px"
-        hLower = self._pxLower[eventType]
-        hUpper = self._pxHigher[eventType]
+        hLower = self._plotsInfo["pxLower"][eventType]
+        hUpper = self._plotsInfo["pxHigher"][eventType]
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
+
         hTitle = eventType + ":py"
-        hLower = self._pyLower[eventType]
-        hUpper = self._pyHigher[eventType]
+        hLower = self._plotsInfo["pyLower"][eventType]
+        hUpper = self._plotsInfo["pyHigher"][eventType]
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
+
         hTitle = eventType + ":pz"
-        hLower = self._pzLower[eventType]
-        hUpper = self._pzHigher[eventType]
+        hLower = self._plotsInfo["pzLower"][eventType]
+        hUpper = self._plotsInfo["pzHigher"][eventType]
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
+
         hTitle = eventType + ":E_v_t"
         self._hists.append(self._hm.book2(hTitle, 50, 0.0, 5.0, 50, 10000.0, 11000.0))
 
