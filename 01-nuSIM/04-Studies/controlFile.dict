@@ -1,11 +1,12 @@
 {   "flags":
     {
-    "tlFlag":"True", "psFlag":"True", "lstFlag":"False", "muDcyFlag":"False"
+    "tlFlag":"False", "psFlag":"True", "lstFlag":"False", "muDcyFlag":"False"
     },
 
     "files":
     {
-    "rootFile":"someFile.root"
+    "rootFile":"someFile.root",
+    "logFile":"normalisation.log"
     },
 
     "runNumber": 110,

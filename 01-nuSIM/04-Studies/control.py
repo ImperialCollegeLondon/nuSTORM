@@ -87,3 +87,7 @@ class control:
 # number of events
     def nEvents(self):
         return self._controlInfo["nEvents"]
+
+#logFile name
+    def logFile(self):
+        return self._controlInfo["files"]["logFile"]

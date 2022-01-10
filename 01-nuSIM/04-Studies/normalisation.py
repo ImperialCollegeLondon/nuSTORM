@@ -12,6 +12,11 @@ Model for calculating normalised numbers
 
     @author  Paul Kyberd
 
+    Add python logging
+    @version     1.1
+    @date        07 January 2021
+
+
     @version     1.0
     @date        05 October 2021
 
@@ -22,7 +27,9 @@ Model for calculating normalised numbers
 import os, sys
 import numpy as np
 import math as math
+import logging
 import PionConst as PC
+import control
 import nuSTORMPrdStrght as nuPrdStrt
 import nuSTORMTrfLineCmplx as nuTrfLineCmplx
 import PionEventInstance as piEvtInst
@@ -368,14 +375,23 @@ class normalisation:
 
 if __name__ == "__main__" :
 
-    print ("========  Normalisation run: start  ======== Version ", normalisation.__version__)
-    print()
+    ctrlInst = control.control()
     normInst = normalisation()
 
-    tlFlag = False
-    psFlag = True
-    lstFlag = False
-    muDcyFlag = False
+#       logfile initialisation
+    logging.basicConfig(filename=ctrlInst.logFile(), encoding='utf-8', level=logging.INFO)
+
+#  start message
+    print ("========  Normalisation run: start  ======== Version ", normalisation.__version__)
+    print()
+    logging.info("========  Normalisation run: start  ======== Version %s", normalisation.__version__)
+
+# set up the processing flags
+    tlFlag = ctrlInst.tlFlag()
+    psFlag = ctrlInst.psFlag()
+    lstFlag = ctrlInst.lstFlag()
+    muDcyFlag = ctrlInst.muDcyFlag()
+    print (f"Processing flags -- tlflag: {tlFlag} / psFlag: {psFlag} / lstFlag: {lstFlag} / muDcyFlag: {muDcyFlag}")
 
 # get constants
     piCnst  = PC.PionConst()
@@ -383,10 +399,10 @@ if __name__ == "__main__" :
     piMass = piCnst.mass()/1000.0
 
 # initialise run number, number of events to generate, central pion momentum, and event weight
-    runNumber = 105
+    runNumber = ctrlInst.runNumber()
     pionMom = 5.0
     crossSection = 50
-    nEvents = 10000
+    nEvents = ctrlInst.nEvents()
     eventWeight = crossSection
 
 # Get the nuSIM path name and use it to set names for the inputfile and the outputFile
