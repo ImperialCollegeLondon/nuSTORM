@@ -1,0 +1,13 @@
+{   "flags":
+    {
+    "tlFlag":"True", "psFlag":"True", "lstFlag":"False", "muDcyFlag":"False"
+    },
+
+    "files":
+    {
+    "rootFile":"someFile.root"
+    },
+
+    "runNumber": 110,
+    "nEvents":10000
+}
