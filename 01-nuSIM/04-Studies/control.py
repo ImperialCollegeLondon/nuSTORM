@@ -47,9 +47,8 @@ class control:
     
 #--------  "Built-in methods":
 
-    def __init__(self):
+    def __init__(self, controlFile):
 
-        controlFile = "04-Studies/controlFile.dict"
         with open(controlFile) as controlFile:
             self._controlInfo = json.load(controlFile)
 
@@ -81,9 +80,34 @@ class control:
         return (self._controlInfo["flags"]["muDcyFlag"] == "True")
 
 # run number 
-    def runNumber(self):
-        return self._controlInfo["runNumber"]
+    def runNumber(self, inc=False):
+
+    # run number is read from a file, it is in the studies directory a sub directory given by the study name and
+    # a fileName given by the runNumber key word in the dictionary
+        rNFile = "101-studies/" + self._controlInfo['study'] + "/" +self._controlInfo['runNumber']
+        rN = open(rNFile, "r")
+        runNumber = int(rN.readline())
+        rN.close()
+        if (inc):
+            runNumber = runNumber + 1
+            rN = open(rNFile, "w")
+            rN.write(str(runNumber))
+            rN.close()
+        return runNumber
 
 # number of events
     def nEvents(self):
         return self._controlInfo["nEvents"]
+
+#logFile name
+    def logFile(self):
+        return "101-studies/" + self._controlInfo['study'] + "/"+ self._controlInfo["files"]["logFile"] + str(self.runNumber()) + ".log"
+
+#plots dictionary file name
+    def plotsDict(self):
+        return self._controlInfo["files"]["plotsDict"]
+
+#plots study name
+    def studyName(self):
+        return self._controlInfo["study"]
+

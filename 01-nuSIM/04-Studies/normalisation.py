@@ -12,6 +12,11 @@ Model for calculating normalised numbers
 
     @author  Paul Kyberd
 
+    Add python logging
+    @version     1.1
+    @date        07 January 2021
+
+
     @version     1.0
     @date        05 October 2021
 
@@ -20,9 +25,13 @@ Model for calculating normalised numbers
 # Class to do the calculation of the event rate normalisation
 #
 import os, sys
+from datetime import datetime
 import numpy as np
 import math as math
+import logging
 import PionConst as PC
+import control
+import histoManager
 import nuSTORMPrdStrght as nuPrdStrt
 import nuSTORMTrfLineCmplx as nuTrfLineCmplx
 import PionEventInstance as piEvtInst
@@ -85,6 +94,7 @@ class normalisation:
 # Now we need to move to the global co-ordinates from the transfer line local
       xd, yd, zd, pxd, pyd, pzd = self.tltoGlbl(xdl, ydl, zdl, pxdl, pydl, pzdl)
       pionTLDecay = particle.particle(runNumber, event, sd, xd, yd, zd, pxd, pyd, pzd, td, eventWeight, "pi+")
+      print ("tlDecay: about to add a particle")
       eH.addParticle("pionDecay", pionTLDecay)
       if (self._tlDcyCount < 5): print (" pion at pionDecay: TL ", pionTLDecay)
 # add the pion flash neutrino
@@ -144,6 +154,7 @@ class normalisation:
       td = pi.getLifetime()*1E9 + t
       if (self._byndPSCount < 5): print ("pi in beyondPS: decayLength ", sd)
       pionLostDecay = particle.particle(runNumber, event, sd, xd, yd, zd, pxd, pyd, pzd, td, eventWeight, "pi+")
+      print("beyond:PS about to add a pion")
       eH.addParticle("pionDecay", pionLostDecay)
       if (self._byndPSCount < 5):  print ("at pionDecay lost")
 # add the pion flash neutrino ... set everything to zero - including eventWeight
@@ -206,15 +217,20 @@ class normalisation:
       yd = tsc[2]
       xpd = tsc[4]
       ypd = tsc[5]
-      pi.getLifetime()
-      td = lifetime*1E9 + t
-      pPion =pi.getppiGen()
+#  need the lifetime in the nuStorm frame in ns
+      piLifetime = pi.getLifetime()*1E9*Epion/(piMass)
+      td = piLifetime + t
       zd = sd - tlCmplxLength
-      pPion = pi.getppiGen()
       pxd = pPion*xpd
       pyd = pPion*ypd
       pzd = np.sqrt(pPion*pPion - pxd**2 - pyd**2)
       pionPSDecay = particle.particle(runNumber, event, sd, xd, yd, zd, pxd, pyd, pzd, td, eventWeight, "pi+")
+      if (td < 150.0): print (f"error in the time {td}")
+      hTotal.Fill(td)
+      hLifetime.Fill(piLifetime)
+      hStarttime.Fill(t)
+      hS.Fill(sd)
+
       eH.addParticle("pionDecay", pionPSDecay)
       if (self._PSDcyCount < 5): print ("pionDecay in PS")
 # add the muon
@@ -368,14 +384,36 @@ class normalisation:
 
 if __name__ == "__main__" :
 
+    controlFile = "101-Studies/pencilValidation/controlFile.dict"
+
+    ctrlInst = control.control(controlFile)
+    normInst = normalisation()
+# run number needed because it labels various files
+    runNumber = ctrlInst.runNumber(True)
+
+#       logfile initialisation
+    logging.basicConfig(filename=ctrlInst.logFile(), encoding='utf-8', level=logging.INFO)
+
+#       Histogram initialisation
+    hm = histoManager.histoManager()
+    hTotal = hm.book("total time", 100, 0.0, 11000.0)
+    hLifetime = hm.book("life time", 100, 0.0, 1000.0)
+    hStarttime = hm.book("start time", 100, 0.0, 11000.0)
+    hS = hm.book("s (m)", 100, 0.0, 300.0)
+#  start message
     print ("========  Normalisation run: start  ======== Version ", normalisation.__version__)
     print()
-    normInst = normalisation()
+    now = datetime.now()
+    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+    logging.info("========  Normalisation run: start  ======== Version %s, ... %s", normalisation.__version__, dt_string)
 
-    tlFlag = False
-    psFlag = True
-    lstFlag = False
-    muDcyFlag = False
+# set up the processing flags
+    tlFlag = ctrlInst.tlFlag()
+    psFlag = ctrlInst.psFlag()
+    lstFlag = ctrlInst.lstFlag()
+    muDcyFlag = ctrlInst.muDcyFlag()
+    print (f"Processing flags -- tlflag: {tlFlag} / psFlag: {psFlag} / lstFlag: {lstFlag} / muDcyFlag: {muDcyFlag}")
+    logging.info("Processing flags -- tlflag: %s,  psFlag: %s,  lstFlag: %s,  muDcyFlag: %s", tlFlag, psFlag, lstFlag, muDcyFlag)
 
 # get constants
     piCnst  = PC.PionConst()
@@ -383,11 +421,11 @@ if __name__ == "__main__" :
     piMass = piCnst.mass()/1000.0
 
 # initialise run number, number of events to generate, central pion momentum, and event weight
-    runNumber = 104
     pionMom = 5.0
     crossSection = 50
-    nEvents = 10000
+    nEvents = ctrlInst.nEvents()
     eventWeight = crossSection
+    logging.info("Run Number: %s,  nEvents: %s,  pion central momentum: %s", runNumber, nEvents, pionMom)
 
 # Get the nuSIM path name and use it to set names for the inputfile and the outputFile
     nuSIMPATH = os.getenv('nuSIMPATH')
@@ -396,7 +434,10 @@ if __name__ == "__main__" :
     trfCmplxFile = os.path.join(nuSIMPATH, '11-Parameters/nuSTORM-TrfLineCmplx-Params-v1.0.csv')
     print ("numSIMPATH, filename, rootfilename, trfCmplxFile \n", nuSIMPATH, "\n", filename, "\n", rootFilename,
          "\n", trfCmplxFile)
-    outFilename = rootFilename#"norm.root"
+    outFilename = rootFilename
+    logging.info("Parameters: %s,  \ntransfer line parameters: %s,  \noutput file: %s", filename,  trfCmplxFile, rootFilename)
+
+
 # Get machine and run parameters
     nuStrt = nuPrdStrt.nuSTORMPrdStrght(filename)
     psLength = nuStrt.ProdStrghtLen()
@@ -449,7 +490,8 @@ for event in range(nEvents):
       se = tlCmplxLength
       ze = 0.0
 # t = d/(beta*c)
-      te = t + 1E9*se*math.sqrt(pPion**2 + piMass**2)/(c*pPion)
+      Epion = math.sqrt(pPion**2 + piMass**2)
+      te = t + 1E9*se*Epion/(c*pPion)
 # x local is the same as before. 
       pionPS = particle.particle(runNumber, event, se, xl, yl, ze, pxl, pyl, pzl, te, eventWeight, "pi+")
       eH.addParticle("productionStraight", pionPS)
@@ -484,6 +526,8 @@ for event in range(nEvents):
 # Write to the root output file and close
 eH.write()
 eH.outFileClose()
+# Write out histograms
+hm.histOutRoot("normalPlots.root")
 ##! Complete:
 print()
 print("========  Normalisation run : complete  ========")
