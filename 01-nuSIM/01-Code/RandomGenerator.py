@@ -71,7 +71,7 @@ class RandomGenerator(object):
 
     #--------  Module methods
     def getRandom(self, histname):
-        rootFile = ROOT.TFile(self._rootfilename, 'READ')
+        rootFile = ROOT.TFile(self._rootfilename, 'READ', 'ROOT file with Histograms')
         hist = rootFile.Get(histname)
         x = hist.GetRandom()
         return x
@@ -79,10 +79,10 @@ class RandomGenerator(object):
     def getRandom2D(self, histname):
         x = ctypes.c_double(0.0)
         y = ctypes.c_double(0.0)
-        rootFile = ROOT.TFile(self._rootfilename, 'READ')
+        rootFile = ROOT.TFile(self._rootfilename, 'READ', 'ROOT file with Histograms')
         hist2D = rootFile.Get(histname)
         hist2D.GetRandom2(x,y)
-        return x, y
+        return x.value, y.value
 
 #--------  "Get methods" only; version, reference, and constants
 #.. Methods believed to be self documenting(!)
