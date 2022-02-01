@@ -183,8 +183,8 @@ class histoManager:
 
 
 
-    def histOutRoot(self):
-        self.outfile = ROOT.TFile( 'plots.root', 'RECREATE', 'ROOT file with Histograms' )
+    def histOutRoot(self, fileName):
+        self.outfile = ROOT.TFile( fileName, 'RECREATE', 'ROOT file with Histograms' )
         for i in range(len(self.hists)):
             hCurr = self.hists[i]
             hCurr.Write()
