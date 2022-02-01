@@ -20,6 +20,10 @@ Model for calculating normalised numbers
     @version     1.0
     @date        05 October 2021
 
+    @author      Marvin Pfaff
+    @version     1.1
+    @date        21 January 2022
+
 """
 #
 # Class to do the calculation of the event rate normalisation
@@ -30,19 +34,21 @@ import numpy as np
 import math as math
 import logging
 import PionConst as PC
+import nuSTORMConst
 import control
 import histoManager
 import nuSTORMPrdStrght as nuPrdStrt
-import nuSTORMTrfLineCmplx as nuTrfLineCmplx
+import nuSTORMTrfLineCmplx as nuTrf
 import PionEventInstance as piEvtInst
 import NeutrinoEventInstance as nuEvtInst
+import RandomGenerator as Rndm
 import plane as plane
 import particle as particle
 import eventHistory as eventHistory
 
 class normalisation:
 
-    __version__ = 1.0
+    __version__ = 1.1
     def __init__(self):
         self._tlDcyCount = 0
         self._byndPSCount = 0
@@ -79,39 +85,39 @@ class normalisation:
       if (self._tlDcyCount < 5): print ("pi in tlDecay ", pi)
       tsc = pi.getTraceSpaceCoord()
       sd = tsc[0]
-      xdl = tsc[1]
-      ydl = tsc[2]
-      zdl = tsc[3]
-      xpd = 0.0
-      ypd = 0.0
+      xd = tsc[1]
+      yd = tsc[2]
+      zd = tsc[3]
+      xpd = tsc[4]
+      ypd = tsc[5]
       pPion = pi.getppiGen()
-      pxdl = pPion*xpd
-      pydl = pPion*ypd
-      pzdl = np.sqrt(pPion*pPion - pxdl**2 - pydl**2)
+      pxd = pPion*xpd
+      pyd = pPion*ypd
+      pzd = np.sqrt(pPion*pPion - pxd**2 - pyd**2)
       pi.getLifetime()
       td = lifetime*1E9 + t
-      zdl = zdl - tlCmplxLength
+      #zdl = zdl - tlCmplxLength                                                     ##WHAT IS THIS DOING?????
 # Now we need to move to the global co-ordinates from the transfer line local
-      xd, yd, zd, pxd, pyd, pzd = self.tltoGlbl(xdl, ydl, zdl, pxdl, pydl, pzdl)
+      #xd, yd, zd, pxd, pyd, pzd = self.tltoGlbl(xdl, ydl, zdl, pxdl, pydl, pzdl)
       pionTLDecay = particle.particle(runNumber, event, sd, xd, yd, zd, pxd, pyd, pzd, td, eventWeight, "pi+")
       print ("tlDecay: about to add a particle")
       eH.addParticle("pionDecay", pionTLDecay)
       if (self._tlDcyCount < 5): print (" pion at pionDecay: TL ", pionTLDecay)
 # add the pion flash neutrino
       numu = pi.getnumu4mmtm()
-      pxnul = numu[1][0]
-      pynul = numu[1][1]
-      pznul = numu[1][2]
-      xd, yd, zd, pxnu, pynu, pznu = self.tltoGlbl(xdl, ydl, zdl, pxnul, pynul, pznul)
+      pxnu = numu[1][0]
+      pynu = numu[1][1]
+      pznu = numu[1][2]
+      #xd, yd, zd, pxnu, pynu, pznu = self.tltoGlbl(xdl, ydl, zdl, pxnul, pynul, pznul)
       nuFlashTL = particle.particle(runNumber, event, sd, xd, yd, zd, pxnu, pynu, pznu, td, eventWeight, "numu")
       eH.addParticle("piFlashNu", nuFlashTL)
       if (self._tlDcyCount < 5): print ("at piFlashNu: TL")
 # add the muon from the pion flash ... not going to track this, weight non zero, but don't track further ?
       mu = pi.getmu4mmtm()
-      pxmul = mu[1][0]
-      pymul = mu[1][1]
-      pzmul = mu[1][2]
-      xd, yd, zd, pxmu, pymu, pzmu = self.tltoGlbl(xdl, ydl, zdl, pxmul, pymul, pzmul)
+      pxmu = mu[1][0]
+      pymu = mu[1][1]
+      pzmu = mu[1][2]
+      #xd, yd, zd, pxmu, pymu, pzmu = self.tltoGlbl(xdl, ydl, zdl, pxmul, pymul, pzmul)
       muonProdTL = particle.particle(runNumber, event, sd, xd, yd, zd, pxmu, pymu, pzmu, td, eventWeight, "mu+")
       eH.addParticle("muonProduction",muonProdTL)
       if (self._tlDcyCount < 5): print ("at muonProduction: TL")
@@ -145,12 +151,15 @@ class normalisation:
 # x,y,z to 0.0 and px,py to 0.0, pz to 0.01 so constructor does not
       tsc = pi.getTraceSpaceCoord()
       sd = tsc[0]
-      xd = 0.0
-      yd = 0.0
-      zd = 0.0
-      pxd = 0.0
-      pyd = 0.0
-      pzd = 0.01
+      xd = tsc[1]
+      yd = tsc[2]
+      zd = tsc[3]
+      xpd = tsc[4]
+      ypd = tsc[5]
+      pPion = pi.getppiGen()
+      pxd = pPion*xpd
+      pyd = pPion*ypd
+      pzd = np.sqrt(pPion*pPion - pxdl**2 - pydl**2)
       td = pi.getLifetime()*1E9 + t
       if (self._byndPSCount < 5): print ("pi in beyondPS: decayLength ", sd)
       pionLostDecay = particle.particle(runNumber, event, sd, xd, yd, zd, pxd, pyd, pzd, td, eventWeight, "pi+")
@@ -158,11 +167,14 @@ class normalisation:
       eH.addParticle("pionDecay", pionLostDecay)
       if (self._byndPSCount < 5):  print ("at pionDecay lost")
 # add the pion flash neutrino ... set everything to zero - including eventWeight
-      nuFlashLost = particle.particle(runNumber, event, sd, xd, yd, zd, pxd, pyd, pzd, td, 0.0, "numu")
+      pxDaught = 0.0
+      pyDaught = 0.0
+      pzDaught = 0.01
+      nuFlashLost = particle.particle(runNumber, event, sd, xd, yd, zd, pxDaught, pyDaught, pzDaught, td, 0.0, "numu")
       if (self._byndPSCount < 5):  print ("at piFlashNu lost")
       eH.addParticle("piFlashNu", nuFlashLost)
 # add the muon from the pion flash ... set everything to zero - including eventWeight
-      muonProdLost = particle.particle(runNumber, event, sd, xd, yd, zd, pxd, pyd, pzd, td, 0.0, "mu+")
+      muonProdLost = particle.particle(runNumber, event, sd, xd, yd, zd, pxDaught, pyDaught, pzDaught, td, 0.0, "mu+")
       if (self._byndPSCount < 5):  print ("at muonProduction lost")
       eH.addParticle("muonProduction",muonProdLost)
       return
@@ -215,8 +227,10 @@ class normalisation:
       sd = tsc[0]
       xd = tsc[1]
       yd = tsc[2]
+      zd = tsc[3]
       xpd = tsc[4]
       ypd = tsc[5]
+      pPion = pi.getppiGen()
 #  need the lifetime in the nuStorm frame in ns
       piLifetime = pi.getLifetime()*1E9*Epion/(piMass)
       td = piLifetime + t
@@ -421,6 +435,7 @@ if __name__ == "__main__" :
     piMass = piCnst.mass()/1000.0
 
 # initialise run number, number of events to generate, central pion momentum, and event weight
+    runNumber = 105
     pionMom = 5.0
     crossSection = 50
     nEvents = ctrlInst.nEvents()
@@ -430,18 +445,20 @@ if __name__ == "__main__" :
 # Get the nuSIM path name and use it to set names for the inputfile and the outputFile
     nuSIMPATH = os.getenv('nuSIMPATH')
     filename  = os.path.join(nuSIMPATH, '11-Parameters/nuSTORM-PrdStrght-Params-v1.0.csv')
+    rootInputFilename = os.path.join(nuSIMPATH, 'Scratch/plots_endProdStrght.root')
     rootFilename = os.path.join(nuSIMPATH, 'Scratch/normalisation'+str(runNumber)+'.root')
     trfCmplxFile = os.path.join(nuSIMPATH, '11-Parameters/nuSTORM-TrfLineCmplx-Params-v1.0.csv')
-    print ("numSIMPATH, filename, rootfilename, trfCmplxFile \n", nuSIMPATH, "\n", filename, "\n", rootFilename,
+    print ("numSIMPATH, filename, rootinputfilename, rootfilename, trfCmplxFile \n", nuSIMPATH, "\n", filename, "\n", rootInputFilename, "\n", rootFilename,
          "\n", trfCmplxFile)
     outFilename = rootFilename
     logging.info("Parameters: %s,  \ntransfer line parameters: %s,  \noutput file: %s", filename,  trfCmplxFile, rootFilename)
 
 
 # Get machine and run parameters
+    RndmGen = Rndm.RandomGenerator(rootInputFilename)
     nuStrt = nuPrdStrt.nuSTORMPrdStrght(filename)
     psLength = nuStrt.ProdStrghtLen()
-    nuTrLnCmplx = nuTrfLineCmplx.nuSTORMTrfLineCmplx(trfCmplxFile)
+    nuTrLnCmplx = nuTrf.nuSTORMTrfLineCmplx(trfCmplxFile)
     tlCmplxLength = nuTrLnCmplx.TrfLineCmplxLen()
     detectorPosZ = nuStrt.HallWallDist()
 # set up the detector front face
@@ -456,16 +473,12 @@ if __name__ == "__main__" :
 
 # event loop
 for event in range(nEvents):
-# generate a pion
-    pi = piEvtInst.PionEventInstance(pionMom)
 # set its values
     s = 0.0
-    xl = 0.0
-    yl = 0.0
+    xl, xpl = RndmGen.getRandom2D('histXPS')
+    yl, ypl = RndmGen.getRandom2D('histYPS')
     zl = -tlCmplxLength
-    xpl = 0.0
-    ypl = 0.0
-    pPion = pi.getppiGen()
+    pPion = RndmGen.getRandom('histP')
     pxl = pPion*xpl
     pyl = pPion*ypl
     pzl = np.sqrt(pPion*pPion - pxl**2 - pyl**2)
@@ -475,6 +488,9 @@ for event in range(nEvents):
 #  pion at target is a point source but with a momentum spread
     pionTarget = particle.particle(runNumber, event, s, xg, yg, zg, pxg, pyg, pzg, t, eventWeight, "pi+")
     eH.addParticle('target', pionTarget)
+
+# generate a pion
+    pi = piEvtInst.PionEventInstance(particleTar=pionTarget)
     tsc = pi.getTraceSpaceCoord()
 
 # get the decay length - in the transfer line, in the production straight - or lost beyond the straight
@@ -524,6 +540,7 @@ for event in range(nEvents):
 
 
 # Write to the root output file and close
+eH.cd()
 eH.write()
 eH.outFileClose()
 # Write out histograms
