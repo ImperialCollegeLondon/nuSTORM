@@ -12,14 +12,17 @@ Script for going through the eventHistory and making plots
 
     @author  Paul Kyberd
 
-    @version     1.0
-    @date        12 November 2021
+
+    @version    2.0
+                add the control class to provide information for the run
+    @version    1.0
+    @date       11 January 2022
 
 
 """
 
 # Generic Python imports
-import sys
+import sys, os
 
 from pathlib import Path            # checking for file existance
 import csv                          # so I can read a synthetic data file
@@ -30,19 +33,36 @@ import eventHistory as eventHistory
 import histoManager as histoManager
 import histsCreate as histsCreate
 import particle as particle
-
+import logging
+import control
 
 ##! Start:
-nTests = 0
-testFails = 0
-descriptions=[]
-locations=[]
-testStatus=[]
+
+aHVersion = 1.0;
+# control file shared with the normalisation code
+#controlFile = "101-Studies/pencilValidation/PSMuRingDcy.dict"
+controlFile = "101-Studies/pencilValidation/PSMuDcyControlFile.dict"
+#controlFile = "101-Studies/pencilValidation/PSPiFlash.dict"
+#controlFile = "101-Studies/pencilValidation/TLPiFlash.dict"
+ctrlInst = control.control(controlFile)
+
+#       logfile initialisation
+logging.basicConfig(filename=ctrlInst.logFile(), encoding='utf-8', level=logging.INFO)
 
 print("========  analysing the eventHistory start  ========")
+logging.info("\n\n")
+logging.info("========  analysing the eventHistory: start  ======== Version %s", aHVersion)
+logging.info("Control file %s", controlFile)
 
 objRd = eventHistory.eventHistory()
-objRd.inFile("Scratch/normalisation105.root")
+
+# Get the nuSIM path name and use it to set names for the inputfile and the outputFile
+nuSIMPATH = os.getenv('nuSIMPATH')
+rootFilename = os.path.join(nuSIMPATH, 'Scratch/normalisation'+str(ctrlInst.runNumber())+'.root')
+logging.info("  input file %s ", rootFilename)
+
+
+objRd.inFile(rootFilename)
 
 nEvent = objRd.getEntries()
 print ("number of entries is ", nEvent)
@@ -57,7 +77,7 @@ locRecord=[]
 locStatus=[]
 hm = histoManager.histoManager()
 # common histograms at all the points in the history
-hC = histsCreate.histsCreate(hm)
+hC = histsCreate.histsCreate(hm, ctrlInst.plotsDict())
 hC.histAdd("target")
 hC.histAdd("productionStraight")
 hC.histAdd("pionDecay")
@@ -109,6 +129,24 @@ hTitle = "fltNuSrcPZ"
 hLower = 1.0
 hUpper = 6.0
 flshNuSrcPZ = hm.book(hTitle, hBins, hLower, hUpper)
+hTitle = "pionLifetime:nuStorm rest"
+hLower = 0.0
+hUpper = 1000.0
+piLifeNuRst = hm.book(hTitle, hBins, hLower, hUpper)
+
+hTitle = "nus from muon overlap:x"
+hLower = -20.0
+hUpper = 20.0
+overLapNusX = hm.book(hTitle, hBins, hLower, hUpper)
+hTitle = "nus from muon overlap:y"
+hLower = -20.0
+hUpper = 20.0
+overLapNusY = hm.book(hTitle, hBins, hLower, hUpper)
+hTitle = "nus from muon overlap:pz"
+hLower = -10.0
+hUpper = 10.0
+overLapNusPz = hm.book(hTitle, hBins, hLower, hUpper)
+
 
 for pnt in range(nEvent):
 # read an event
@@ -160,6 +198,10 @@ for pnt in range(nEvent):
     hC.histsFill("nueDetector", partNueDetect)
     if (dbgFlag): print ("nueProduction Particle is ", partNueDetect)
 
+# lifetime of the pion in the nuStorm frame
+    if (partPD.weight() > 0.0):
+        piLife =  partPD.t() - partTar.t()
+        piLifeNuRst.Fill(piLife)
 # some specfic analysis - neutrinos from muon decay if only muon decays in the ring are included
     if (partNumuDetect.weight() > 0.0):
       xs = partNumuProd.x()
@@ -198,17 +240,26 @@ for pnt in range(nEvent):
       flshNuSrcPY.Fill(p[1][1])
       flshNuSrcPZ.Fill(p[1][2])
       arrivalT.Fill(partNumuDetect.t())
-
+#
+#  Muons in the production straight first time
+    muonPathEnd = partMuonDecay.s()
+    if (muonPathEnd > 0.0) and (muonPathEnd < 240.0): print (f"muon decay point: {muonPathEnd}")
+    if (muonPathEnd < 240.0) and (partNumuDetect.weight() > 0.0):
+        overLapNusX.Fill(partNumuDetect.x())
+        overLapNusY.Fill(partNumuDetect.y())
+        if (abs(partNumuDetect.x()) < 2.5) and (abs(partNumuDetect.y()) < 2.5):
+            overLapNusPz.Fill(partNumuDetect.p()[1][2])
 
 #hm.histdo()
-hm.histOutRoot()
+fileName = "101-studies/" + ctrlInst.studyName() + "/plots" + str(ctrlInst.runNumber()) + ".root"
+print (fileName)
+hm.histOutRoot(fileName)
 # write plots to individual .pdf files
-hm.histdo()
 hm.texCreate()
 hC.summary()
 
 print()
 print("========  analysing the eventHistory ends ========")
-
+logging.info("========  analysing the eventHistory: end  ========")
 
 sys.exit(0)

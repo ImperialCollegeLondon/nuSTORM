@@ -79,6 +79,18 @@ class control:
     def muDcyFlag(self):
         return (self._controlInfo["flags"]["muDcyFlag"] == "True")
 
+# Process muons outside the acceptance but in the production straight
+    def PSMuons(self):
+        return (self._controlInfo["flags"]["PSMuons"] == "True")
+
+    def ringMuons(self):
+        return (self._controlInfo["flags"]["ringMuons"] == "True")
+
+
+# Track the flash neutrinos to the detector
+    def flashAtDetector(self):
+        return (self._controlInfo["flags"]["flashAtDetector"] == "True")
+
 # run number 
     def runNumber(self, inc=False):
 
@@ -99,6 +111,10 @@ class control:
     def nEvents(self):
         return self._controlInfo["nEvents"]
 
+# Pion energy
+    def EPi(self):
+        return self._controlInfo["EPi"]
+
 #logFile name
     def logFile(self):
         return "101-studies/" + self._controlInfo['study'] + "/"+ self._controlInfo["files"]["logFile"] + str(self.runNumber()) + ".log"
@@ -111,3 +127,6 @@ class control:
     def studyName(self):
         return self._controlInfo["study"]
 
+#run description study name
+    def description(self):
+        return self._controlInfo["description"]
