@@ -202,6 +202,7 @@ class PionEventInstance:
             xl, yl, xpl, ypl = nuStrt.GenerateTrans(coord[0])
         elif (self._mode == 'input' and self._pion.traceSpace().s() < 50.):
             #transform the global coordinates of pion at target back to tlLocal to get the position and momentum spread with respect to BeamPos & BeamDir
+            #print("This is a global input.")
             xg = self._pion.x()
             yg = self._pion.y()
             zg = self._pion.z()
@@ -212,6 +213,7 @@ class PionEventInstance:
             xpl = pxl/pzl
             ypl = pyl/pzl
         elif (self._mode == 'input local' or (self._mode == 'input' and self._pion.traceSpace().s() >= 50.)):
+            #print("This is a local input.")
             xl = self._pion.x()
             yl = self._pion.y()
             pxl = self._pion.p()[1][0]
@@ -408,13 +410,13 @@ class PionEventInstance:
 
     def glbltoTl(self, xg, yg, zg, pxg, pyg, pzg):
 
-        xl = xg - zg*math.sin(self._tlAngle)
+        xl = xg + zg*math.tan(self._tlAngle)
         yl = yg
-        zl = zg*math.cos(self._tlAngle)
+        zl = zg/math.cos(self._tlAngle)
 
-        pxl = pxg*math.cos(self._tlAngle) + pzg*math.sin(self._tlAngle)
+        pxl = pxg*math.cos(self._tlAngle) - pzg*math.sin(self._tlAngle)
         pyl = pyg
-        pzl = pzg*math.cos(self._tlAngle) - pxg*math.sin(self._tlAngle)
+        pzl = pxg*math.sin(self._tlAngle) + pzg*math.cos(self._tlAngle)
 
         return xl, yl, zl, pxl, pyl, pzl
 
