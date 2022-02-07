@@ -49,13 +49,19 @@ class RandomGenerator(object):
     __instance = None
 
 #--------  "Built-in methods":
-    def __new__(cls, rootfilename):
+    def __new__(cls, rootfilename, histname, histname2D):
         if cls.__instance is None:
             print('RandomGenerator.__new__: creating the RandomGenerator object')
             print('-------------------')
             cls.__instance = super(RandomGenerator, cls).__new__(cls)
 
             cls._rootfilename = rootfilename
+            rootFile = ROOT.TFile(cls._rootfilename, 'READ', 'ROOT file with Histograms')
+            cls._hist = rootFile.Get(histname)
+            cls._hist.SetDirectory(0)
+            cls._hist2D = rootFile.Get(histname2D)
+            cls._hist2D.SetDirectory(0)
+            rootFile.Close()
 
             # Summarise initialisation
             cls.print(cls)
@@ -70,18 +76,18 @@ class RandomGenerator(object):
         self.print()
 
     #--------  Module methods
-    def getRandom(self, histname):
-        rootFile = ROOT.TFile(self._rootfilename, 'READ', 'ROOT file with Histograms')
-        hist = rootFile.Get(histname)
-        x = hist.GetRandom()
+    def getRandom(self):
+        #rootFile = ROOT.TFile(self._rootfilename, 'READ', 'ROOT file with Histograms')
+        #hist = rootFile.Get(histname)
+        x = self._hist.GetRandom()
         return x
 
-    def getRandom2D(self, histname):
+    def getRandom2D(self):
         x = ctypes.c_double(0.0)
         y = ctypes.c_double(0.0)
-        rootFile = ROOT.TFile(self._rootfilename, 'READ', 'ROOT file with Histograms')
-        hist2D = rootFile.Get(histname)
-        hist2D.GetRandom2(x,y)
+        #rootFile = ROOT.TFile(self._rootfilename, 'READ', 'ROOT file with Histograms')
+        #hist2D = rootFile.Get(histname)
+        self._hist2D.GetRandom2(x,y)
         return x.value, y.value
 
 #--------  "Get methods" only; version, reference, and constants

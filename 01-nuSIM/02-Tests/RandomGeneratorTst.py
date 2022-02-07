@@ -24,8 +24,8 @@ print("RandomGeneratorTest:", RandomGeneratorTest, " check if class is a singlet
 nuSIMPATH    = os.getenv('nuSIMPATH')
 rootfilename = os.path.join(nuSIMPATH, 'Scratch/plots_endProdStrght.root')
 print(rootfilename)
-RndmGen  = Rndm.RandomGenerator(rootfilename)
-RndmGen1 = Rndm.RandomGenerator(rootfilename)
+RndmGen  = Rndm.RandomGenerator(rootfilename,'histP','histXPS')
+RndmGen1 = Rndm.RandomGenerator(rootfilename,'histP','histXPS')
 print("---->RndmGen singleton test:", id(RndmGen), id(RndmGen1), id(RndmGen)-id(RndmGen1))
 if RndmGen != RndmGen1:
     raise Exception("RandomGenerator is not a singleton class!")
@@ -45,13 +45,13 @@ p = np.array([])
 n = 200000
 
 for i in range(0,n):
-    x_cur, xp_cur = RndmGen.getRandom2D('histXPS')
-    y_cur, yp_cur = RndmGen.getRandom2D('histYPS')
+    x_cur, xp_cur = RndmGen.getRandom2D()
+    y_cur, yp_cur = RndmGen.getRandom2D()
     x = np.append(x,x_cur)
     y = np.append(y,y_cur)
     xp = np.append(xp,xp_cur)
     yp = np.append(yp,yp_cur)
-    p_cur = RndmGen.getRandom('histP')
+    p_cur = RndmGen.getRandom()
     p = np.append(p,p_cur)
 
 n, bins, patches = plt.hist(p, bins=50, color='y', range=(4.25,5.75))
