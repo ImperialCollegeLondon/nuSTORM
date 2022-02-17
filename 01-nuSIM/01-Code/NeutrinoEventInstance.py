@@ -374,8 +374,41 @@ class NeutrinoEventInstance:
         
         return P_e, P_nue, P_numu
     
+    def Absorption(self, piTraceSpaceCoord, mu4mmtm, mucostheta):
+      n = 4.8 #how much rounded
+   
+      x0 = 0 # graph translation 
+      y0 = 0
+      Mux = piTraceSpaceCoord[1]         #Pion decay transverse position coordinates = Muon Decay transverse position coordinates
+      Muy = piTraceSpaceCoord[2]
+      Muxp= mu4mmtm[1][0]/mu4mmtm[1][2]  #xp and yp from generated muon momentum
+      Muyp= mu4mmtm[1][1]/mu4mmtm[1][2]
+      Muy = Muy*2.5/0.15
+      Muyp = Muyp*2./0.006
+      def k(i):
+        return (2*math.pi*i)/3
+      def g(t):
+        return (abs(t-(1./3.)))**n
+      def f(x,y):
+        return 0.1*g(-(x+x0)*math.cos(k(1))-(y+y0)*math.sin(k(1)))+0.1*g(-(x+x0)*math.cos(k(2))-(y+y0)*math.sin(k(2)))+0.1*g(-(x+x0)*math.cos(k(3))-(y+y0)*math.sin(k(3)))
+
+
+      if (Mux*Mux/(0.05*0.05))+(Muxp*Muxp/(0.004*0.004)) < 1. and f(Muy, Muyp) < 1.0 and mucostheta < 0:
+            Absorbed = False
+      else:
+            Absorbed = True
+            
+      return Absorbed
+
 
 #--------  get/set methods:
+
+    def getAbsorbed(self):
+        return deepcopy(self._Absorbed)    
+
+    def getLifeTime(self):
+        return self._ct
+
     def getpmu(self):
         return deepcopy(self._pmu)
 

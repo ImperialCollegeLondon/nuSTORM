@@ -11,12 +11,13 @@ Model for calculating normalised numbers
 """
 
 from pathlib import Path
+import math
 import json
 
 class histsCreate():
 
 
-    def __init__(self, hM):
+    def __init__(self, hM, plotsDict):
         self._locsStart = []
         self._locs=[]
         self._hists=[]
@@ -31,9 +32,8 @@ class histsCreate():
                 "muonDecay": 0, "eProduction": 0, "numuProduction":0, "nueProduction": 0, "numuDetector": 0, "nueDetector": 0}
 
 #  read in the dictionaries
-        plotsFile = "04-Studies/plotsOne.dict"
-        with open(plotsFile) as plotsFile:
-            self._plotsInfo = json.load(plotsFile)
+        with open(plotsDict) as pD:
+            self._plotsInfo = json.load(pD)
 
     def __repr__(self):
         return "create a set of histograms for a particle at a location in the event History"
@@ -102,6 +102,11 @@ class histsCreate():
         hLower = self._plotsInfo["pzLower"][eventType]
         hUpper = self._plotsInfo["pzHigher"][eventType]
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
+#  Energy plot
+        hTitle = eventType + ":E"
+        hLower = self._plotsInfo["eLower"][eventType]
+        hUpper = self._plotsInfo["eHigher"][eventType]
+        self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
 
         hTitle = eventType + ":E_v_t"
         self._hists.append(self._hm.book2(hTitle, 50, 0.0, 5.0, 50, 10000.0, 11000.0))
@@ -139,7 +144,7 @@ class histsCreate():
             self._hists[hPnt+5].Fill(t)
             self._hists[hPnt+6].Fill(px)
             self._hists[hPnt+7].Fill(py)
-            self._hists[hPnt+9].Fill(pz,t)
+            self._hists[hPnt+10].Fill(pz,t)
 
             self._hists[hPnt+0].Fill(x)
             self._hists[hPnt+1].Fill(y)
@@ -149,11 +154,14 @@ class histsCreate():
 # plots with non-zero weight - for production straight
                  self._count = self._count + 1
 
-            if (location == 'numuDetector'):
+            Enu = math.sqrt(px*px + py*py + pz*pz)
+            if ((location == 'numuDetector') or (location == "nueDetector")):
                 if ((abs(x) < 2.5) and (abs(y) < 2.5)):
                         self._hists[hPnt+8].Fill(pz)
+                        self._hists[hPnt+9].Fill(Enu)
             else:
                 self._hists[hPnt+8].Fill(pz)
+                self._hists[hPnt+9].Fill(Enu)
 
 
 

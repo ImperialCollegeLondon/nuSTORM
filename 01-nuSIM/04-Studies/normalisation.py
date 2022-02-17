@@ -12,6 +12,11 @@ Model for calculating normalised numbers
 
     @author  Paul Kyberd
 
+    Add python logging
+    @version     1.1
+    @date        07 January 2021
+
+
     @version     1.0
     @date        05 October 2021
 
@@ -24,10 +29,14 @@ Model for calculating normalised numbers
 # Class to do the calculation of the event rate normalisation
 #
 import os, sys
+from datetime import datetime
 import numpy as np
 import math as math
+import logging
 import PionConst as PC
 import nuSTORMConst
+import control
+import histoManager
 import nuSTORMPrdStrght as nuPrdStrt
 import nuSTORMTrfLineCmplx as nuTrf
 import PionEventInstance as piEvtInst
@@ -54,7 +63,7 @@ class normalisation:
 
     def tltoGlbl(self, xl, yl, zl, pxl, pyl, pzl):
 
-        xg = xl - zl*self._sth
+        xg = xl + zl*self._sth
         yg = yl
         zg = zl*self._cth
 
@@ -122,11 +131,11 @@ class normalisation:
       sNumu = sd + dsNumu
       tNumu = td + dsNumu*1E9/c + t
       if (self._tlDcyCount < 5): print ( "sNumu is ", sNumu, "    dsNumu is ", dsNumu, "     tNumu is ", tNumu, "    c is ", c)
-      if ((abs(numuX) < 100) and (abs(numuY) < 100)):
+      if ((abs(numuX) < 40.0) and (abs(numuY) < 40.0)):
           eW = eventWeight
       else:
           eW = 0.0
-      numuDetector = particle.particle(runNumber, event, sNumu, numuX, numuY, numuZ, pxnu, pynu, pnmu, tNumu, eW, "numu")
+      numuDetector = particle.particle(runNumber, event, sNumu, numuX, numuY, numuZ, pxnu, pynu, pznu, tNumu, eW, "numu")
       eH.addParticle("numuDetector", numuDetector)
       if (self._tlDcyCount < 5): print ("numu at detector")
 
@@ -153,6 +162,7 @@ class normalisation:
       td = pi.getLifetime()*1E9 + t
       if (self._byndPSCount < 5): print ("pi in beyondPS: decayLength ", sd)
       pionLostDecay = particle.particle(runNumber, event, sd, xd, yd, zd, pxd, pyd, pzd, td, eventWeight, "pi+")
+      print("beyond:PS about to add a pion")
       eH.addParticle("pionDecay", pionLostDecay)
       if (self._byndPSCount < 5):  print ("at pionDecay lost")
 # add the pion flash neutrino ... set everything to zero - including eventWeight
@@ -221,13 +231,20 @@ class normalisation:
       ypd = tsc[5]
       pi.getLifetime()
       td = lifetime*1E9 + t
-      #pPion =pi.getppiGen()
-      #zd = sd - tlCmplxLength
-      pPion = pi.getppiGen()
+      pPion =pi.getppiGen()
+#  need the lifetime in the nuStorm frame in ns
+      piLifetime = pi.getLifetime()*1E9*Epion/(piMass)
+      td = piLifetime + t
+      zd = sd - tlCmplxLength
       pxd = pPion*xpd
       pyd = pPion*ypd
       pzd = np.sqrt(pPion*pPion - pxd**2 - pyd**2)
       pionPSDecay = particle.particle(runNumber, event, sd, xd, yd, zd, pxd, pyd, pzd, td, eventWeight, "pi+")
+      if (td < 150.0): print (f"error in the time {td}")
+      hTotal.Fill(td)
+      hLifetime.Fill(piLifetime)
+      hStarttime.Fill(t)
+      hS.Fill(sd)
       eH.addParticle("pionDecay", pionPSDecay)
       if (self._PSDcyCount < 5): print ("pionDecay in PS")
 # add the muon
@@ -248,22 +265,23 @@ class normalisation:
       eH.addParticle("piFlashNu", nuFlash)
       if (self._PSDcyCount < 5):  print ("piFlashNu PS")
 # extrapolate the neutrino the the detector plane
-      hitMu = fluxPlane.findHitPositionPiFlash(nuFlash)
-      if (self._PSDcyCount < 5): print ("hit position of neutrino ", hitMu)
+      if FlshAtDetFlg:
+          hitMu = fluxPlane.findHitPositionPiFlash(nuFlash)
+          if (self._PSDcyCount < 5): print ("hit position of neutrino ", hitMu)
 #  fill the event History
-      numuX = hitMu[0]
-      numuY = hitMu[1]
-      numuZ = hitMu[2]
-      dsNumu = math.sqrt((xd-numuX)**2 + (yd-numuY)**2 + (zd-numuZ)**2)
-      sNumu = sd + dsNumu
-      tNumu = td + dsNumu*1E9/c + t
-      if (self._PSDcyCount < 5): print ( "sNumu is ", sNumu, "    dsNumu is ", dsNumu, "     tNumu is ", tNumu, "    c is ", c)
-      if ((abs(numuX) < 10.0) and (abs(numuY) < 10.0)):
-          eW = eventWeight
-      else:
-          eW = 0.0
-      numuDetector = particle.particle(runNumber, event, sNumu, numuX, numuY, numuZ, pxnu, pynu, pznu, tNumu, eW, "numu")
-      eH.addParticle("numuDetector", numuDetector)
+          numuX = hitMu[0]
+          numuY = hitMu[1]
+          numuZ = hitMu[2]
+          dsNumu = math.sqrt((xd-numuX)**2 + (yd-numuY)**2 + (zd-numuZ)**2)
+          sNumu = sd + dsNumu
+          tNumu = td + dsNumu*1E9/c + t
+          if (self._PSDcyCount < 5): print ( "sNumu is ", sNumu, "    dsNumu is ", dsNumu, "     tNumu is ", tNumu, "    c is ", c)
+          if ((abs(numuX) < 10.0) and (abs(numuY) < 10.0)):
+              eW = eventWeight
+          else:
+              eW = 0.0
+          numuDetector = particle.particle(runNumber, event, sNumu, numuX, numuY, numuZ, pxnu, pynu, pznu, tNumu, eW, "numu")
+          eH.addParticle("numuDetector", numuDetector)
       if (self._PSDcyCount < 5): print ("numu at detector")
 
 #
@@ -296,99 +314,218 @@ class normalisation:
 #  if the muon doesn't make it in the ring acceptance ... it is absorbed ... so for the
 #  muon we create a suitable muon - but the other particles are all put to null values so
 #  all values bar run and event are put to zero
+
       if (Absorbed):
         testParticle = particle.particle(runNumber, event, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0,   "mu+")
         eH.addParticle("muonDecay", testParticle)
         if (self._muDcyCount < 5): print ("absorbed")
-      else:
-        self._muDcyCount = self._muDcyCount + 1
-        if (self._muDcyCount < 5): print ("not absorbed")
-        muTSC = nuEvt.getTraceSpaceCoord()
-        if (self._muDcyCount < 5): print ("muTSC is ", muTSC)
+# here we deal with muons which decay before the end of the production straight and so we do not worry about absorption
+        if (PSMuonsFlag):
+          muTSC = nuEvt.getTraceSpaceCoord()
+          sDcy = muTSC[0]
+          if (sDcy < 230.0):
+            print (f"muon in production: {sDcy}")
 # Muon Decay
-        sDcy = muTSC[0]
-        xDcy = muTSC[1]
-        yDcy = muTSC[2]
-        zDcy = muTSC[3]
-        pzDcy = nuEvt.getpmu()
-        pxDcy = muTSC[4]*pzDcy
-        pyDcy = muTSC[5]*pzDcy
-        tDcy = (pi.getLifetime()+nuEvt.getLifeTime())*1E9 + t
-        muDecay = particle.particle(runNumber, event, sDcy, xDcy, yDcy, zDcy, pxDcy, pyDcy, pzDcy, tDcy, eventWeight, "mu+")
-        eH.addParticle("muonDecay", muDecay)
-        if (self._muDcyCount < 5): print ("muDecay is ", muDecay)
+            sDcy = muTSC[0]
+            xDcy = muTSC[1]
+            yDcy = muTSC[2]
+            zDcy = muTSC[3]
+            pzDcy = nuEvt.getpmu()
+            pxDcy = muTSC[4]*pzDcy
+            pyDcy = muTSC[5]*pzDcy
+            tDcy = (pi.getLifetime()+nuEvt.getLifeTime())*1E9 + t
+            muDecay = particle.particle(runNumber, event, sDcy, xDcy, yDcy, zDcy, pxDcy, pyDcy, pzDcy, tDcy, eventWeight, "mu+")
+            eH.addParticle("muonDecay", muDecay)
+            if (self._muDcyCount < 5): print ("muDecay is ", muDecay)
 
 # electron production
-        e4mmtm = nuEvt.gete4mmtm()
-        e3mmtm = e4mmtm[1]
-        eProd = particle.particle(runNumber, event, sDcy, xDcy, yDcy, zDcy, e3mmtm[0], e3mmtm[1], e3mmtm[2], tDcy, eventWeight, 'e+')
-        eH.addParticle('eProduction', eProd)
-        if (self._muDcyCount < 5): print ("eProduction is ", eProd)
-
+            e4mmtm = nuEvt.gete4mmtm()
+            e3mmtm = e4mmtm[1]
+            eProd = particle.particle(runNumber, event, sDcy, xDcy, yDcy, zDcy, e3mmtm[0], e3mmtm[1], e3mmtm[2], tDcy, eventWeight, 'e+')
+            eH.addParticle('eProduction', eProd)
+            if (self._muDcyCount < 5): print ("eProduction is ", eProd)
+  
 # numu production
-        numu4mmtm = nuEvt.getnumu4mmtm()
-        numu3mmtm = numu4mmtm[1]
-        numuPx = numu3mmtm[0]
-        numuPy = numu3mmtm[1]
-        numuPz = numu3mmtm[2]
-        numuProd = particle.particle(runNumber, event, sDcy, xDcy, yDcy, zDcy, numu3mmtm[0], numu3mmtm[1], numu3mmtm[2], tDcy, eventWeight, 'numuBar')
-        eH.addParticle('numuProduction', numuProd)
-        if (self._muDcyCount < 5): print ("numuProduction is ", numuProd)
-
+            numu4mmtm = nuEvt.getnumu4mmtm()
+            numu3mmtm = numu4mmtm[1]
+            numuPx = numu3mmtm[0]
+            numuPy = numu3mmtm[1]
+            numuPz = numu3mmtm[2]
+            numuProd = particle.particle(runNumber, event, sDcy, xDcy, yDcy, zDcy, numu3mmtm[0], numu3mmtm[1], numu3mmtm[2], tDcy, eventWeight, 'numuBar')
+            eH.addParticle('numuProduction', numuProd)
+            if (self._muDcyCount < 5): print ("numuProduction is ", numuProd)
+ 
 # nue production
-        nue4mmtm = nuEvt.getnue4mmtm()
-        nue3mmtm = nue4mmtm[1]
-        nuePx = nue3mmtm[0]
-        nuePy = nue3mmtm[1]
-        nuePz = nue3mmtm[2]
-        nueProd = particle.particle(runNumber, event, sDcy, xDcy, yDcy, zDcy, nue3mmtm[0], nue3mmtm[1], nue3mmtm[2], tDcy, eventWeight, 'nue')
-        eH.addParticle('nueProduction', nueProd)
-        if (self._muDcyCount < 5): print ("nueProduction is ", nueProd)
+            nue4mmtm = nuEvt.getnue4mmtm()
+            nue3mmtm = nue4mmtm[1]
+            nuePx = nue3mmtm[0]
+            nuePy = nue3mmtm[1]
+            nuePz = nue3mmtm[2]
+            nueProd = particle.particle(runNumber, event, sDcy, xDcy, yDcy, zDcy, nue3mmtm[0], nue3mmtm[1], nue3mmtm[2], tDcy, eventWeight, 'nue')
+            eH.addParticle('nueProduction', nueProd)
+            if (self._muDcyCount < 5): print ("nueProduction is ", nueProd)
 
 # and finally extrapolate to the neutrino detector
 #   hitx is x, y, z, R, phi, px, py, pz, E
-        hitE,hitMu=fluxPlane.findHitPositionMuEvt(nuEvt)
+            hitE,hitMu=fluxPlane.findHitPositionMuEvt(nuEvt)
 #  numu extrapolation to the detector
-        numuX = hitMu[0]
-        numuY = hitMu[1]
-        numuZ = hitMu[2]
-        dsNumu = math.sqrt((xDcy-numuX)**2 + (yDcy-numuY)**2 + (zDcy-numuZ)**2)
-        sNumu = sDcy + dsNumu
-        tNumu = tDcy + sNumu/c + t
-        if (self._muDcyCount < 5): print ( "sNumu is ", sNumu, "    dsNumu is ", dsNumu, "     tNumu is ", tNumu)
-        if ((abs(numuX) < 2.50) and (abs(numuY) < 2.50)):
-            eW = eventWeight
-        else:
-            eW = 0.0
-        numuDetector = particle.particle(runNumber, event, sNumu, numuX, numuY, numuZ, numuPx, numuPy, numuPz, tNumu, eW, "numu")
-        eH.addParticle("numuDetector", numuDetector)
-        if (self._muDcyCount < 5): print ("numu at detector")
+            numuX = hitMu[0]
+            numuY = hitMu[1]
+            numuZ = hitMu[2]
+            dsNumu = math.sqrt((xDcy-numuX)**2 + (yDcy-numuY)**2 + (zDcy-numuZ)**2)
+            sNumu = sDcy + dsNumu
+            tNumu = tDcy + sNumu/c + t
+            if (self._muDcyCount < 5): print ( "sNumu is ", sNumu, "    dsNumu is ", dsNumu, "     tNumu is ", tNumu)
+            if ((abs(numuX) < 2.50) and (abs(numuY) < 2.50)):
+                eW = eventWeight
+            else:
+                eW = 0.0
+            numuDetector = particle.particle(runNumber, event, sNumu, numuX, numuY, numuZ, numuPx, numuPy, numuPz, tNumu, eW, "numu")
+            eH.addParticle("numuDetector", numuDetector)
+            if (self._muDcyCount < 5): print ("numu at detector")
 #  nue extrapolation to the detector
-        nueX = hitE[0]
-        nueY = hitE[1]
-        nueZ = hitE[2]
-        dsNue = math.sqrt((xDcy-nueX)**2 + (yDcy-nueY)**2 + (zDcy-nueZ)**2)
-        sNue = sDcy + dsNue
-        tNue = tDcy + sNue/c + t
-        if ((abs(nueX) < 2.50) and (abs(nueY) < 2.50)):
-            eW = eventWeight
-        else:
-            eW = 0.0
-        nueDetector = particle.particle(runNumber, event, sNue, nueX, nueY, nueZ, nuePx, nuePy, nuePz, tNue, eW, "nue")
-        eH.addParticle("nueDetector", nueDetector)
-        if (self._muDcyCount < 5): print ("nue at detector")
+            nueX = hitE[0]
+            nueY = hitE[1]
+            nueZ = hitE[2]
+            dsNue = math.sqrt((xDcy-nueX)**2 + (yDcy-nueY)**2 + (zDcy-nueZ)**2)
+            sNue = sDcy + dsNue
+            tNue = tDcy + sNue/c + t
+            if ((abs(nueX) < 2.50) and (abs(nueY) < 2.50)):
+                eW = eventWeight
+            else:
+                eW = 0.0
+            nueDetector = particle.particle(runNumber, event, sNue, nueX, nueY, nueZ, nuePx, nuePy, nuePz, tNue, eW, "nue")
+            eH.addParticle("nueDetector", nueDetector)
+            if (self._muDcyCount < 5): print ("nue at detector")
+
+# finished dealing with muon decays in the production straight
+      else:
+        if (ringMuonsFlag):
+            print (f" running ring muons")
+            self._muDcyCount = self._muDcyCount + 1
+            if (self._muDcyCount < 5): print ("not absorbed")
+            muTSC = nuEvt.getTraceSpaceCoord()
+            if (self._muDcyCount < 5): print ("muTSC is ", muTSC)
+# Muon Decay
+            sDcy = muTSC[0]
+            xDcy = muTSC[1]
+            yDcy = muTSC[2]
+            zDcy = muTSC[3]
+            pzDcy = nuEvt.getpmu()
+            pxDcy = muTSC[4]*pzDcy
+            pyDcy = muTSC[5]*pzDcy
+            tDcy = (pi.getLifetime()+nuEvt.getLifeTime())*1E9 + t
+            muDecay = particle.particle(runNumber, event, sDcy, xDcy, yDcy, zDcy, pxDcy, pyDcy, pzDcy, tDcy, eventWeight, "mu+")
+            eH.addParticle("muonDecay", muDecay)
+            if (self._muDcyCount < 5): print ("muDecay is ", muDecay)
+
+# electron production
+            e4mmtm = nuEvt.gete4mmtm()
+            e3mmtm = e4mmtm[1]
+            eProd = particle.particle(runNumber, event, sDcy, xDcy, yDcy, zDcy, e3mmtm[0], e3mmtm[1], e3mmtm[2], tDcy, eventWeight, 'e+')
+            eH.addParticle('eProduction', eProd)
+            if (self._muDcyCount < 5): print ("eProduction is ", eProd)
+
+# numu production
+            numu4mmtm = nuEvt.getnumu4mmtm()
+            numu3mmtm = numu4mmtm[1]
+            numuPx = numu3mmtm[0]
+            numuPy = numu3mmtm[1]
+            numuPz = numu3mmtm[2]
+            numuProd = particle.particle(runNumber, event, sDcy, xDcy, yDcy, zDcy, numu3mmtm[0], numu3mmtm[1], numu3mmtm[2], tDcy, eventWeight, 'numuBar')
+            eH.addParticle('numuProduction', numuProd)
+            if (self._muDcyCount < 5): print ("numuProduction is ", numuProd)
+
+# nue production
+            nue4mmtm = nuEvt.getnue4mmtm()
+            nue3mmtm = nue4mmtm[1]
+            nuePx = nue3mmtm[0]
+            nuePy = nue3mmtm[1]
+            nuePz = nue3mmtm[2]
+            nueProd = particle.particle(runNumber, event, sDcy, xDcy, yDcy, zDcy, nue3mmtm[0], nue3mmtm[1], nue3mmtm[2], tDcy, eventWeight, 'nue')
+            eH.addParticle('nueProduction', nueProd)
+            if (self._muDcyCount < 5): print ("nueProduction is ", nueProd)
+
+# and finally extrapolate to the neutrino detector
+#   hitx is x, y, z, R, phi, px, py, pz, E
+            hitE,hitMu=fluxPlane.findHitPositionMuEvt(nuEvt)
+#  numu extrapolation to the detector
+            numuX = hitMu[0]
+            numuY = hitMu[1]
+            numuZ = hitMu[2]
+            dsNumu = math.sqrt((xDcy-numuX)**2 + (yDcy-numuY)**2 + (zDcy-numuZ)**2)
+            sNumu = sDcy + dsNumu
+            tNumu = tDcy + sNumu/c + t
+            if (self._muDcyCount < 5): print ( "sNumu is ", sNumu, "    dsNumu is ", dsNumu, "     tNumu is ", tNumu)
+            if ((abs(numuX) < 10.0) and (abs(numuY) < 10.0)):
+                eW = eventWeight
+            else:
+                eW = 0.0
+            numuDetector = particle.particle(runNumber, event, sNumu, numuX, numuY, numuZ, numuPx, numuPy, numuPz, tNumu, eW, "numu")
+            eH.addParticle("numuDetector", numuDetector)
+            if (self._muDcyCount < 5): print ("numu at detector")
+#  nue extrapolation to the detector
+            nueX = hitE[0]
+            nueY = hitE[1]
+            nueZ = hitE[2]
+            dsNue = math.sqrt((xDcy-nueX)**2 + (yDcy-nueY)**2 + (zDcy-nueZ)**2)
+            sNue = sDcy + dsNue
+            tNue = tDcy + sNue/c + t
+            if ((abs(nueX) < 10.0) and (abs(nueY) < 10.0)):
+                eW = eventWeight
+            else:
+                eW = 0.0
+            nueDetector = particle.particle(runNumber, event, sNue, nueX, nueY, nueZ, nuePx, nuePy, nuePz, tNue, eW, "nue")
+            eH.addParticle("nueDetector", nueDetector)
+            
+            if (self._muDcyCount < 5): print ("nue at detector")
 
 
 if __name__ == "__main__" :
 
+
+    controlFile = "101-Studies/pencilValidation/PSMuDcyControlFile.dict"
+#    controlFile = "101-Studies/pencilValidation/PSMuRingDcy.dict"
+#    controlFile = "101-Studies/pencilValidation/PSnoMuDcyControlFile.dict"
+#    controlFile = "101-Studies/pencilValidation/PSPiFlash.dict"
+#    controlFile = "101-Studies/pencilValidation/TLPiFlash.dict"
+
+    ctrlInst = control.control(controlFile)
+    normInst = normalisation()
+# run number needed because it labels various files
+    runNumber = ctrlInst.runNumber(True)
+
+#       logfile initialisation
+    logging.basicConfig(filename=ctrlInst.logFile(), encoding='utf-8', level=logging.INFO)
+
+#       Histogram initialisation
+    hm = histoManager.histoManager()
+    hTotal = hm.book("total time", 100, 0.0, 11000.0)
+    hLifetime = hm.book("life time", 100, 0.0, 1000.0)
+    hStarttime = hm.book("start time", 100, 0.0, 11000.0)
+    hS = hm.book("s (m)", 100, 0.0, 300.0)
+#  start message
     print ("========  Normalisation run: start  ======== Version ", normalisation.__version__)
     print()
-    normInst = normalisation()
+    now = datetime.now()
+    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+    logging.info("========  Normalisation run: start  ======== Version %s, ... %s", normalisation.__version__, dt_string)
+    logging.info("Control file %s", controlFile)
+    logging.info("\n   Description ... %s ",  ctrlInst.description())
 
-    tlFlag = False
-    psFlag = True
-    lstFlag = False
-    muDcyFlag = False
+
+# set up the processing flags
+    tlFlag = ctrlInst.tlFlag()
+    psFlag = ctrlInst.psFlag()
+    lstFlag = ctrlInst.lstFlag()
+    muDcyFlag = ctrlInst.muDcyFlag()
+    FlshAtDetFlg = ctrlInst.flashAtDetector()
+    PSMuonsFlag = ctrlInst.PSMuons()
+    ringMuonsFlag = ctrlInst.ringMuons()
+    print (f"Processing flags -- tlflag: {tlFlag} / psFlag: {psFlag} / lstFlag: {lstFlag} / muDcyFlag: {muDcyFlag} / FlshAtDetFlg: \
+        {FlshAtDetFlg} / PSMuonsFlag: {PSMuonsFlag} / ringMuonsFlag {ringMuonsFlag}")
+    logging.info("Processing flags -- tlflag: %s,  psFlag: %s,  lstFlag: %s,  muDcyFlag: %s, FlshAtDetFlg: %s, PSMuonsFlag: %s, ringMuonsFlag: %s", \
+        tlFlag, psFlag, lstFlag, muDcyFlag, FlshAtDetFlg, PSMuonsFlag, ringMuonsFlag)
 
 # get constants
     piCnst  = PC.PionConst()
@@ -399,8 +536,9 @@ if __name__ == "__main__" :
     runNumber = 105
     pionMom = 5.0
     crossSection = 50
-    nEvents = 10000
+    nEvents = ctrlInst.nEvents()
     eventWeight = crossSection
+    logging.info("Run Number: %s,  nEvents: %s,  pion central momentum: %s", runNumber, nEvents, pionMom)
 
 # Get the nuSIM path name and use it to set names for the inputfile and the outputFile
     nuSIMPATH = os.getenv('nuSIMPATH')
@@ -410,7 +548,10 @@ if __name__ == "__main__" :
     trfCmplxFile = os.path.join(nuSIMPATH, '11-Parameters/nuSTORM-TrfLineCmplx-Params-v1.0.csv')
     print ("numSIMPATH, filename, rootinputfilename, rootfilename, trfCmplxFile \n", nuSIMPATH, "\n", filename, "\n", rootInputFilename, "\n", rootFilename,
          "\n", trfCmplxFile)
-    outFilename = rootFilename#"norm.root"
+    outFilename = rootFilename
+    logging.info("Parameters: %s,  \ntransfer line parameters: %s,  \noutput file: %s", filename,  trfCmplxFile, rootFilename)
+
+
 # Get machine and run parameters
     RndmGen = Rndm.RandomGenerator(rootInputFilename,'histP','histXPS')
     nuStrt = nuPrdStrt.nuSTORMPrdStrght(filename)
@@ -498,6 +639,8 @@ for event in range(nEvents):
 eH.cd()
 eH.write()
 eH.outFileClose()
+# Write out histograms
+hm.histOutRoot("normalPlots.root")
 ##! Complete:
 print()
 print("========  Normalisation run : complete  ========")
