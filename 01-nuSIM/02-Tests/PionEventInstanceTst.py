@@ -133,10 +133,6 @@ print("PionEventInstanceTest:", PionEventInstanceTest, \
       "soak test generating distributions from particle.")
 piEI_h = []
 Ppion=piMomentum
-##Use the following 3 lines to create according to histogram distributions
-#nuSIMPATH = os.getenv('nuSIMPATH')
-#rootInputFilename = os.path.join(nuSIMPATH, 'Scratch/plots_endProdStrght.root')
-#RndmGen = Rndm.RandomGenerator(rootInputFilename,'histP','histXPS')
 eH = eventHistory.eventHistory()
 eH.outFile("Scratch/PionEventInstanceTestOut.root")
 eH.rootStructure()
@@ -165,8 +161,8 @@ for i in range(len(piEI)):
 for i in range(5):
     print("    piEI_h[i]:", piEI_h[i])
     print("    ppi:", piEI_h[i].getppiGen())
-
 eH.cd()
+
 eH.write()
 eH.outFileClose()
 
@@ -212,6 +208,7 @@ dir = os.path.join(nuSIMPATH,r'Scratch/PionEventInstanceTst')
 dirExist = os.path.isdir(dir)
 if dirExist == False:
     os.mkdir(dir)
+
 
 '''
 #Plots from regular method using ppi

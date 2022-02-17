@@ -6,9 +6,12 @@
     "files":
     {
     "rootFile":"someFile.root",
-    "logFile":"normalisation.log"
+    "logFile":"normalisation",
+    "plotsDict":"101-Studies/pencilValidation/plotsPSnoMuDcy.dict"
     },
 
-    "runNumber": 110,
+    "study": "pencilValidation",
+
+    "runNumber": "runNumber",
     "nEvents":10000
 }
