@@ -553,7 +553,7 @@ if __name__ == "__main__" :
 
 
 # Get machine and run parameters
-    RndmGen = Rndm.RandomGenerator(rootInputFilename)
+    RndmGen = Rndm.RandomGenerator(rootInputFilename,'histP','histXPS')
     nuStrt = nuPrdStrt.nuSTORMPrdStrght(filename)
     psLength = nuStrt.ProdStrghtLen()
     nuTrLnCmplx = nuTrf.nuSTORMTrfLineCmplx(trfCmplxFile)
@@ -573,10 +573,10 @@ if __name__ == "__main__" :
 for event in range(nEvents):
 # set its values
     s = 0.0
-    xl, xpl = RndmGen.getRandom2D('histXPS')
-    yl, ypl = RndmGen.getRandom2D('histYPS')
+    xl, xpl = RndmGen.getRandom2D()
+    yl, ypl = RndmGen.getRandom2D()
     zl = -tlCmplxLength
-    pPion = RndmGen.getRandom('histP')
+    pPion = RndmGen.getRandom()
     pxl = pPion*xpl
     pyl = pPion*ypl
     pzl = np.sqrt(pPion*pPion - pxl**2 - pyl**2)
@@ -617,7 +617,6 @@ for event in range(nEvents):
         normInst.decayPiInPS()
 # decay the muons
         if (muDcyFlag): normInst.decayMuons()
-
 
 
 #  write to the root structure

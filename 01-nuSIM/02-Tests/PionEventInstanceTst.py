@@ -209,7 +209,6 @@ dirExist = os.path.isdir(dir)
 if dirExist == False:
     os.mkdir(dir)
 
-
 '''
 #Plots from regular method using ppi
 #-- Lifetime distribution:

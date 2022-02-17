@@ -408,13 +408,14 @@ class PionEventInstance:
 
     def glbltoTl(self, xg, yg, zg, pxg, pyg, pzg):
 
-        xl = xg - zg*math.sin(self._tlAngle)
-        yl = yg
-        zl = zg*math.cos(self._tlAngle)
 
-        pxl = pxg*math.cos(self._tlAngle) + pzg*math.sin(self._tlAngle)
+        xl = xg + zg*math.tan(self._tlAngle)
+        yl = yg
+        zl = zg/math.cos(self._tlAngle)
+
+        pxl = pxg*math.cos(self._tlAngle) - pzg*math.sin(self._tlAngle)
         pyl = pyg
-        pzl = pzg*math.cos(self._tlAngle) - pxg*math.sin(self._tlAngle)
+        pzl = pxg*math.sin(self._tlAngle) + pzg*math.cos(self._tlAngle)
 
         return xl, yl, zl, pxl, pyl, pzl
 
