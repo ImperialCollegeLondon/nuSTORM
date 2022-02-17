@@ -24,6 +24,7 @@ import nuSTORMPrdStrght as nuPrdStrt
 import nuSTORMTrfLineCmplx as nuTrfLineCmplx
 import particle as particle
 import eventHistory
+import RandomGenerator as Rndm
 import numpy as np
 import matplotlib.pyplot as plt
 import Simulation as Simu
@@ -39,7 +40,7 @@ nuTrLnCmplx = nuTrfLineCmplx.nuSTORMTrfLineCmplx(trfCmplxFile)
 ##! Start:
 print("========  PionEventInstance: tests start  ========")
 
-n_events = 10000
+n_events = 5000
 
 ##! Create instance, test built-in methods:
 PionEventInstanceTest = 1
@@ -145,9 +146,13 @@ for i in range(len(piEI)):
     eventNum = i
     p = nuStrt.GeneratePiMmtm(Ppion)
     x, y, xp, yp = nuStrt.GenerateTrans(s)
-    #pz = np.sqrt(p**2/(1+xp**2+yp**2))
-    px = xp*p   #pz
-    py = yp*p   #pz
+    ##Use the following 3 lines instead of the 2 above to create pion characteristics according to histogram distributions
+    #x, xp = RndmGen.getRandom2D()
+    #y, yp = RndmGen.getRandom2D()
+    #p  = RndmGen.getRandom()
+    pz = np.sqrt(p**2/(1+xp**2+yp**2))
+    px = xp*pz
+    py = yp*pz
     pz = np.sqrt(p**2-px**2-py**2)
     pi = particle.particle(runNum,eventNum,s_pi,x,y,z,px,py,pz,t,weight,pdg)
     eH.addParticle('target', pi)
@@ -156,6 +161,7 @@ for i in range(len(piEI)):
 for i in range(5):
     print("    piEI_h[i]:", piEI_h[i])
     print("    ppi:", piEI_h[i].getppiGen())
+eH.cd()
 
 eH.write()
 eH.outFileClose()
@@ -203,6 +209,8 @@ dirExist = os.path.isdir(dir)
 if dirExist == False:
     os.mkdir(dir)
 
+
+'''
 #Plots from regular method using ppi
 #-- Lifetime distribution:
 n, bins, patches = plt.hist(s, bins=50, color='y', log=True)
@@ -445,7 +453,7 @@ plt.title('Muon $\\cos(\\theta)$ distribution')
 #plt.show()
 plt.savefig('Scratch/PionEventInstanceTst/PionEventInstanceTst6_cosTheta.pdf')
 plt.close()
-
+'''
 ##! Complete:
 print()
 print("========  PionEventInstance: tests complete  ========")

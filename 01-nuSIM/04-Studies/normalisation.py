@@ -229,7 +229,9 @@ class normalisation:
       zd = tsc[3]
       xpd = tsc[4]
       ypd = tsc[5]
-      pPion = pi.getppiGen()
+      pi.getLifetime()
+      td = lifetime*1E9 + t
+      pPion =pi.getppiGen()
 #  need the lifetime in the nuStorm frame in ns
       piLifetime = pi.getLifetime()*1E9*Epion/(piMass)
       td = piLifetime + t
@@ -531,7 +533,8 @@ if __name__ == "__main__" :
     piMass = piCnst.mass()/1000.0
 
 # initialise run number, number of events to generate, central pion momentum, and event weight
-    pionMom = ctrlInst.EPi()
+    runNumber = 105
+    pionMom = 5.0
     crossSection = 50
     nEvents = ctrlInst.nEvents()
     eventWeight = crossSection
@@ -601,9 +604,8 @@ for event in range(nEvents):
       se = tlCmplxLength
       ze = 0.0
 # t = d/(beta*c)
-      Epion = math.sqrt(pPion**2 + piMass**2)
-      te = t + 1E9*se*Epion/(c*pPion)
-# x local is the same as before. 
+      te = t + 1E9*se*math.sqrt(pPion**2 + piMass**2)/(c*pPion)
+# x local is the same as before.
       pionPS = particle.particle(runNumber, event, se, xl, yl, ze, pxl, pyl, pzl, te, eventWeight, "pi+")
       eH.addParticle("productionStraight", pionPS)
 # decay beyond the end of the production straight
