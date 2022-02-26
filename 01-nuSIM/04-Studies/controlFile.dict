@@ -1,0 +1,14 @@
+{   "flags":
+    {
+    "tlFlag":"False", "psFlag":"True", "lstFlag":"False", "muDcyFlag":"False"
+    },
+
+    "files":
+    {
+    "rootFile":"someFile.root",
+    "logFile":"normalisation.log"
+    },
+
+    "runNumber": 110,
+    "nEvents":10000
+}

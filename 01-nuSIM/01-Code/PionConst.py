@@ -10,11 +10,11 @@ Class PionConst:
   Class attributes:
   -----------------
   __instance : Set on creation of first (and only) instance.
-      
+
   Instance attributes:
   --------------------
   None; all constants returned by "get" methods.
-    
+
   Methods:
   --------
   Built-in methods __new__, __repr__ and __str__.
@@ -32,7 +32,7 @@ Class PionConst:
       lifetime(): Lifetime (s)
       SoL()     : Speed of light (m/s)
       print()   : Dumps parameters
-  
+
 Created on Thu 25Mar2021; Version history:
 ----------------------------------------------
  1.0: 25Mar2021: First implementation - based on MuonConst.py
@@ -48,14 +48,14 @@ class PionConst(object):
         if cls.__instance is None:
             #print('PionConst.__new__: creating the PionConst object')
             cls.__instance = super(PionConst, cls).__new__(cls)
-            
+
 # Only constants; print values that will be used:
         #print("PionConst: version:", cls.CdVrsn(cls))
         #print("PionConst: PDG reference:", cls.PDGref(cls))
         #print("PionConst: mass (MeV):", cls.mass(cls))
         #print("PionConst: lifetime (s):", cls.lifetime(cls))
         #print("PionConst: speed of light:", cls.SoL(cls))
-            
+
         return cls.__instance
 
     def __repr__(self):
@@ -75,7 +75,7 @@ class PionConst(object):
 
     def pdgCode(self):
         return 211
-    
+
     def mass(self):
         return 139.57061
 
@@ -89,8 +89,7 @@ class PionConst(object):
     def print(self):
         print("PionConst: version:", self.CdVrsn())
         print("PionConst: PDG reference:", self.PDGref())
-        print("MuonConst: PDG code", self.pdgCode())
+        print("PionConst: PDG code", self.pdgCode())
         print("PionConst: mass (MeV):", self.mass())
         print("PionConst: lifetime (s):", self.lifetime())
         print("PionConst: speed of light (m/s):", self.SoL())
-        

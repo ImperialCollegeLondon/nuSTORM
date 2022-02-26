@@ -14,8 +14,34 @@ Class: eventHistory:
     @version     1.1
     @date        11 November 2021
 
+Methods:
+  --------
+  Built-in methods __init__, __repr__ and __str__.
+      __init__: Initialisation of
+      __repr__: One liner with call.
+      __str__ : Summary
+
+  Get/set methods:
+
+   	makeHistory()		: Create an empty structure (all pi+) to be filled by the user with add particle
+		getEntries()		: total number of entries in the root file (for reading)
+		readNext()			: read next entry in the root file
+		addParticle(location, par): add particle par at location to the history
+		findParticle(location, par): return particle par at location from the history
+
+  Generation, calcution methods and utilities:
+
+   	outFile(fileName)	: Name and open a file for output
+   	inFile(fileName)	: Name and open a file for input
+		readNext()			: read next entry in the root file
+		addParticle(location, par): add particle par at location to the history
+		findParticle(location, par): return particle par at location from the history
+
+
+
+
 Version 1.1										11/11/2021
-After writing out 
+After writing out
 
 Version 1.0										16/09/2021
 Initial version
@@ -275,7 +301,7 @@ class eventHistory:
 		self._outputFilename = fileName
 		self._outTFile = TFile( self._outputFilename, 'RECREATE', 'event History' )
 
-#  Name and open a file for input 
+#  Name and open a file for input
 	def inFile(self, fileName ):
 		self._inputFilename = fileName
 		self._inTFile = TFile( self._inputFilename, 'READ', 'event History' )
@@ -326,38 +352,38 @@ class eventHistory:
 
 		self._eHTree.GetEntry(self._entryPnt)
 
-		pTar = particle.particle(self.target.runNumber, self.target.eventNumber, self.target.s, 
-			self.target.x, self.target.y, self.target.z, self.target.px, self.target.py, self.target.pz, 
+		pTar = particle.particle(self.target.runNumber, self.target.eventNumber, self.target.s,
+			self.target.x, self.target.y, self.target.z, self.target.px, self.target.py, self.target.pz,
 			self.target.t, self.target.eventWeight, self.target.pdgCode)
-		pPs = particle.particle(self.productionStraight.runNumber, self.productionStraight.eventNumber, self.productionStraight.s, 
-			self.productionStraight.x, self.productionStraight.y, self.productionStraight.z, self.productionStraight.px, self.productionStraight.py, 
+		pPs = particle.particle(self.productionStraight.runNumber, self.productionStraight.eventNumber, self.productionStraight.s,
+			self.productionStraight.x, self.productionStraight.y, self.productionStraight.z, self.productionStraight.px, self.productionStraight.py,
 			self.productionStraight.pz, self.productionStraight.t, self.productionStraight.eventWeight, self.productionStraight.pdgCode)
-		pPiDcy = particle.particle(self.pionDecay.runNumber, self.pionDecay.eventNumber, self.pionDecay.s, 
-			self.pionDecay.x, self.pionDecay.y, self.pionDecay.z, self.pionDecay.px, self.pionDecay.py, self.pionDecay.pz, 
+		pPiDcy = particle.particle(self.pionDecay.runNumber, self.pionDecay.eventNumber, self.pionDecay.s,
+			self.pionDecay.x, self.pionDecay.y, self.pionDecay.z, self.pionDecay.px, self.pionDecay.py, self.pionDecay.pz,
 			self.pionDecay.t, self.pionDecay.eventWeight, self.pionDecay.pdgCode)
-		pMuPrd = particle.particle(self.muonProduction.runNumber, self.muonProduction.eventNumber, self.muonProduction.s, 
-			self.muonProduction.x, self.muonProduction.y, self.muonProduction.z, self.muonProduction.px, self.muonProduction.py, self.muonProduction.pz, 
+		pMuPrd = particle.particle(self.muonProduction.runNumber, self.muonProduction.eventNumber, self.muonProduction.s,
+			self.muonProduction.x, self.muonProduction.y, self.muonProduction.z, self.muonProduction.px, self.muonProduction.py, self.muonProduction.pz,
 			self.muonProduction.t, self.muonProduction.eventWeight, self.muonProduction.pdgCode)
-		pFlsNu = particle.particle(self.piFlashProd.runNumber, self.piFlashProd.eventNumber, self.piFlashProd.s, 
-			self.piFlashProd.x, self.piFlashProd.y, self.piFlashProd.z, self.piFlashProd.px, self.piFlashProd.py, self.piFlashProd.pz, 
+		pFlsNu = particle.particle(self.piFlashProd.runNumber, self.piFlashProd.eventNumber, self.piFlashProd.s,
+			self.piFlashProd.x, self.piFlashProd.y, self.piFlashProd.z, self.piFlashProd.px, self.piFlashProd.py, self.piFlashProd.pz,
 			self.piFlashProd.t, self.piFlashProd.eventWeight, self.piFlashProd.pdgCode)
-		pMuDcy = particle.particle(self.muonDecay.runNumber, self.muonDecay.eventNumber, self.muonDecay.s, 
-			self.muonDecay.x, self.muonDecay.y, self.muonDecay.z, self.muonDecay.px, self.muonDecay.py, self.muonDecay.pz, 
+		pMuDcy = particle.particle(self.muonDecay.runNumber, self.muonDecay.eventNumber, self.muonDecay.s,
+			self.muonDecay.x, self.muonDecay.y, self.muonDecay.z, self.muonDecay.px, self.muonDecay.py, self.muonDecay.pz,
 			self.muonDecay.t, self.muonDecay.eventWeight, self.muonDecay.pdgCode)
-		pEPrd = particle.particle(self.eProduction.runNumber, self.eProduction.eventNumber, self.eProduction.s, 
-			self.eProduction.x, self.eProduction.y, self.eProduction.z, self.eProduction.px, self.eProduction.py, self.eProduction.pz, 
+		pEPrd = particle.particle(self.eProduction.runNumber, self.eProduction.eventNumber, self.eProduction.s,
+			self.eProduction.x, self.eProduction.y, self.eProduction.z, self.eProduction.px, self.eProduction.py, self.eProduction.pz,
 			self.eProduction.t, self.eProduction.eventWeight, self.eProduction.pdgCode)
-		pNumuPrd = particle.particle(self.numuProduction.runNumber, self.numuProduction.eventNumber, self.numuProduction.s, 
-			self.numuProduction.x, self.numuProduction.y, self.numuProduction.z, self.numuProduction.px, self.numuProduction.py, self.numuProduction.pz, 
+		pNumuPrd = particle.particle(self.numuProduction.runNumber, self.numuProduction.eventNumber, self.numuProduction.s,
+			self.numuProduction.x, self.numuProduction.y, self.numuProduction.z, self.numuProduction.px, self.numuProduction.py, self.numuProduction.pz,
 			self.numuProduction.t, self.numuProduction.eventWeight, self.numuProduction.pdgCode)
-		pNuePrd = particle.particle(self.numuProduction.runNumber, self.numuProduction.eventNumber, self.nueProduction.s, 
-			self.nueProduction.x, self.nueProduction.y, self.nueProduction.z, self.nueProduction.px, self.nueProduction.py, self.nueProduction.pz, 
+		pNuePrd = particle.particle(self.numuProduction.runNumber, self.numuProduction.eventNumber, self.nueProduction.s,
+			self.nueProduction.x, self.nueProduction.y, self.nueProduction.z, self.nueProduction.px, self.nueProduction.py, self.nueProduction.pz,
 			self.nueProduction.t, self.nueProduction.eventWeight, self.nueProduction.pdgCode)
-		pNumuDet = particle.particle(self.numuDetector.runNumber, self.numuDetector.eventNumber, self.numuDetector.s, 
-			self.numuDetector.x, self.numuDetector.y, self.numuDetector.z, self.numuDetector.px, self.numuDetector.py, self.numuDetector.pz, 
+		pNumuDet = particle.particle(self.numuDetector.runNumber, self.numuDetector.eventNumber, self.numuDetector.s,
+			self.numuDetector.x, self.numuDetector.y, self.numuDetector.z, self.numuDetector.px, self.numuDetector.py, self.numuDetector.pz,
 			self.numuDetector.t, self.numuDetector.eventWeight, self.numuDetector.pdgCode)
-		pNueDet = particle.particle(self.nueDetector.runNumber, self.nueDetector.eventNumber, self.nueDetector.s, 
-			self.nueDetector.x, self.nueDetector.y, self.nueDetector.z, self.nueDetector.px, self.nueDetector.py, self.nueDetector.pz, 
+		pNueDet = particle.particle(self.nueDetector.runNumber, self.nueDetector.eventNumber, self.nueDetector.s,
+			self.nueDetector.x, self.nueDetector.y, self.nueDetector.z, self.nueDetector.px, self.nueDetector.py, self.nueDetector.pz,
 			self.nueDetector.t, self.nueDetector.eventWeight, self.nueDetector.pdgCode)
 
 		self.addParticle('target', pTar)
@@ -585,6 +611,10 @@ class eventHistory:
 	def write(self):
 		self.evTree.Write()
 
+#  Write the root structure out to the file
+	def cd(self):
+		self._outTFile.cd()
+
 #  add particles to the history
 	def addParticle(self, location, par):
 		if location == "target":
@@ -656,4 +686,3 @@ class eventHistory:
 		print("nue Production ", self._particles[8])
 		print("numu at Detector ", self._particles[9])
 		print("nue at Detector ", self._particles[10])
-

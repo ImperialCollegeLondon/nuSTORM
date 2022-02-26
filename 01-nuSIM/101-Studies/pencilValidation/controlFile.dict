@@ -1,0 +1,17 @@
+{   "flags":
+    {
+    "tlFlag":"False", "psFlag":"True", "lstFlag":"False", "muDcyFlag":"False"
+    },
+
+    "files":
+    {
+    "rootFile":"someFile.root",
+    "logFile":"normalisation",
+    "plotsDict":"101-Studies/pencilValidation/plotsPSnoMuDcy.dict"
+    },
+
+    "study": "pencilValidation",
+
+    "runNumber": "runNumber",
+    "nEvents":10000
+}
