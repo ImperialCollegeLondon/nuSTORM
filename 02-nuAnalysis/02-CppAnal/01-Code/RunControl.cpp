@@ -1,8 +1,9 @@
 /*  Run control class implementation file */
 
-#include <cstdlib>
 #include <iostream>
 #include <fstream>
+
+#include <cstdlib>
 #include <string.h>
 #include "sys/stat.h"
 

@@ -1,7 +1,8 @@
 /*    nuAnalysis class implementation file */
 
 #include <iostream>
-#include <filesystem>
+#include<dirent.h>
+
 #include <vector>
 
 #include "TChain.h"
@@ -40,13 +41,30 @@ nuAnalysis::nuAnalysis(bool Dbg) {
   runInfo_ch = new TChain("runInfo");
   beam_ch    = new TChain("beam");
   flux_ch    = new TChain("flux");
+
+  // Process files in directory with "chain":
   if ( RC->getChainFlag() ){
-    for ( const auto & entry :
-	    std::filesystem::directory_iterator(RC->getCHAINdirname()) ){
-      runInfo_ch->AddFile(entry.path().c_str());
-      beam_ch->AddFile(entry.path().c_str());
-      flux_ch->AddFile(entry.path().c_str());
+    struct dirent *d;
+    DIR *dr;
+    std::string ChnDir = RC->getCHAINdirname().c_str();
+    char *c = const_cast<char*>(ChnDir.c_str());
+    dr = opendir(c);
+    std::cout << "           Setting up to process files in: "
+	      << RC->getCHAINdirname() << std::endl;
+    std::cout << "               ----> Directory open: " << c << std::endl;
+
+    std::string FilePath;
+    for ( d=readdir(dr) ; d!=NULL ; d=readdir(dr) ){
+      if ( strcmp(d->d_name, ".") != 0 && strcmp(d->d_name, "..") != 0 ){
+	FilePath = RC->getCHAINdirname() + "/" + d->d_name;
+	std::cout << "                     ----> Path: " << FilePath << std::endl;
+	runInfo_ch->AddFile(FilePath.c_str());
+	beam_ch->AddFile(FilePath.c_str());
+	flux_ch->AddFile(FilePath.c_str());
+      }
     }
+    closedir(dr);
+    std::cout << "               <---- Directory closed: " << c << std::endl;
   }
   if ( RC->getFileFlag() ){
     runInfo_ch->AddFile(RC->getROOTfilename().c_str());

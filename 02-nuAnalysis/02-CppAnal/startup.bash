@@ -1,4 +1,3 @@
-ps
 #!/bin/bash
 
 stm=$PWD
