@@ -3,3 +3,4 @@
 02-nuAnalysis/02-CppAnal/*.root
 02-nuAnalysis/02-CppAnal/*.png
 02-nuAnalysis/02-CppAnal/compile-output*
+02-nuAnalysis/02-CppAnal/31-data/normalisation400.root
