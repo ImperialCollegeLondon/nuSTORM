@@ -203,7 +203,7 @@ Double_t nuAnalysis::numuErest(Double_t *xin, Double_t *par) {
   return y;
 }
 
-TLorentzVector nuAnalysis::DetectorHitPosition(TLorentzVector Xin, TLorentzVector Pin, Double_t zPosDet) {
+TLorentzVector nuAnalysis::DetectorHitPosition(TLorentzVector Xin, TLorentzVector Pin, Double_t t0, Double_t zPosDet) {
   TLorentzVector Xout;
   Double_t deltaZ;
   Double_t ds;
@@ -212,7 +212,7 @@ TLorentzVector nuAnalysis::DetectorHitPosition(TLorentzVector Xin, TLorentzVecto
   Xout.SetY(Xin.Y() + Pin.Py()*deltaZ/Pin.Pz());
   Xout.SetZ(zPosDet);
   ds = sqrt(pow((Xin.X()-Xout.X()),2)+pow((Xin.Y()-Xout.Y()),2)+pow((Xin.Z()-Xout.Z()),2));
-  Xout.SetT(Xin.T() + ds*0.299792458);
+  Xout.SetT(Xin.T() + ds/0.299792458 + t0);
   return Xout;
 }
 
@@ -388,54 +388,79 @@ void nuSIMtstRestFrame::EventLoop( bool Dbg ) {
 
     //if ( nuAnalysis::getDebug() and i<10) {
     if (nuePrdctn[11] > 0.) {
+
+      Xnue.SetXYZT(nuePrdctn[3],nuePrdctn[4],nuePrdctn[5],nuePrdctn[10]);
+      Xnumu.SetXYZT(numuPrdctn[3],numuPrdctn[4],numuPrdctn[5],numuPrdctn[10]);
+
+      XnueDet = nuAnalysis::DetectorHitPosition(Xnue,Pnue,trgt[10],230.);
+      XnumuDet = nuAnalysis::DetectorHitPosition(Xnumu,Pnumu,trgt[10],230.);
+
       if ( nuAnalysis::getDebug() && (count_nu++ < 10)) {
+
         std::cout << "          ----> Run:   " << nuePrdctn[0] << std::endl;
         std::cout << "          ----> Event: " << i << std::endl;
         std::cout << "          ----> Weight:   " << nuePrdctn[11] << std::endl;
+
         std::cout << "              ----> Nue.P: ";
         for(int ii=7;ii<10;ii++){
 	         std::cout << nuePrdctn[ii] << ", ";
          }
          std::cout << std::endl;
+
          std::cout << "              ----> NuMu.P: ";
          for(int ii=7;ii<10;ii++){
 	          std::cout << numuPrdctn[ii] << ", ";
          }
          std::cout << std::endl;
+
          std::cout << "              ----> muon.P: ";
          for(int ii=7;ii<10;ii++){
 	          std::cout << muPrdctn[ii] << ", ";
          }
          std::cout << std::endl;
+
          std::cout << "                  ----> Mass of muon check: "<< Mmu << std::endl;
+
          std::cout <<"                  ----> Setting up boost parameters check: "<< std::endl;
          std::cout << "                      Boost vector: ";
          for(int ii=0;ii<3;ii++){
 	          std::cout << b[ii] << ", ";
          }
          std::cout << std::endl;
+
          std::cout <<"                  ----> Muon 4-mmtm in rest frame check: ";
          for(int ii=0;ii<4;ii++){
 	          std::cout << PmuRest[ii] << ", ";
          }
          std::cout << std::endl;
+
          std::cout <<"                  ----> NuMu 4-mmtm in rest frame check: ";
          for(int ii=0;ii<4;ii++){
 	          std::cout << PnumuRest[ii] << ", ";
          }
          std::cout << std::endl;
+
          std::cout <<"                  ----> NuE 4-mmtm in rest frame check: ";
          for(int ii=0;ii<4;ii++){
 	          std::cout << PnueRest[ii] << ", ";
          }
          std::cout << std::endl;
+
+         // TODO: Also print out XnueDet and XnumuDet and compare with Pauls entries (tree->Show(eventNum))
+         //       like I did on Friday with the momentum
+
+         std::cout << "              ----> NuE.X @ DetectorPlane: ";
+         for (int iii = 0; iii<4; iii++){
+           std::cout<<XnueDet[iii]<<", ";
+         }
+         std::cout<<std::endl;
+
+         std::cout << "              ----> NuMu.X @ DetectorPlane: ";
+         for (int iii = 0; iii<4; iii++){
+           std::cout<<XnumuDet[iii]<<", ";
+         }
+         std::cout<<std::endl;
       }
-
-      Xnue.SetXYZT(nuePrdctn[3],nuePrdctn[4],nuePrdctn[5],nuePrdctn[10]);
-      Xnumu.SetXYZT(numuPrdctn[3],numuPrdctn[4],numuPrdctn[5],numuPrdctn[10]);
-
-      XnueDet = nuAnalysis::DetectorHitPosition(Xnue,Pnue,230.);
-      XnumuDet = nuAnalysis::DetectorHitPosition(Xnumu,Pnumu,230.);
 
       hnueDetHit->Fill(XnueDet.X(),XnueDet.Y());
       hnumuDetHit->Fill(XnumuDet.X(),XnumuDet.Y());
@@ -534,61 +559,53 @@ void nuSIMtstRestFrame::PostEventLoop( bool Dbg ) {
   std::string PltFile = RC->getOUTPUTdirname() + "hmumass.png";
   hmumass->Draw();
   std::cout<<"    ----> Last bin with an entry in hmumass: "<<hmumass->FindLastBinAbove()<<std::endl;
-  //fnueErest->Draw("SAME");
   c->Print(PltFile.c_str());
 
   PltFile = RC->getOUTPUTdirname() + "hnueErest.png";
   hnueErest->Draw();
   std::cout<<"    ----> Last bin with an entry in hnueErest: "<<hnueErest->FindLastBinAbove()<<std::endl;
-  //fnueErest->Draw("SAME");
+  fnueErest->Draw("SAME");
   c->Print(PltFile.c_str());
 
   PltFile = RC->getOUTPUTdirname() + "hnumuErest.png";
   hnumuErest->Draw();
   std::cout<<"    ----> Last bin with an entry in hnumuErest: "<<hnumuErest->FindLastBinAbove()<<std::endl;
-  //fnumuErest->Draw("SAME");
+  fnumuErest->Draw("SAME");
   c->Print(PltFile.c_str());
 
   PltFile = RC->getOUTPUTdirname() + "hmuE.png";
   hmuE->Draw();
   std::cout<<"    ----> Last bin with an entry in hmuE: "<<hmuE->FindLastBinAbove()<<std::endl;
-  //fnueErest->Draw("SAME");
   c->Print(PltFile.c_str());
 
   PltFile = RC->getOUTPUTdirname() + "hnueE.png";
   hnueE->Draw();
   std::cout<<"    ----> Last bin with an entry in hnueE: "<<hnueE->FindLastBinAbove()<<std::endl;
-  //fnueErest->Draw("SAME");
   c->Print(PltFile.c_str());
 
   PltFile = RC->getOUTPUTdirname() + "hnumuE.png";
   hnumuE->Draw();
   std::cout<<"    ----> Last bin with an entry in hnumuE: "<<hnumuE->FindLastBinAbove()<<std::endl;
-  //fnueErest->Draw("SAME");
   c->Print(PltFile.c_str());
 
   PltFile = RC->getOUTPUTdirname() + "hpiE.png";
   hpiE->Draw();
   std::cout<<"    ----> Last bin with an entry in hpiE: "<<hpiE->FindLastBinAbove()<<std::endl;
-  //fnueErest->Draw("SAME");
   c->Print(PltFile.c_str());
 
   PltFile = RC->getOUTPUTdirname() + "hpimass.png";
   hpimass->Draw();
   std::cout<<"    ----> Last bin with an entry in hpimass: "<<hpimass->FindLastBinAbove()<<std::endl;
-  //fnueErest->Draw("SAME");
   c->Print(PltFile.c_str());
 
   PltFile = RC->getOUTPUTdirname() + "hnueDetHit.png";
   hnueDetHit->Draw();
   //std::cout<<"    ----> Last bin with an entry in hnueDetHit: "<<hnueDetHit->FindLastBinAbove()<<std::endl;
-  //fnueErest->Draw("SAME");
   c->Print(PltFile.c_str());
 
   PltFile = RC->getOUTPUTdirname() + "hnumuDetHit.png";
   hnumuDetHit->Draw();
   //std::cout<<"    ----> Last bin with an entry in hnumuDetHit: "<<hnumuDetHit->FindLastBinAbove()<<std::endl;
-  //fnueErest->Draw("SAME");
   c->Print(PltFile.c_str());
 
   if ( nuAnalysis::getDebug() ) {

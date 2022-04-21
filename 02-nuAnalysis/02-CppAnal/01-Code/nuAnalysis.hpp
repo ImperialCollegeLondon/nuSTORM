@@ -3,6 +3,7 @@
 #include "TChain.h"
 #include "TH1.h"
 #include "TH2.h"
+#include "TGraph.h"
 #include "TLorentzVector.h"
 
 class nuAnalysis {
@@ -20,6 +21,7 @@ public:
   std::vector<TH1F*> TH1Flist;
   std::vector<TH2F*> TH2Flist;
   std::vector<TF1*>  TF1list;
+  std::vector<TGraph*> TGlist;
 
   nuAnalysis( bool Dbg=true );
 
@@ -51,7 +53,7 @@ public:
 
   static Double_t  nueErest(Double_t *xin, Double_t *par);
   static Double_t numuErest(Double_t *xin, Double_t *par);
-  TLorentzVector DetectorHitPosition(TLorentzVector Xin, TLorentzVector Pin, Double_t zPos);
+  TLorentzVector DetectorHitPosition(TLorentzVector Xin, TLorentzVector Pin, Double_t t0, Double_t zPos);
 
 };
 

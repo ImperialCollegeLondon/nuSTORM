@@ -3,6 +3,8 @@
 #include <iostream>
 #include <vector>
 
+// #include <all other packages that you need>
+
 #include "RunControl.hpp"
 #include "nuAnalysis.hpp"
 
@@ -16,16 +18,16 @@ nuSIMUserAnal::nuSIMUserAnal(bool Dbg) {
 }
 
 void nuSIMUserAnal::PreEventLoop( bool Dbg ) {
-  
+
   if ( nuAnalysis::getDebug() ) {
     std::cout << " ----> nuSIMUserAnal: Pre-event loop method entered:"
 	      << std::endl;
   }
-    
+
   if ( nuAnalysis::getDebug() ) {
     std::cout << " <---- Leaving Pre-event loop method." << std::endl;
   }
-    
+
 }
 
 void nuSIMUserAnal::EventLoop( bool Dbg ) {
@@ -35,24 +37,24 @@ void nuSIMUserAnal::EventLoop( bool Dbg ) {
   }
 
   // Loop over neutrinos in flux ntuple:
-  int nEvt = nuAnalysis::getbeam_ch()->GetEntries();
+  int nEvt = nuAnalysis::geteventHist_ch()->GetEntries();
   if ( nuAnalysis::getDebug() ) {
-    std::cout << "     ----> Beam ntuple has "
+    std::cout << "     ----> eventHistory ntuple has "
 	      << nEvt << " entries" << std::endl;
   }
-    
+
   for (int i=0 ; i<nEvt ; i++) {
-    nuAnalysis::getbeam_ch()->GetEntry(i);
+    nuAnalysis::geteventHist_ch()->GetEntry(i);
     if ( nuAnalysis::getDebug() and i<10) {
       std::cout << "          ----> Event: " << i << std::endl;
     }
-    
+
   }
-  
+
   if ( nuAnalysis::getDebug() ) {
     std::cout << " <---- Leaving event loop method." << std::endl;
   }
- 
+
 }
 
 void nuSIMUserAnal::PostEventLoop( bool Dbg ) {
@@ -62,11 +64,11 @@ void nuSIMUserAnal::PostEventLoop( bool Dbg ) {
 	      << std::endl;
   }
   RunControl* RC = RunControl::getInstance();
-  
+
   if ( nuAnalysis::getDebug() ) {
     std::cout << " <---- Leaving post event loop method." << std::endl;
   }
- 
+
 }
 
 int main(int nArgs, char **ArgV){
