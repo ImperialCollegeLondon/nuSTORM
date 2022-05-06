@@ -8,12 +8,12 @@ Class control:
 
   Class attributes:
 
-  
-      
+
+
   Instance attributes:
   --------------------
- 
-    
+
+
   Methods:
   --------
   Built-in methods __new__, __repr__ and __str__.
@@ -22,7 +22,7 @@ Class control:
       __str__  : Dump the conditions
 
   Get/set methods:
-  
+
   General methods:
 
 Version history:
@@ -34,6 +34,7 @@ Version history:
 """
 
 import math, sys
+import os
 import json
 import numpy as np
 from copy import deepcopy
@@ -41,10 +42,10 @@ import traceSpace
 import MuonConst as mC
 import PionConst as piC
 
-    
+
 class control:
     __Debug  = False
-    
+
 #--------  "Built-in methods":
 
     def __init__(self, controlFile):
@@ -75,28 +76,35 @@ class control:
     def lstFlag(self):
         return (self._controlInfo["flags"]["lstFlag"] == "True")
 
-# Process muon decays 
+# Process muon decays
     def muDcyFlag(self):
         return (self._controlInfo["flags"]["muDcyFlag"] == "True")
 
 # Process muons outside the acceptance but in the production straight
     def PSMuons(self):
         return (self._controlInfo["flags"]["PSMuons"] == "True")
-
+# Process muons that decay in the ring - after the overlap with the pions in the PS
     def ringMuons(self):
         return (self._controlInfo["flags"]["ringMuons"] == "True")
-
-
+# Generate pencil beam at target
+    def pencilBeam(self):
+        return (self._controlInfo["flags"]["pencilBeam"] == "True")
+# All pions start at t=0
+    def tEqualsZero(self):
+        return (self._controlInfo["flags"]["tEqualsZero"] == "True")
 # Track the flash neutrinos to the detector
     def flashAtDetector(self):
         return (self._controlInfo["flags"]["flashAtDetector"] == "True")
 
-# run number 
+# run number
     def runNumber(self, inc=False):
 
     # run number is read from a file, it is in the studies directory a sub directory given by the study name and
     # a fileName given by the runNumber key word in the dictionary
-        rNFile = "101-studies/" + self._controlInfo['study'] + "/" +self._controlInfo['runNumber']
+    #    rNFile = "102-studies/" + self._controlInfo['study'] + "/" +self._controlInfo['runNumber']
+        sDir =os.environ['StudyDir']
+#        rNFile = "102-studies/" + self._controlInfo['study'] + "/" +self._controlInfo['runNumber']
+        rNFile = sDir  + "/" +self._controlInfo['runNumber']
         rN = open(rNFile, "r")
         runNumber = int(rN.readline())
         rN.close()
@@ -111,13 +119,19 @@ class control:
     def nEvents(self):
         return self._controlInfo["nEvents"]
 
+# print limit
+    def printLimit(self):
+        return self._controlInfo["printLimit"]
+
+
 # Pion energy
     def EPi(self):
         return self._controlInfo["EPi"]
 
 #logFile name
     def logFile(self):
-        return "101-studies/" + self._controlInfo['study'] + "/"+ self._controlInfo["files"]["logFile"] + str(self.runNumber()) + ".log"
+        sDir =os.environ['StudyDir']
+        return sDir + "/" + self._controlInfo['study'] + "/"+ self._controlInfo["files"]["logFile"] + str(self.runNumber()) + ".log"
 
 #plots dictionary file name
     def plotsDict(self):

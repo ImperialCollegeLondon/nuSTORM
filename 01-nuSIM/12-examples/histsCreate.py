@@ -26,9 +26,9 @@ class histsCreate():
         self._count = 0
         self._targetWeight = 0
         self._targetNoWeight = 0
-        self._NZWeight = {"target":0, "productionStraight": 0, "pionDecay": 0, "muonProduction": 0,"piFlashNu": 0,
+        self._NZWeight = {"target":0, "productionStraight": 0, "prodStraightEnd": 0, "pionDecay": 0, "muonProduction": 0,"piFlashNu": 0,
                 "muonDecay": 0, "eProduction": 0, "numuProduction":0, "nueProduction": 0, "numuDetector": 0, "nueDetector": 0}
-        self._zeroWeight = {"target":0, "productionStraight": 0, "pionDecay": 0, "muonProduction": 0,"piFlashNu": 0,
+        self._zeroWeight = {"target":0, "productionStraight": 0, "prodStraightEnd": 0, "pionDecay": 0, "muonProduction": 0,"piFlashNu": 0,
                 "muonDecay": 0, "eProduction": 0, "numuProduction":0, "nueProduction": 0, "numuDetector": 0, "nueDetector": 0}
 
 #  read in the dictionaries
@@ -165,7 +165,7 @@ class histsCreate():
 
 
 
-    def summary(self):
+    def summary(self, fileName):
 
         texHline = "\\hline\n"
         slash = "\\"
@@ -173,8 +173,9 @@ class histsCreate():
         print (self._zeroWeight)
         print (self._NZWeight)
 #  Outout the information as a latex table
-        sumDir = Path.cwd()
-        sumFile = str(Path.cwd())+"/summary.tex"
+#        sumDir = Path.cwd()
+#        sumFile = str(Path.cwd())+"/summary.tex"
+        sumFile = fileName
         print (sumFile)
         f = open(sumFile, "w")
         f.write("\\begin{tabular}{|  l | l | l  | p{9.0cm} | }\n" )
@@ -183,6 +184,7 @@ class histsCreate():
         f.write(texHline )
         f.write("target                   & " + str(self._zeroWeight['target']) + " & " + str(self._NZWeight['target']) + " &\\\\ \n")
         f.write("productionStraight       & " + str(self._zeroWeight['productionStraight']) + " & " + str(self._NZWeight['productionStraight']) + " &\\\\ \n")
+        f.write("prodStraightEnd          & " + str(self._zeroWeight['prodStraightEnd']) + " & " + str(self._NZWeight['prodStraightEnd']) + " &\\\\ \n")
         f.write("pionDecay                & " + str(self._zeroWeight['pionDecay']) + " & " + str(self._NZWeight['pionDecay']) + " &\\\\ \n")
         f.write("muonProduction           & " + str(self._zeroWeight['muonProduction']) + " & " + str(self._NZWeight['muonProduction']) + " &\\\\ \n")
         f.write("piFlashNu                & " + str(self._zeroWeight['piFlashNu']) + " & " + str(self._NZWeight['piFlashNu']) + " &\\\\ \n")

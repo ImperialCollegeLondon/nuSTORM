@@ -1,0 +1,77 @@
+{
+    "xLower": 
+        {"target":-50.0, "productionStraight":-1.0, "prodStraightEnd":-1.0, "pionDecay":-1.0, "muonProduction":-1.0,"piFlashNu":-2.0,
+        "muonDecay":-1.0, "eProduction":-1.0, "numuProduction":-0.5, "nueProduction":-1.0, "numuDetector":-25.0, "nueDetector":-25.0},
+    "xHigher":
+        {"target": 100.0, "productionStraight": 1.0, "prodStraightEnd":1.0, "pionDecay": 1.0, "muonProduction": 1.0,"piFlashNu": 18.0,
+        "muonDecay": 1.0, "eProduction": 1.0, "numuProduction":0.5, "nueProduction": 1.0, "numuDetector": 24.5, "nueDetector": 24.5},
+
+    "yLower":
+        {"target":-0.5, "productionStraight":-1.0, "prodStraightEnd":-1.0, "pionDecay":-1.0, "muonProduction":-1.0,"piFlashNu":-1.0,
+        "muonDecay": -1.0, "eProduction":-1.0, "numuProduction":-0.3, "nueProduction":-1.0, "numuDetector":-25.0, "nueDetector":-10.0},
+    "yHigher":
+        {"target":0.5, "productionStraight": 1.0, "prodStraightEnd":1.0, "pionDecay": 1.0, "muonProduction": 1.0,"piFlashNu": 1.0,
+        "muonDecay": 1.0, "eProduction": 1.0, "numuProduction":0.3, "nueProduction": 1.0, "numuDetector": 24.5, "nueDetector": 10.0},
+
+    "zLower":
+        {"target": -60.0, "productionStraight": 0.0, "prodStraightEnd":0.0, "pionDecay": 0.0, "muonProduction": -20.0,"piFlashNu": 0.0,
+        "muonDecay": -100.0, "eProduction": -100.0, "numuProduction": -100.0, "nueProduction": -100.0, "numuDetector": 0.0, "nueDetector":-1.0},
+    "zHigher":
+        {"target":0.0, "productionStraight": 100.0, "prodStraightEnd":100.0, "pionDecay": 300.0, "muonProduction": 280.0,"piFlashNu": 200.0,
+            "muonDecay": 400.0, "eProduction": 400.0, "numuProduction": 400.0, "nueProduction": 400.0, "numuDetector": 500.0, "nueDetector": 500.0},
+
+    "sLower":
+        {"target":-1.0, "productionStraight": 0.0, "prodStraightEnd":0.0, "pionDecay": 0.0, "muonProduction": -1.0,"piFlashNu": 0.0,
+        "muonDecay": 0.0, "eProduction": 0.0, "numuProduction":0.0, "nueProduction": 0.0, "numuDetector": 0.0, "nueDetector": 0.0},
+    "sHigher":
+        {"target":400.0, "productionStraight": 100.0, "prodStraightEnd":100.0, "pionDecay": 300.0, "muonProduction": 400.0,"piFlashNu": 250.0,
+        "muonDecay": 60000.0, "eProduction": 60000.0, "numuProduction":40000.0, "nueProduction": 40000.0,"numuDetector": 500.0, "nueDetector": 80000.0},
+        
+    "tBunchLower":
+        {"target": 0.0, "productionStraight": 190.0, "prodStraightEnd":190.0, "pionDecay": 0.0, "muonProduction": 0.0,"piFlashNu": 0.0,
+        "muonDecay": 0.0, "eProduction": 0.0, "numuProduction":0, "nueProduction": 0.0, "numuDetector": 0.0, "nueDetector": 0.0},
+    "tBunchHigher":
+        {"target": 500.0, "productionStraight": 390.0, "prodStraightEnd":390.0, "pionDecay": 1000.0, "muonProduction": 500.0,"piFlashNu": 1000.0,
+        "muonDecay": 60000.0, "eProduction": 60000.0, "numuProduction": 60000.0, "nueProduction": 60000.0, "numuDetector": 20000.0,"nueDetector": 60000.0},
+
+    "TOFLower":
+        {"target": 0.0, "productionStraight": 190.0, "prodStraightEnd":190.0, "pionDecay": 0.0, "muonProduction": 0.0,"piFlashNu": 0.0,
+        "muonDecay": 0.0, "eProduction": 0.0, "numuProduction":0, "nueProduction": 0.0, "numuDetector": 0.0, "nueDetector": 0.0},
+    "TOFHigher":
+        {"target": 500.0, "productionStraight": 390.0, "prodStraightEnd":390.0, "pionDecay": 1000.0, "muonProduction": 500.0,"piFlashNu": 1000.0,
+        "muonDecay": 60000.0, "eProduction": 60000.0, "numuProduction": 60000.0, "nueProduction": 60000.0, "numuDetector": 20000.0,"nueDetector": 60000.0},
+
+    "pxLower":
+        {"target":0.0, "productionStraight":-0.2, "prodStraightEnd":-0.2, "pionDecay":-1.0, "muonProduction":-1.0,"piFlashNu":-10.0,
+        "muonDecay":-1.0, "eProduction":-1.0, "numuProduction":-0.5, "nueProduction":-1.0, "numuDetector":-2.0, "nueDetector":-10.0},
+    "pxHigher":
+        {"target": 1.0, "productionStraight": 0.2, "prodStraightEnd":0.2, "pionDecay": 1.0, "muonProduction": 1.0,"piFlashNu": -20.0,
+        "muonDecay": 1.0, "eProduction": 1.0, "numuProduction":0.5, "nueProduction": 1.0, "numuDetector": 2.0, "nueDetector": 10.0},
+
+    "pyLower":
+        {"target":-0.2, "productionStraight":-0.2, "prodStraightEnd":-0.2, "pionDecay":-1.0, "muonProduction":-1.0,"piFlashNu": 20.0,
+        "muonDecay":-1.0, "eProduction":-1.0, "numuProduction":-0.5, "nueProduction":-1.0, "numuDetector":-2.0, "nueDetector":-10.0},
+    "pyHigher":
+        {"target": 0.2, "productionStraight": 0.2, "prodStraightEnd":0.2, "pionDecay": 1.0, "muonProduction": 1.0,"piFlashNu": 1.0,
+        "muonDecay": 1.0, "eProduction": 1.0, "numuProduction":0.5, "nueProduction": 1.0, "numuDetector": 2.0, "nueDetector": 10.0},
+
+    "pzLower":
+        {"target": 4.0, "productionStraight": 4.0, "prodStraightEnd":2.0, "pionDecay":4.0, "muonProduction": 0.0,"piFlashNu":-1.0,
+        "muonDecay":-1.0, "eProduction":-6.0, "numuProduction":-6.0, "nueProduction":-6.0, "numuDetector":0.0, "nueDetector":-10.0},
+    "pzHigher":
+        {"target": 6.0, "productionStraight": 6.0, "prodStraightEnd":6.0, "pionDecay": 6.0, "muonProduction": 7.0,"piFlashNu": 5.0,
+        "muonDecay": 7.0, "eProduction": 6.0, "numuProduction": 6.0, "nueProduction": 6.0, "numuDetector": 5.0, "nueDetector": 10.0},
+
+    "eLower":
+        {"target": 4.0, "productionStraight": 4.0, "prodStraightEnd":4.0, "pionDecay":4.0, "muonProduction": 0.0,"piFlashNu":-1.0,
+        "muonDecay":-1.0, "eProduction":-6.0, "numuProduction":-6.0, "nueProduction":-6.0, "numuDetector":0.0, "nueDetector":-10.0},
+    "eHigher":
+        {"target": 6.0, "productionStraight": 6.0, "prodStraightEnd":6.0, "pionDecay": 6.0, "muonProduction": 7.0,"piFlashNu": 5.0,
+        "muonDecay": 7.0, "eProduction": 6.0, "numuProduction": 6.0, "nueProduction": 6.0, "numuDetector": 2.5, "nueDetector": 10.0},
+
+    "bins":
+        {"target": 100, "productionStraight": 100, "prodStraightEnd":100, "pionDecay": 100, "muonProduction": 100,"piFlashNu": 100,
+        "muonDecay": 50, "eProduction": 1000, "numuProduction":40000.0, "nueProduction": 40000.0, "numuDetector": 40000.0, "nueDetector": 40000.0}
+
+
+}

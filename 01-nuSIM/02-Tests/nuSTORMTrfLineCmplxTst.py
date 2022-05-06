@@ -14,7 +14,6 @@ Test script for "nuSTORMTrfLineCmplx" class
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import colors
 from iminuit import Minuit
 from iminuit.cost import LeastSquares
 from Simulation import *
@@ -27,7 +26,7 @@ import MuonConst as MuonConst
 piCnst = PionConst.PionConst()
 muCnst = MuonConst.MuonConst()
 
-n_tst = 200000
+n_tst = 50000
 t_bunch = 2.
 t_spacing = 5.
 t_extraction = 10.5
@@ -102,7 +101,7 @@ for i in range(n_tst4):
   if npi < 11:
       print(npi, ppi[npi-1], tpi[npi-1], zpi[npi-1], x, y, xp, yp)
 
-'''
+
 ##! Check generating pion distributions from scratch
 nuSTORMTrfLineCmplxTest = 5
 print()
@@ -396,7 +395,7 @@ print("P_numu input: ",P_numu)
 print("P_numu output after boosting back: ",P_numu_rf)
 print("P_numu boosted to nuSTORM frame: ",P_numu_nS)
 
-'''
+
 #! PLOTTING
 #For nuSTORMTrfLineCmplxTest = 4
 n, bins, patches = plt.hist(ppi, bins=50, color='y', range=(4.0,6.0))
@@ -455,17 +454,6 @@ plt.title('y^prime distribution')
 plt.savefig('Scratch/nuSTORMTrfLineCmplx/nuSTORMTrfLineCmplxTst_4_yp.pdf')
 plt.close()
 
-pltX = plt.hist2d(xpi,xppi, bins=200,range=[[-0.2,0.2],[-.008,.008]],norm=colors.LogNorm())
-plt.colorbar()
-plt.xlabel('x [m]')
-plt.ylabel('x^prime')
-plt.title('phase space distribution in x')
-#plt.grid(alpha=0.)
-#plt.show()
-plt.savefig('Scratch/nuSTORMTrfLineCmplx/nuSTORMTrfLineCmplxTst_4_xPS_new.pdf')
-plt.savefig('Scratch/nuSTORMTrfLineCmplx/nuSTORMTrfLineCmplxTst_4_xPS_new.png')
-plt.close()
-
 n, bins, patches = plt.hist(t_dcy_pi, bins=50,color='y',range=(0.,0.7*10**(-5)),log=True) #,range=(0.,0.6*10**(-5))
 plt.xlabel('$t_{decay}$ (s)')
 plt.ylabel('Entries')
@@ -502,7 +490,7 @@ plt.savefig('Scratch/nuSTORMTrfLineCmplx/nuSTORMTrfLineCmplxTst_4_tprod.pdf')
 plt.close()
 
 
-'''
+
 #For nuSTORMTrfLineCmplxTest = 5
 dir = os.path.join(nuSIMPATH,r'Scratch/nuSTORMTrfLineCmplx/0_target')
 dirExist = os.path.isdir(dir)
@@ -819,7 +807,7 @@ plt.ylabel('Entries')
 plt.title('$\phi$ distribution for PiFlashNu')
 plt.savefig('Scratch/nuSTORMTrfLineCmplx/2_pionDecay/nuSTORMTrfLineCmplxTst_6_phi_rf_tst.pdf')
 plt.close()
-'''
+
 
 ##! Complete:
 print()

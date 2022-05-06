@@ -1,0 +1,23 @@
+{   
+    "description":"pion decay in production straight; Pion Flash",
+    
+    "flags":
+    {
+    "tlFlag":"False", "psFlag":"True", "lstFlag":"False", "muDcyFlag":"False", "flashAtDetector":"True",
+    "PSMuons":"False", "ringMuons":"False","tEqualsZero":"False"
+    },
+
+    "files":
+    {
+    "rootFile":"someFile.root",
+    "logFile":"normalisation",
+    "plotsDict":"<studyDir>/<studyname>/plotsPSPiFlash.dict"
+    },
+
+    "study": "<studyname>",
+
+    "printLimit":0,
+    "EPi": 3.0,
+    "runNumber": "runNumber",
+    "nEvents":5000
+}

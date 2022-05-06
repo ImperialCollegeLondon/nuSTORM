@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# set up the PYTHONPAATH must be sourced before running nuSIM
+
 stm=$PWD
 #echo $stm
 

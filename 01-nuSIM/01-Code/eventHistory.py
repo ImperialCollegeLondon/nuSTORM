@@ -40,6 +40,9 @@ Methods:
 
 
 
+Version 1.2 									29/04/2022
+Add a point at the end of the production straight
+
 Version 1.1										11/11/2021
 After writing out
 
@@ -85,6 +88,23 @@ gROOT.ProcessLine(
 
 gROOT.ProcessLine(
 "struct productionStraight {\
+   Int_t				runNumber;\
+   Int_t				eventNumber;\
+   Int_t				pdgCode;\
+   Float_t			x;\
+   Float_t			y;\
+   Float_t			z;\
+   Float_t			s;\
+   Float_t			px;\
+   Float_t			py;\
+   Float_t			pz;\
+   Float_t			t;\
+   Float_t			eventWeight;\
+   Float_t			mass;\
+};" );
+
+gROOT.ProcessLine(
+"struct prodStraightEnd {\
    Int_t				runNumber;\
    Int_t				eventNumber;\
    Int_t				pdgCode;\
@@ -265,7 +285,7 @@ class eventHistory:
 		self._inputFilename = "null"
 		self._eHTree = "null"
 		self._runNum = -1
-		self._particles = [None]*11
+		self._particles = [None]*12
 		self.evTree = TTree('eventHistory', 'nuStorm Event')
 		self._entryPnt = 0
 
@@ -286,6 +306,7 @@ class eventHistory:
 		testParticle = particle.particle(-1, -1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, "pi+")
 		self.addParticle("target", testParticle)
 		self.addParticle("productionStraight", testParticle)
+		self.addParticle("prodStraightEnd", testParticle)
 		self.addParticle("pionDecay", testParticle)
 		self.addParticle("muonProduction", testParticle)
 		self.addParticle("piFlashNu", testParticle)
@@ -311,6 +332,8 @@ class eventHistory:
 		self._eHTree.SetBranchAddress('target', self.target)
 		self.productionStraight = ROOT.productionStraight()
 		self._eHTree.SetBranchAddress('productionStraight', self.productionStraight)
+		self.prodStraightEnd = ROOT.prodStraightEnd()
+		self._eHTree.SetBranchAddress('prodStraightEnd', self.prodStraightEnd)
 		self.pionDecay = ROOT.pionDecay()
 		self._eHTree.SetBranchAddress("pionDecay", self.pionDecay)
 		self.muonProduction = ROOT.muonProduction()
@@ -358,6 +381,9 @@ class eventHistory:
 		pPs = particle.particle(self.productionStraight.runNumber, self.productionStraight.eventNumber, self.productionStraight.s,
 			self.productionStraight.x, self.productionStraight.y, self.productionStraight.z, self.productionStraight.px, self.productionStraight.py,
 			self.productionStraight.pz, self.productionStraight.t, self.productionStraight.eventWeight, self.productionStraight.pdgCode)
+		pPsEnd = particle.particle(self.prodStraightEnd.runNumber, self.prodStraightEnd.eventNumber, self.prodStraightEnd.s,
+			self.prodStraightEnd.x, self.prodStraightEnd.y, self.prodStraightEnd.z, self.prodStraightEnd.px, self.prodStraightEnd.py,
+			self.prodStraightEnd.pz, self.prodStraightEnd.t, self.prodStraightEnd.eventWeight, self.prodStraightEnd.pdgCode)
 		pPiDcy = particle.particle(self.pionDecay.runNumber, self.pionDecay.eventNumber, self.pionDecay.s,
 			self.pionDecay.x, self.pionDecay.y, self.pionDecay.z, self.pionDecay.px, self.pionDecay.py, self.pionDecay.pz,
 			self.pionDecay.t, self.pionDecay.eventWeight, self.pionDecay.pdgCode)
@@ -388,6 +414,7 @@ class eventHistory:
 
 		self.addParticle('target', pTar)
 		self.addParticle('productionStraight', pPs)
+		self.addParticle('prodStraightEnd', pPsEnd)
 		self.addParticle('pionDecay', pPiDcy)
 		self.addParticle('muonProduction', pMuPrd)
 		self.addParticle('piFlashNu', pFlsNu)
@@ -405,6 +432,8 @@ class eventHistory:
 		self.evTree.Branch('target', self.target, 'run/I:event:pdgCode:x/F:y:z:s:px:py:pz:t:eventWeight:mass')
 		self.productionStraight = ROOT.productionStraight()
 		self.evTree.Branch('productionStraight', self.productionStraight, 'run/I:event:pdgCode:x/F:y:z:s:px:py:pz:t:eventWeight:mass')
+		self.prodStraightEnd = ROOT.prodStraightEnd()
+		self.evTree.Branch('prodStraightEnd', self.prodStraightEnd, 'run/I:event:pdgCode:x/F:y:z:s:px:py:pz:t:eventWeight:mass')
 		self.pionDecay = ROOT.pionDecay()
 		self.evTree.Branch('pionDecay', self.pionDecay, 'run/I:event:pdgCode:x/F:y:z:s:px:py:pz:t:eventWeight:mass')
 		self.muonProduction = ROOT.muonProduction()
@@ -433,6 +462,7 @@ class eventHistory:
 	def fill(self):
 
 # target
+		partPnt = 0
 		self.target.runNumber = self._particles[0].run()
 		self.target.eventNumber = self._particles[0].event()
 		self.target.pdgCode = self._particles[0].pdgCode()
@@ -447,155 +477,181 @@ class eventHistory:
 		self.target.eventWeight = self._particles[0].weight()
 		self.target.mass = self._particles[0].mass()
 
-# production straight
-		self.productionStraight.runNumber = self._particles[1].run()
-		self.productionStraight.eventNumber = self._particles[1].event()
-		self.productionStraight.pdgCode = self._particles[1].pdgCode()
-		self.productionStraight.x = self._particles[1].x()
-		self.productionStraight.y = self._particles[1].y()
-		self.productionStraight.z = self._particles[1].z()
-		self.productionStraight.s = self._particles[1].s()
-		self.productionStraight.px = self._particles[1].p()[1][0]
-		self.productionStraight.py = self._particles[1].p()[1][1]
-		self.productionStraight.pz = self._particles[1].p()[1][2]
-		self.productionStraight.t = self._particles[1].t()
-		self.productionStraight.eventWeight = self._particles[1].weight()
-		self.productionStraight.mass = self._particles[1].mass()
+# production straight (start)
+		partPnt = partPnt + 1
+		self.productionStraight.runNumber = self._particles[partPnt].run()
+		self.productionStraight.eventNumber = self._particles[partPnt].event()
+		self.productionStraight.pdgCode = self._particles[partPnt].pdgCode()
+		self.productionStraight.x = self._particles[partPnt].x()
+		self.productionStraight.y = self._particles[partPnt].y()
+		self.productionStraight.z = self._particles[partPnt].z()
+		self.productionStraight.s = self._particles[partPnt].s()
+		self.productionStraight.px = self._particles[partPnt].p()[1][0]
+		self.productionStraight.py = self._particles[partPnt].p()[1][1]
+		self.productionStraight.pz = self._particles[partPnt].p()[1][2]
+		self.productionStraight.t = self._particles[partPnt].t()
+		self.productionStraight.eventWeight = self._particles[partPnt].weight()
+		self.productionStraight.mass = self._particles[partPnt].mass()
+
+# production straight end
+		partPnt = partPnt + 1
+		self.prodStraightEnd.runNumber = self._particles[partPnt].run()
+		self.prodStraightEnd.eventNumber = self._particles[partPnt].event()
+		self.prodStraightEnd.pdgCode = self._particles[partPnt].pdgCode()
+		self.prodStraightEnd.x = self._particles[partPnt].x()
+		self.prodStraightEnd.y = self._particles[partPnt].y()
+		self.prodStraightEnd.z = self._particles[partPnt].z()
+		self.prodStraightEnd.s = self._particles[partPnt].s()
+		self.prodStraightEnd.px = self._particles[partPnt].p()[1][0]
+		self.prodStraightEnd.py = self._particles[partPnt].p()[1][1]
+		self.prodStraightEnd.pz = self._particles[partPnt].p()[1][2]
+		self.prodStraightEnd.t = self._particles[partPnt].t()
+		self.prodStraightEnd.eventWeight = self._particles[partPnt].weight()
+		self.prodStraightEnd.mass = self._particles[partPnt].mass()
 
 # pion decay
-		self.pionDecay.runNumber = self._particles[2].run()
-		self.pionDecay.eventNumber = self._particles[2].event()
-		self.pionDecay.pdgCode = self._particles[2].pdgCode()
-		self.pionDecay.x = self._particles[2].x()
-		self.pionDecay.y = self._particles[2].y()
-		self.pionDecay.z = self._particles[2].z()
-		self.pionDecay.s = self._particles[2].s()
-		self.pionDecay.px = self._particles[2].p()[1][0]
-		self.pionDecay.py = self._particles[2].p()[1][1]
-		self.pionDecay.pz = self._particles[2].p()[1][2]
-		self.pionDecay.t = self._particles[2].t()
-		self.pionDecay.eventWeight = self._particles[2].weight()
-		self.pionDecay.mass = self._particles[2].mass()
+		partPnt = partPnt + 1
+		self.pionDecay.runNumber = self._particles[partPnt].run()
+		self.pionDecay.eventNumber = self._particles[partPnt].event()
+		self.pionDecay.pdgCode = self._particles[partPnt].pdgCode()
+		self.pionDecay.x = self._particles[partPnt].x()
+		self.pionDecay.y = self._particles[partPnt].y()
+		self.pionDecay.z = self._particles[partPnt].z()
+		self.pionDecay.s = self._particles[partPnt].s()
+		self.pionDecay.px = self._particles[partPnt].p()[1][0]
+		self.pionDecay.py = self._particles[partPnt].p()[1][1]
+		self.pionDecay.pz = self._particles[partPnt].p()[1][2]
+		self.pionDecay.t = self._particles[partPnt].t()
+		self.pionDecay.eventWeight = self._particles[partPnt].weight()
+		self.pionDecay.mass = self._particles[partPnt].mass()
 
 # muon production
-		self.muonProduction.runNumber = self._particles[3].run()
-		self.muonProduction.eventNumber = self._particles[3].event()
-		self.muonProduction.pdgCode = self._particles[3].pdgCode()
-		self.muonProduction.x = self._particles[3].x()
-		self.muonProduction.y = self._particles[3].y()
-		self.muonProduction.z = self._particles[3].z()
-		self.muonProduction.s = self._particles[3].s()
-		self.muonProduction.px = self._particles[3].p()[1][0]
-		self.muonProduction.py = self._particles[3].p()[1][1]
-		self.muonProduction.pz = self._particles[3].p()[1][2]
-		self.muonProduction.t = self._particles[3].t()
-		self.muonProduction.eventWeight = self._particles[3].weight()
-		self.muonProduction.mass = self._particles[3].mass()
+		partPnt = partPnt + 1
+		self.muonProduction.runNumber = self._particles[partPnt].run()
+		self.muonProduction.eventNumber = self._particles[partPnt].event()
+		self.muonProduction.pdgCode = self._particles[partPnt].pdgCode()
+		self.muonProduction.x = self._particles[partPnt].x()
+		self.muonProduction.y = self._particles[partPnt].y()
+		self.muonProduction.z = self._particles[partPnt].z()
+		self.muonProduction.s = self._particles[partPnt].s()
+		self.muonProduction.px = self._particles[partPnt].p()[1][0]
+		self.muonProduction.py = self._particles[partPnt].p()[1][1]
+		self.muonProduction.pz = self._particles[partPnt].p()[1][2]
+		self.muonProduction.t = self._particles[partPnt].t()
+		self.muonProduction.eventWeight = self._particles[partPnt].weight()
+		self.muonProduction.mass = self._particles[partPnt].mass()
 
 # neutrino flash production
-		self.piFlashNu.runNumber = self._particles[4].run()
-		self.piFlashNu.eventNumber = self._particles[4].event()
-		self.piFlashNu.pdgCode = self._particles[4].pdgCode()
-		self.piFlashNu.x = self._particles[4].x()
-		self.piFlashNu.y = self._particles[4].y()
-		self.piFlashNu.z = self._particles[4].z()
-		self.piFlashNu.s = self._particles[4].s()
-		self.piFlashNu.px = self._particles[4].p()[1][0]
-		self.piFlashNu.py = self._particles[4].p()[1][1]
-		self.piFlashNu.pz = self._particles[4].p()[1][2]
-		self.piFlashNu.t = self._particles[4].t()
-		self.piFlashNu.eventWeight = self._particles[4].weight()
-		self.piFlashNu.mass = self._particles[4].mass()
+		partPnt = partPnt + 1
+		self.piFlashNu.runNumber = self._particles[partPnt].run()
+		self.piFlashNu.eventNumber = self._particles[partPnt].event()
+		self.piFlashNu.pdgCode = self._particles[partPnt].pdgCode()
+		self.piFlashNu.x = self._particles[partPnt].x()
+		self.piFlashNu.y = self._particles[partPnt].y()
+		self.piFlashNu.z = self._particles[partPnt].z()
+		self.piFlashNu.s = self._particles[partPnt].s()
+		self.piFlashNu.px = self._particles[partPnt].p()[1][0]
+		self.piFlashNu.py = self._particles[partPnt].p()[1][1]
+		self.piFlashNu.pz = self._particles[partPnt].p()[1][2]
+		self.piFlashNu.t = self._particles[partPnt].t()
+		self.piFlashNu.eventWeight = self._particles[partPnt].weight()
+		self.piFlashNu.mass = self._particles[partPnt].mass()
 
 # muon decay
-		self.muonDecay.runNumber = self._particles[5].run()
-		self.muonDecay.eventNumber = self._particles[5].event()
-		self.muonDecay.pdgCode = self._particles[5].pdgCode()
-		self.muonDecay.x = self._particles[5].x()
-		self.muonDecay.y = self._particles[5].y()
-		self.muonDecay.z = self._particles[5].z()
-		self.muonDecay.s = self._particles[5].s()
-		self.muonDecay.px = self._particles[5].p()[1][0]
-		self.muonDecay.py = self._particles[5].p()[1][1]
-		self.muonDecay.pz = self._particles[5].p()[1][2]
-		self.muonDecay.t = self._particles[5].t()
-		self.muonDecay.eventWeight = self._particles[5].weight()
-		self.muonDecay.mass = self._particles[5].mass()
+		partPnt = partPnt + 1
+		self.muonDecay.runNumber = self._particles[partPnt].run()
+		self.muonDecay.eventNumber = self._particles[partPnt].event()
+		self.muonDecay.pdgCode = self._particles[partPnt].pdgCode()
+		self.muonDecay.x = self._particles[partPnt].x()
+		self.muonDecay.y = self._particles[partPnt].y()
+		self.muonDecay.z = self._particles[partPnt].z()
+		self.muonDecay.s = self._particles[partPnt].s()
+		self.muonDecay.px = self._particles[partPnt].p()[1][0]
+		self.muonDecay.py = self._particles[partPnt].p()[1][1]
+		self.muonDecay.pz = self._particles[partPnt].p()[1][2]
+		self.muonDecay.t = self._particles[partPnt].t()
+		self.muonDecay.eventWeight = self._particles[partPnt].weight()
+		self.muonDecay.mass = self._particles[partPnt].mass()
 
 # e production
-		self.eProduction.runNumber = self._particles[6].run()
-		self.eProduction.eventNumber = self._particles[6].event()
-		self.eProduction.pdgCode = self._particles[6].pdgCode()
-		self.eProduction.x = self._particles[6].x()
-		self.eProduction.y = self._particles[6].y()
-		self.eProduction.z = self._particles[6].z()
-		self.eProduction.s = self._particles[6].s()
-		self.eProduction.px = self._particles[6].p()[1][0]
-		self.eProduction.py = self._particles[6].p()[1][1]
-		self.eProduction.pz = self._particles[6].p()[1][2]
-		self.eProduction.t = self._particles[6].t()
-		self.eProduction.eventWeight = self._particles[6].weight()
-		self.eProduction.mass = self._particles[6].mass()
+		partPnt = partPnt + 1
+		self.eProduction.runNumber = self._particles[partPnt].run()
+		self.eProduction.eventNumber = self._particles[partPnt].event()
+		self.eProduction.pdgCode = self._particles[partPnt].pdgCode()
+		self.eProduction.x = self._particles[partPnt].x()
+		self.eProduction.y = self._particles[partPnt].y()
+		self.eProduction.z = self._particles[partPnt].z()
+		self.eProduction.s = self._particles[partPnt].s()
+		self.eProduction.px = self._particles[partPnt].p()[1][0]
+		self.eProduction.py = self._particles[partPnt].p()[1][1]
+		self.eProduction.pz = self._particles[partPnt].p()[1][2]
+		self.eProduction.t = self._particles[partPnt].t()
+		self.eProduction.eventWeight = self._particles[partPnt].weight()
+		self.eProduction.mass = self._particles[partPnt].mass()
 
 # numu production
-		self.numuProduction.runNumber = self._particles[7].run()
-		self.numuProduction.eventNumber = self._particles[7].event()
-		self.numuProduction.pdgCode = self._particles[7].pdgCode()
-		self.numuProduction.x = self._particles[7].x()
-		self.numuProduction.y = self._particles[7].y()
-		self.numuProduction.z = self._particles[7].z()
-		self.numuProduction.s = self._particles[7].s()
-		self.numuProduction.px = self._particles[7].p()[1][0]
-		self.numuProduction.py = self._particles[7].p()[1][1]
-		self.numuProduction.pz = self._particles[7].p()[1][2]
-		self.numuProduction.t = self._particles[7].t()
-		self.numuProduction.eventWeight = self._particles[7].weight()
-		self.numuProduction.mass = self._particles[7].mass()
+		partPnt = partPnt + 1
+		self.numuProduction.runNumber = self._particles[partPnt].run()
+		self.numuProduction.eventNumber = self._particles[partPnt].event()
+		self.numuProduction.pdgCode = self._particles[partPnt].pdgCode()
+		self.numuProduction.x = self._particles[partPnt].x()
+		self.numuProduction.y = self._particles[partPnt].y()
+		self.numuProduction.z = self._particles[partPnt].z()
+		self.numuProduction.s = self._particles[partPnt].s()
+		self.numuProduction.px = self._particles[partPnt].p()[1][0]
+		self.numuProduction.py = self._particles[partPnt].p()[1][1]
+		self.numuProduction.pz = self._particles[partPnt].p()[1][2]
+		self.numuProduction.t = self._particles[partPnt].t()
+		self.numuProduction.eventWeight = self._particles[partPnt].weight()
+		self.numuProduction.mass = self._particles[partPnt].mass()
 
 # nue production
-		self.nueProduction.runNumber = self._particles[8].run()
-		self.nueProduction.eventNumber = self._particles[8].event()
-		self.nueProduction.pdgCode = self._particles[8].pdgCode()
-		self.nueProduction.x = self._particles[8].x()
-		self.nueProduction.y = self._particles[8].y()
-		self.nueProduction.z = self._particles[8].z()
-		self.nueProduction.s = self._particles[8].s()
-		self.nueProduction.px = self._particles[8].p()[1][0]
-		self.nueProduction.py = self._particles[8].p()[1][1]
-		self.nueProduction.pz = self._particles[8].p()[1][2]
-		self.nueProduction.t = self._particles[8].t()
-		self.nueProduction.eventWeight = self._particles[8].weight()
-		self.nueProduction.mass = self._particles[8].mass()
+		partPnt = partPnt + 1
+		self.nueProduction.runNumber = self._particles[partPnt].run()
+		self.nueProduction.eventNumber = self._particles[partPnt].event()
+		self.nueProduction.pdgCode = self._particles[partPnt].pdgCode()
+		self.nueProduction.x = self._particles[partPnt].x()
+		self.nueProduction.y = self._particles[partPnt].y()
+		self.nueProduction.z = self._particles[partPnt].z()
+		self.nueProduction.s = self._particles[partPnt].s()
+		self.nueProduction.px = self._particles[partPnt].p()[1][0]
+		self.nueProduction.py = self._particles[partPnt].p()[1][1]
+		self.nueProduction.pz = self._particles[partPnt].p()[1][2]
+		self.nueProduction.t = self._particles[partPnt].t()
+		self.nueProduction.eventWeight = self._particles[partPnt].weight()
+		self.nueProduction.mass = self._particles[partPnt].mass()
 
 # numu Detector
-		self.numuDetector.runNumber = self._particles[9].run()
-		self.numuDetector.eventNumber = self._particles[9].event()
-		self.numuDetector.pdgCode = self._particles[9].pdgCode()
-		self.numuDetector.x = self._particles[9].x()
-		self.numuDetector.y = self._particles[9].y()
-		self.numuDetector.z = self._particles[9].z()
-		self.numuDetector.s = self._particles[9].s()
-		self.numuDetector.px = self._particles[9].p()[1][0]
-		self.numuDetector.py = self._particles[9].p()[1][1]
-		self.numuDetector.pz = self._particles[9].p()[1][2]
-		self.numuDetector.t = self._particles[9].t()
-		self.numuDetector.eventWeight = self._particles[9].weight()
-		self.numuDetector.mass = self._particles[9].mass()
+		partPnt = partPnt + 1
+		self.numuDetector.runNumber = self._particles[partPnt].run()
+		self.numuDetector.eventNumber = self._particles[partPnt].event()
+		self.numuDetector.pdgCode = self._particles[partPnt].pdgCode()
+		self.numuDetector.x = self._particles[partPnt].x()
+		self.numuDetector.y = self._particles[partPnt].y()
+		self.numuDetector.z = self._particles[partPnt].z()
+		self.numuDetector.s = self._particles[partPnt].s()
+		self.numuDetector.px = self._particles[partPnt].p()[1][0]
+		self.numuDetector.py = self._particles[partPnt].p()[1][1]
+		self.numuDetector.pz = self._particles[partPnt].p()[1][2]
+		self.numuDetector.t = self._particles[partPnt].t()
+		self.numuDetector.eventWeight = self._particles[partPnt].weight()
+		self.numuDetector.mass = self._particles[partPnt].mass()
 
 # nue Detector
-		self.nueDetector.runNumber = self._particles[10].run()
-		self.nueDetector.eventNumber = self._particles[10].event()
-		self.nueDetector.pdgCode = self._particles[10].pdgCode()
-		self.nueDetector.x = self._particles[10].x()
-		self.nueDetector.y = self._particles[10].y()
-		self.nueDetector.z = self._particles[10].z()
-		self.nueDetector.s = self._particles[10].s()
-		self.nueDetector.px = self._particles[10].p()[1][0]
-		self.nueDetector.py = self._particles[10].p()[1][1]
-		self.nueDetector.pz = self._particles[10].p()[1][2]
-		self.nueDetector.t = self._particles[10].t()
-		self.nueDetector.eventWeight = self._particles[10].weight()
-		self.nueDetector.mass = self._particles[10].mass()
+		partPnt = partPnt + 1
+		self.nueDetector.runNumber = self._particles[partPnt].run()
+		self.nueDetector.eventNumber = self._particles[partPnt].event()
+		self.nueDetector.pdgCode = self._particles[partPnt].pdgCode()
+		self.nueDetector.x = self._particles[partPnt].x()
+		self.nueDetector.y = self._particles[partPnt].y()
+		self.nueDetector.z = self._particles[partPnt].z()
+		self.nueDetector.s = self._particles[partPnt].s()
+		self.nueDetector.px = self._particles[partPnt].p()[1][0]
+		self.nueDetector.py = self._particles[partPnt].p()[1][1]
+		self.nueDetector.pz = self._particles[partPnt].p()[1][2]
+		self.nueDetector.t = self._particles[partPnt].t()
+		self.nueDetector.eventWeight = self._particles[partPnt].weight()
+		self.nueDetector.mass = self._particles[partPnt].mass()
 
 # write out
 		self.evTree.Fill()
@@ -611,34 +667,32 @@ class eventHistory:
 	def write(self):
 		self.evTree.Write()
 
-#  Write the root structure out to the file
-	def cd(self):
-		self._outTFile.cd()
-
 #  add particles to the history
 	def addParticle(self, location, par):
 		if location == "target":
 			self._particles[0] = par
 		elif location == "productionStraight":
 			self._particles[1] = par
-		elif location == "pionDecay":
+		elif location == "prodStraightEnd":
 			self._particles[2] = par
-		elif location == "muonProduction":
+		elif location == "pionDecay":
 			self._particles[3] = par
-		elif location == "piFlashNu":
+		elif location == "muonProduction":
 			self._particles[4] = par
-		elif location == "muonDecay":
+		elif location == "piFlashNu":
 			self._particles[5] = par
-		elif location == "eProduction":
+		elif location == "muonDecay":
 			self._particles[6] = par
-		elif location == "numuProduction":
+		elif location == "eProduction":
 			self._particles[7] = par
-		elif location == "nueProduction":
+		elif location == "numuProduction":
 			self._particles[8] = par
-		elif location == "numuDetector":
+		elif location == "nueProduction":
 			self._particles[9] = par
-		elif location == "nueDetector":
+		elif location == "numuDetector":
 			self._particles[10] = par
+		elif location == "nueDetector":
+			self._particles[11] = par
 		else:
 			print ("unrecognised point on the history .. adding a particle", location)
 			sys.exit(0)
@@ -649,24 +703,26 @@ class eventHistory:
 			return deepcopy(self._particles[0])
 		elif location == "productionStraight":
 			return deepcopy(self._particles[1])
-		elif location == "pionDecay":
+		elif location == "prodStraightEnd":
 			return deepcopy(self._particles[2])
-		elif location == "muonProduction":
+		elif location == "pionDecay":
 			return deepcopy(self._particles[3])
-		elif location == "piFlashNu":
+		elif location == "muonProduction":
 			return deepcopy(self._particles[4])
-		elif location == "muonDecay":
+		elif location == "piFlashNu":
 			return deepcopy(self._particles[5])
-		elif location == "eProduction":
+		elif location == "muonDecay":
 			return deepcopy(self._particles[6])
-		elif location == "numuProduction":
+		elif location == "eProduction":
 			return deepcopy(self._particles[7])
-		elif location == "nueProduction":
+		elif location == "numuProduction":
 			return deepcopy(self._particles[8])
-		elif location == "numuDetector":
+		elif location == "nueProduction":
 			return deepcopy(self._particles[9])
-		elif location == "nueDetector":
+		elif location == "numuDetector":
 			return deepcopy(self._particles[10])
+		elif location == "nueDetector":
+			return deepcopy(self._particles[11])
 
 		else:
 			print ("unrecognised point on the history .. finding a particle", location)
@@ -677,12 +733,13 @@ class eventHistory:
 
 		print("Particle at target ", self._particles[0])
 		print("Particle at start of production straight", self._particles[1])
-		print("Pion at decay point ", self._particles[2])
-		print("muon at production point ", self._particles[3])
-		print("neutrino from pion Flash ", self._particles[4])
-		print("muon decay ", self._particles[5])
-		print("electron Production ", self._particles[6])
-		print("numu Production ", self._particles[7])
-		print("nue Production ", self._particles[8])
-		print("numu at Detector ", self._particles[9])
-		print("nue at Detector ", self._particles[10])
+		print("Particle at end of production straight", self._particles[2])
+		print("Pion at decay point ", self._particles[3])
+		print("muon at production point ", self._particles[4])
+		print("neutrino from pion Flash ", self._particles[5])
+		print("muon decay ", self._particles[6])
+		print("electron Production ", self._particles[7])
+		print("numu Production ", self._particles[8])
+		print("nue Production ", self._particles[9])
+		print("numu at Detector ", self._particles[10])
+		print("nue at Detector ", self._particles[11])

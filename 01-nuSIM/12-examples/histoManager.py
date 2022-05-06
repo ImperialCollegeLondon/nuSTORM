@@ -83,7 +83,7 @@ class histoManager:
 #  TH3D ... bins, lower,upper, bins,lower,upper, bins,lower,upper
 #
 #         Start by just doing a simple 1D
-        
+
         self.Title = title
         name = title                                  # name must be unique .. put it equal to title
         self.histVar = ROOT.TH1D(name, title, bins, lower, upper)
@@ -120,7 +120,7 @@ class histoManager:
                 canvas.cd(hPnt)
                 canvas.Update()
                 hCurr.Draw()
-            
+
             if self.action == "m":
                 canvas.cd(hPnt)
                 canvas.Update()
@@ -138,12 +138,13 @@ class histoManager:
 
 # create a tex file with all the plots
 
-    def texCreate(self):
+    def texCreate(self, fileName):
         texHline = "\\hline\n"
         slash = "\\"
 #  Outout the information as a document
-        plotDir = Path.cwd()
-        plotFile = str(Path.cwd())+"/plots.tex"
+#        plotDir = Path.cwd()
+#        plotFile = str(Path.cwd())+"/plots.tex"
+        plotFile = fileName
         print (plotFile)
         f = open(plotFile, "w")
         f.write(slash + "documentclass{article}\n")
@@ -214,7 +215,7 @@ if __name__ == "__main__":
 #    print (hm.toString())
 #    print (stringComp)
 
-    hTitle = "Test histogram 1" 
+    hTitle = "Test histogram 1"
     hBins  = 100
     hLower = -1.0
     hUpper = 1.0
@@ -222,7 +223,7 @@ if __name__ == "__main__":
     hm.setParams("m")
 
     h3 = hm.book("Test histogram 3", 100, -3.0, 3.0)
-    h4 = hm.book("Test histogram 4", 80, -4.0, 4.0)    
+    h4 = hm.book("Test histogram 4", 80, -4.0, 4.0)
     h5 = hm.book("Test histogram 5", 80, -4.0, 4.0)
     h6 = hm.book("Test histogram 6", 80, -4.0, 4.0)
 
@@ -242,4 +243,3 @@ if __name__ == "__main__":
     hm.histdo()
 
     t.summary()
-

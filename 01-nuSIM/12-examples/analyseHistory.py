@@ -12,11 +12,8 @@ Script for going through the eventHistory and making plots
 
     @author  Paul Kyberd
 
-
-    @version    2.0
-                add the control class to provide information for the run
-    @version    1.0
-    @date       11 January 2022
+    @version     1.0
+    @date        12 November 2021
 
 
 """
@@ -33,34 +30,55 @@ import eventHistory as eventHistory
 import histoManager as histoManager
 import histsCreate as histsCreate
 import particle as particle
-import logging
 import control
+import logging
 
 ##! Start:
 
 aHVersion = 1.0;
-# control file shared with the normalisation code
-#controlFile = "101-Studies/pencilValidation/PSMuRingDcy.dict"
-controlFile = "101-Studies/pencilValidation/PSMuDcyControlFile.dict"
-#controlFile = "101-Studies/pencilValidation/PSPiFlash.dict"
-#controlFile = "101-Studies/pencilValidation/TLPiFlash.dict"
+
+nTests = 0
+testFails = 0
+descriptions=[]
+locations=[]
+testStatus=[]
+
+# Pions Flash in the production straight
+#controlFile = "102-Studies/pencilValidation/PSPiFlash.dict"
+# Muons decay in ring, after first pass of the production straight
+#controlFile = "102-Studies/pencilValidation/PSMuRingDcy.dict"
+# Muons decay in production straight with pions.
+#controlFile = "102-Studies/pencilValidation/TLPiFlash.dict"
+#controlFile = "102-Studies/pencilValidation/PSMuDcy.dict"
+# muons from transfer line
+StudyDir = os.getenv('StudyDir')
+StudyName = os.getenv('StudyName')
+controlFile = os.path.join(StudyDir, "PSPiFLash.dict")
+#controlFile = "StudyDir/StudyName/TLmuonDecay.dict"
+
+##controlFile = "101-Studies/bdSimBeam01/PSPiFlash.dict"
+
+##controlFile = "101-Studies/bdSimBeam01/PSMuDcyCF.dict"
+
+##controlFile = "101-Studies/pencilValidation/PSMuDcyControlFile.dict"
+
+## control file shared with the normalisation code
 ctrlInst = control.control(controlFile)
+
 
 #       logfile initialisation
 logging.basicConfig(filename=ctrlInst.logFile(), encoding='utf-8', level=logging.INFO)
-
 print("========  analysing the eventHistory start  ========")
 logging.info("\n\n")
 logging.info("========  analysing the eventHistory: start  ======== Version %s", aHVersion)
 logging.info("Control file %s", controlFile)
 
 objRd = eventHistory.eventHistory()
-
 # Get the nuSIM path name and use it to set names for the inputfile and the outputFile
 nuSIMPATH = os.getenv('nuSIMPATH')
-rootFilename = os.path.join(nuSIMPATH, 'Scratch/normalisation'+str(ctrlInst.runNumber())+'.root')
+rootFilename = os.path.join(StudyDir, StudyName, 'normalisation' + str(ctrlInst.runNumber())+'.root')
+#rootFilename = os.path.join(nuSIMPATH, 'Scratch/normalisation365.root')
 logging.info("  input file %s ", rootFilename)
-
 
 objRd.inFile(rootFilename)
 
@@ -76,10 +94,12 @@ print("start reading")
 locRecord=[]
 locStatus=[]
 hm = histoManager.histoManager()
+hmDataOut = histoManager.histoManager()
 # common histograms at all the points in the history
 hC = histsCreate.histsCreate(hm, ctrlInst.plotsDict())
 hC.histAdd("target")
 hC.histAdd("productionStraight")
+hC.histAdd("prodStraightEnd")
 hC.histAdd("pionDecay")
 hC.histAdd("muonProduction")
 hC.histAdd("piFlashNu")
@@ -129,23 +149,17 @@ hTitle = "fltNuSrcPZ"
 hLower = 1.0
 hUpper = 6.0
 flshNuSrcPZ = hm.book(hTitle, hBins, hLower, hUpper)
-hTitle = "pionLifetime:nuStorm rest"
-hLower = 0.0
-hUpper = 1000.0
-piLifeNuRst = hm.book(hTitle, hBins, hLower, hUpper)
 
-hTitle = "nus from muon overlap:x"
-hLower = -20.0
-hUpper = 20.0
-overLapNusX = hm.book(hTitle, hBins, hLower, hUpper)
-hTitle = "nus from muon overlap:y"
-hLower = -20.0
-hUpper = 20.0
-overLapNusY = hm.book(hTitle, hBins, hLower, hUpper)
-hTitle = "nus from muon overlap:pz"
-hLower = -10.0
-hUpper = 10.0
-overLapNusPz = hm.book(hTitle, hBins, hLower, hUpper)
+#  Data file for genie analysis
+hTitle = "Enumu"
+hLower = 0.0
+hUpper = 4.0
+eNumuData = hmDataOut.book(hTitle, hBins, hLower, hUpper)
+
+hTitle = "Enue"
+hLower = 0.0
+hUpper = 4.0
+eNueData = hmDataOut.book(hTitle, hBins, hLower, hUpper)
 
 
 for pnt in range(nEvent):
@@ -161,6 +175,10 @@ for pnt in range(nEvent):
     partPS = objRd.findParticle("productionStraight")
     hC.histsFill("productionStraight", partPS)
     if (dbgFlag): print ("productionStraight Particle is ", partPS)
+
+    partPSEnd = objRd.findParticle("prodStraightEnd")
+    hC.histsFill("prodStraightEnd", partPSEnd)
+    if (dbgFlag): print ("prodStraightEnd Particle is ", partPSEnd)
 
     partPD = objRd.findParticle("pionDecay")
     hC.histsFill("pionDecay", partPD)
@@ -198,10 +216,6 @@ for pnt in range(nEvent):
     hC.histsFill("nueDetector", partNueDetect)
     if (dbgFlag): print ("nueProduction Particle is ", partNueDetect)
 
-# lifetime of the pion in the nuStorm frame
-    if (partPD.weight() > 0.0):
-        piLife =  partPD.t() - partTar.t()
-        piLifeNuRst.Fill(piLife)
 # some specfic analysis - neutrinos from muon decay if only muon decays in the ring are included
     if (partNumuDetect.weight() > 0.0):
       xs = partNumuProd.x()
@@ -212,6 +226,12 @@ for pnt in range(nEvent):
       zd = partNumuDetect.z()
       dist = math.sqrt((xd-xs)*(xd-xs) + (yd-ys)*(yd-ys) +(zd-zs)*(zd-zs))
       numuDist.Fill(dist)
+      if (abs(xd) < 2.5) and (abs(yd) < 2.5):
+        numuPx = partNumuDetect.p()[1][0]
+        numuPy = partNumuDetect.p()[1][1]
+        numuPz = partNumuDetect.p()[1][2]
+        numuE = math.sqrt(numuPx*numuPx + numuPy*numuPy + numuPz*numuPz )
+        eNumuData.Fill(numuE)
     if (partNueDetect.weight() > 0.0):
       xs = partNueProd.x()
       ys = partNueProd.y()
@@ -221,9 +241,15 @@ for pnt in range(nEvent):
       zd = partNueDetect.z()
       dist = math.sqrt((xd-xs)*(xd-xs) + (yd-ys)*(yd-ys) +(zd-zs)*(zd-zs))
       nueDist.Fill(dist)
+      if (abs(xd) < 2.5) and (abs(yd) < 2.5):
+        nuePx = partNueDetect.p()[1][0]
+        nuePy = partNueDetect.p()[1][1]
+        nuePz = partNueDetect.p()[1][2]
+        nueE = math.sqrt(nuePx*nuePx + nuePy*nuePy + nuePz*nuePz )
+        eNueData.Fill(nueE)
 # Flash neutrinos - if only transfer line decays of the pion are included
 #    if (partNumuDetect.weight() > -1.0):
-    if (partNueDetect.weight() > 0.0):
+    if (partNumuDetect.weight() > 0.0):
       xs = partFlshNu.x()
       ys = partFlshNu.y()
       zs = partFlshNu.z()
@@ -240,26 +266,26 @@ for pnt in range(nEvent):
       flshNuSrcPY.Fill(p[1][1])
       flshNuSrcPZ.Fill(p[1][2])
       arrivalT.Fill(partNumuDetect.t())
-#
-#  Muons in the production straight first time
-    muonPathEnd = partMuonDecay.s()
-    if (muonPathEnd > 0.0) and (muonPathEnd < 240.0): print (f"muon decay point: {muonPathEnd}")
-    if (muonPathEnd < 240.0) and (partNumuDetect.weight() > 0.0):
-        overLapNusX.Fill(partNumuDetect.x())
-        overLapNusY.Fill(partNumuDetect.y())
-        if (abs(partNumuDetect.x()) < 2.5) and (abs(partNumuDetect.y()) < 2.5):
-            overLapNusPz.Fill(partNumuDetect.p()[1][2])
+
+
 
 #hm.histdo()
-fileName = "101-studies/" + ctrlInst.studyName() + "/plots" + str(ctrlInst.runNumber()) + ".root"
+fileName = os.path.join(StudyDir, ctrlInst.studyName() + "/plots" + str(ctrlInst.runNumber()) + ".root")
 print (fileName)
 hm.histOutRoot(fileName)
+fileName01 = os.path.join(StudyDir, ctrlInst.studyName() + "/nuDetector" + str(ctrlInst.runNumber()) + ".root")
+#hmDataOut.histOutRoot("nuDetector.root")
+hmDataOut.histOutRoot(fileName01)
 # write plots to individual .pdf files
-hm.texCreate()
-hC.summary()
+#hm.histdo()
+fileName02 = os.path.join(StudyDir, ctrlInst.studyName() + "/plots" + str(ctrlInst.runNumber()) + ".tex")
+hm.texCreate(fileName02)
+fileName03 = os.path.join(StudyDir, ctrlInst.studyName() + "/summary" + str(ctrlInst.runNumber()) + ".tex")
+hC.summary(fileName03)
 
 print()
 print("========  analysing the eventHistory ends ========")
 logging.info("========  analysing the eventHistory: end  ========")
+
 
 sys.exit(0)

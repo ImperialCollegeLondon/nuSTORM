@@ -1,0 +1,22 @@
+{   
+    "description":"pion decay in production straight and muon decay in the ring",
+    
+    "flags":
+    {
+    "tlFlag":"False", "psFlag":"True", "lstFlag":"False", "muDcyFlag":"True", "flashAtDetector":"False",
+    "PSMuons":"False","ringMuons":"True","tEqualsZero":"False"
+    },
+
+    "files":
+    {
+    "rootFile":"someFile.root",
+    "logFile":"normalisation",
+    "plotsDict":"<studyDir>/<studyname>/plotsPSMuRingDcy.dict"
+    },
+
+    "study": "<studyname>",
+    "EPi": 3.0,
+    "printLimit":0,
+    "runNumber": "runNumber",
+    "nEvents":5000
+}

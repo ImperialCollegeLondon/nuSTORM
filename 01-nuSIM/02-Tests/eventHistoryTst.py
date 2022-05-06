@@ -13,8 +13,14 @@ Test script for eventHistory class
 
     @author  Paul Kyberd
 
+    @version    1.1
+    @date       29 April 2022
+    Add prodStraightEnd
+
     @version     1.0
     @date        16 September 2021
+
+
 
 
 """
@@ -171,6 +177,10 @@ locations.append('productionStraight')
 descString = "Check addParticle and findParticle - with '"+locations[-1]+"' location"
 descriptions.append(descString)
 #
+locations.append('prodStraightEnd')
+descString = "Check addParticle and findParticle - with '"+locations[-1]+"' location"
+descriptions.append(descString)
+#
 locations.append('pionDecay')
 descString = "Check addParticle and findParticle - with '"+locations[-1]+"' location"
 descriptions.append(descString)
@@ -258,17 +268,19 @@ testParticle7 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, e
 testParticle8 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight,  "numu")
 testParticle9 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight,  "numuBar")
 testParticle10 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, "pi+")
+testParticle11 = particle.particle(runNum, eventNum, x, y, z, s, px, py, pz, t, eventWeight, "pi-")
 obj.addParticle("target", testParticle)
 obj.addParticle("productionStraight", testParticle1)
-obj.addParticle("pionDecay", testParticle2)
-obj.addParticle("muonProduction", testParticle3)
-obj.addParticle("piFlashNu", testParticle4)
-obj.addParticle("muonDecay", testParticle5)
-obj.addParticle("eProduction", testParticle6)
-obj.addParticle("numuProduction", testParticle7)
-obj.addParticle("nueProduction", testParticle8)
-obj.addParticle("numuDetector", testParticle9)
-obj.addParticle("nueDetector", testParticle10)
+obj.addParticle("prodStraightEnd", testParticle2)
+obj.addParticle("pionDecay", testParticle3)
+obj.addParticle("muonProduction", testParticle4)
+obj.addParticle("piFlashNu", testParticle5)
+obj.addParticle("muonDecay", testParticle6)
+obj.addParticle("eProduction", testParticle7)
+obj.addParticle("numuProduction", testParticle8)
+obj.addParticle("nueProduction", testParticle9)
+obj.addParticle("numuDetector", testParticle10)
+obj.addParticle("nueDetector", testParticle11)
 
 obj.display()
 
