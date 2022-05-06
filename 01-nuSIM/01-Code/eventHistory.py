@@ -667,6 +667,11 @@ class eventHistory:
 	def write(self):
 		self.evTree.Write()
 
+# Cd allows to change directory back to output file after
+# potentially having opened another root file
+	def cd(self):
+		self._outTFile.cd()
+
 #  add particles to the history
 	def addParticle(self, location, par):
 		if location == "target":
