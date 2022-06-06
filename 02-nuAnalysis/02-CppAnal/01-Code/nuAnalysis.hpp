@@ -23,6 +23,22 @@ public:
   std::vector<TF1*>  TF1list;
   std::vector<TGraph*> TGlist;
 
+  struct eventHistory {
+    Int_t runNumber;
+    Int_t eventNumber;
+    Int_t pdgCode;
+    Float_t x;
+    Float_t y;
+    Float_t z;
+    Float_t s;
+    Float_t px;
+    Float_t py;
+    Float_t pz;
+    Float_t t;
+    Float_t eventWeight;
+    Float_t mass;
+  };
+
   nuAnalysis( bool Dbg=true );
 
   ~nuAnalysis() {  }
