@@ -18,6 +18,7 @@
 
     "printLimit":0,
     "EPi": 3.0,
+    "EMu": 1.79,
     "runNumber": "runNumber",
     "nEvents":5000
 }

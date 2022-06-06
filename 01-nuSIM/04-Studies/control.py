@@ -28,9 +28,10 @@ Class control:
 Version history:
 ----------------
  1.0: 07Jan22: read the conditions for a particular run of the software
-
-
 @author: PaulKyberd
+
+ 1.1: 06Jun22: include central stored muon energy and the ability to set a static runNumber
+@author: MarvinPfaff
 """
 
 import math, sys
@@ -54,6 +55,7 @@ class control:
             self._controlInfo = json.load(controlFile)
 
         self._var = 2.3
+        self._runNumber = 0
 # fill variables
         return
 
@@ -96,23 +98,35 @@ class control:
     def flashAtDetector(self):
         return (self._controlInfo["flags"]["flashAtDetector"] == "True")
 
+# Add possibility to set static runNumber
+    def setRunNumber(self, runNum):
+        self._runNumber = runNum
+        print("========  Control Instance  ========")
+        print("RunNumber set manually to ",self._runNumber)
+        print("====================================")
+        return True
+
 # run number
     def runNumber(self, inc=False):
 
+        if self._runNumber == 0:
     # run number is read from a file, it is in the studies directory a sub directory given by the study name and
     # a fileName given by the runNumber key word in the dictionary
     #    rNFile = "102-studies/" + self._controlInfo['study'] + "/" +self._controlInfo['runNumber']
-        sDir =os.environ['StudyDir']
+            sDir =os.environ['StudyDir']
 #        rNFile = "102-studies/" + self._controlInfo['study'] + "/" +self._controlInfo['runNumber']
-        rNFile = sDir  + "/" +self._controlInfo['runNumber']
-        rN = open(rNFile, "r")
-        runNumber = int(rN.readline())
-        rN.close()
-        if (inc):
-            runNumber = runNumber + 1
-            rN = open(rNFile, "w")
-            rN.write(str(runNumber))
+            rNFile = sDir  + "/" +self._controlInfo['runNumber']
+            rN = open(rNFile, "r")
+            runNumber = int(rN.readline())
             rN.close()
+            if (inc):
+                runNumber = runNumber + 1
+                rN = open(rNFile, "w")
+                rN.write(str(runNumber))
+                rN.close()
+        else:
+            runNumber = self._runNumber
+
         return runNumber
 
 # number of events
@@ -127,6 +141,10 @@ class control:
 # Pion energy
     def EPi(self):
         return self._controlInfo["EPi"]
+
+# Central muon energy stored in the ring
+    def EMu(self):
+        return self._controlInfo["EMu"]
 
 #logFile name
     def logFile(self):

@@ -16,6 +16,7 @@
 
     "study": "<studyname>",
     "EPi": 3.0,
+    "EMu": 1.79,
     "printLimit":0,
     "runNumber": "runNumber",
     "nEvents":5000
