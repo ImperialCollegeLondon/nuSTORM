@@ -14,13 +14,15 @@ Class PionEventInstance:
 
   Instance attributes:
   --------------------
-  _ppi      : Pion momentum: i/p argument at instance creation
-  _pmu      : Muon momentum;
-  _TrcSpcCrd: Trace space (s, x, y, z, x', y') in numpy array at
-              point of decay
-  _ppiGen   : Generated pion momentum
-  _P_mu     : Muon 4 momentum: (E, array(px, py, pz)), GeV
-  _P_numu   : Muon-neutrino 4 momentum: (E, array(px, py, pz)), GeV
+  _ppi          : Pion momentum: i/p argument at instance creation
+  _pmu          : Muon momentum;
+  _TrcSpcCrd    : Trace space (s, x, y, z, x', y') in numpy array at
+                  point of decay
+  _LclTrcSpcCrd : (Local) Trace space (s, x, y, z, x', y') in numpy
+                  array at point where pion is generated
+  _ppiGen       : Generated pion momentum
+  _P_mu         : Muon 4 momentum: (E, array(px, py, pz)), GeV
+  _P_numu       : Muon-neutrino 4 momentum: (E, array(px, py, pz)), GeV
 
   Methods:
   --------
@@ -30,12 +32,13 @@ Class PionEventInstance:
       __str__  : Dump of values of decay
 
   Get/set methods:
-    getpppi           : Returns pion momentum as real
-    getpmu            : Returns muon momentum as real
-    getTraceSpaceCoord: Returns trace space: (s, x, y, z, x', y') (m)
-    getppiGen         : Returns generated pion momentum (GeV)
-    getmu4mmtm        : Returns muon 4 momentum: (E, array(px, py, pz)), GeV
-    getnumu4mmtm      : Returns muon-neutrino 4 momentum: (E, array(px, py, pz)), GeV
+    getpppi              : Returns pion momentum as real
+    getpmu               : Returns muon momentum as real
+    getTraceSpaceCoord   : Returns trace space: (s, x, y, z, x', y') (m) at pion decay
+    getLclTraceSpaceCoord: Returns (local) trace space: (s, x, y, z, x', y') (m) at pion generation
+    getppiGen            : Returns generated pion momentum (GeV)
+    getmu4mmtm           : Returns muon 4 momentum: (E, array(px, py, pz)), GeV
+    getnumu4mmtm         : Returns muon-neutrino 4 momentum: (E, array(px, py, pz)), GeV
 
   General methods:
     CreateMuon           : Manager for pion decay, returns z (m) of decay (real), P_mu, P_numu, RestFrame
@@ -60,6 +63,10 @@ Created on Tue 30Mar21;02:26: Version history:
  1.3: 20Jan22: Include possibility to take original pion phase space from pion at target in event history and exploit
                TLorentzVector class from PyROOT to do bost to nuSTORM frame
  @author: MarvinPfaff
+
+ 1.3: 06Jun22: Output two trace spaces, one at pion generation (Coord, _LclTrcSpcCrd) and one at pion decay
+               (DcyCoord, _TrcSpcCrd) and get nuSTORM constants from nuSTORMConst.py
+ @author: MarvinPfaff
 """
 
 from copy import deepcopy
@@ -82,6 +89,7 @@ nuSIMPATH = os.getenv('nuSIMPATH')
 #trfCmplxFile = os.path.join(nuSIMPATH, '11-Parameters/nuSTORM-TrfLineCmplx-Params-v1.0.csv')
 #nuTrLnCmplx = nuTrf.nuSTORMTrfLineCmplx(trfCmplxFile)
 tlCmplxLength = nuSTRMCnst.TrfLineCmplxLen()
+tlCmplxAngle  = nuSTRMCnst.TrfLineCmplxAng()
 
 class PionEventInstance:
 
@@ -108,8 +116,8 @@ class PionEventInstance:
         self._phi=-10.0
         self._costheta=-10.0
         self._lifetime = 0.0
-        self._tlAngle = 8.5 * math.pi / 180.
-        self._TrcSpcCrd, self._ppiGen, self._P_mu, self._P_numu = self.CreateMuon()
+        self._tlAngle = tlCmplxAngle * math.pi / 180.
+        self._TrcSpcCrd, self._LclTrcSpcCrd, self._ppiGen, self._P_mu, self._P_numu = self.CreateMuon()
 
         return
 
@@ -129,7 +137,7 @@ class PionEventInstance:
     def CreateMuon(self):
 #        print ("Starting create muon")
 
-        PrdStrghtLngth = 180.0
+        PrdStrghtLngth = nuSTRMCnst.ProdStrghtLen()
 #        #.. Prepare--get muon decay instance in pion rest frame:
 #        z = 2.* PrdStrghtLngth
 #        Dcy = 0
@@ -164,7 +172,7 @@ class PionEventInstance:
         self._phi = Dcy.getphi()
         self._costheta = Dcy.getcostheta()
         if (self.__Debug): print("PionEventInstance.CreatePion: Dcy ", Dcy)
-        DcyCoord, DirCos = self.GenerateDcyPhaseSpace(Dcy,Ppi)
+        DcyCoord, Coord, DirCos = self.GenerateDcyPhaseSpace(Dcy,Ppi)
         self._lifetime = Dcy.getLifetime()
         if (self.__Debug): print("PionEventInstance.CreatePion: Ppi ", Ppi)
         if (self.__Debug): print("PionEventInstance.CreatePion: DcyCoord ", DcyCoord)
@@ -184,24 +192,28 @@ class PionEventInstance:
         del Dcy
 
 #        print ("Ending create muon")
-        return DcyCoord, Ppi, P_mu, P_numu
+        return DcyCoord, Coord, Ppi, P_mu, P_numu
 
 #.. Trace space coordinate generation: array(s, x, y, z, x', y')
     def GenerateDcyPhaseSpace(self, Dcy, Ppi):
  #       print ("generate phase space start")
+        dcyCoord = np.array([0., 0., 0., 0., 0., 0.])
         coord = np.array([0., 0., 0., 0., 0., 0.])
         #.. longitudinal position, "s", z:
-#        coord[0] = self.GenerateLongiPos(Dcy, Ppi)
+#        dcyCoord[0] = self.GenerateLongiPos(Dcy, Ppi)
 # using  s = (beta*c) * (gamma*t) = p/E * c * E/m * lifetime = p*c*lifetime/m
-        coord[0] =Ppi*PionEventInstance.__sol*Dcy.getLifetime()/PionEventInstance.__pimass
+        dcyCoord[0] =Ppi*PionEventInstance.__sol*Dcy.getLifetime()/PionEventInstance.__pimass
 
-        R, Rinv, BeamPos, theta = self.BeamDir(coord[0], nuStrt, Ppi)
+        R, Rinv, BeamPos, theta = self.BeamDir(dcyCoord[0], Ppi)
 # here we set the Beam Twiss parameters and Energy spread
 
         if self._mode == 'random':
-            xl, yl, xpl, ypl = nuStrt.GenerateTrans(coord[0])
-        elif (self._mode == 'input' and self._pion.traceSpace().s() < 50.):
+            xl, yl, xpl, ypl = nuStrt.GenerateTrans(dcyCoord[0])
+            s  = 0.
+            zl = s - tlCmplxLength
+        elif (self._mode == 'input' and self._pion.traceSpace().s() < tlCmplxLength):
             #transform the global coordinates of pion at target back to tlLocal to get the position and momentum spread with respect to BeamPos & BeamDir
+            s = self._pion.traceSpace().s()
             xg = self._pion.x()
             yg = self._pion.y()
             zg = self._pion.z()
@@ -211,22 +223,31 @@ class PionEventInstance:
             xl, yl, zl, pxl, pyl, pzl = self.glbltoTl(xg, yg, zg, pxg, pyg, pzg)
             xpl = pxl/pzl
             ypl = pyl/pzl
-        elif (self._mode == 'input local' or (self._mode == 'input' and self._pion.traceSpace().s() >= 50.)):
+        elif (self._mode == 'input local' or (self._mode == 'input' and self._pion.traceSpace().s() >= tlCmplxLength)):
+            s = self._pion.traceSpace().s()
             xl = self._pion.x()
             yl = self._pion.y()
+            zl = self._pion.z()
             pxl = self._pion.p()[1][0]
             pyl = self._pion.p()[1][1]
             pzl = self._pion.p()[1][2]
             xpl = pxl/pzl
             ypl = pyl/pzl
 
-        coord[1] = xl + BeamPos[0]
-        coord[2] = yl + BeamPos[1]
-        # [3] is the z position which is calculated from the decay distance and information about the
-        # beam trajectory.
-        coord[3] = BeamPos[2]
+        coord[0] = s
+        coord[1] = xl
+        coord[2] = yl
+        coord[3] = zl
         coord[4] = xpl
         coord[5] = ypl
+
+        dcyCoord[1] = xl + BeamPos[0]
+        dcyCoord[2] = yl + BeamPos[1]
+        # [3] is the z position which is calculated from the decay distance and information about the
+        # beam trajectory.
+        dcyCoord[3] = BeamPos[2]
+        dcyCoord[4] = xpl
+        dcyCoord[5] = ypl
 
         p0    = np.array([0., 0., 0.])
         p1    = np.array([0., 0., 0.])
@@ -241,15 +262,15 @@ class PionEventInstance:
             print("         ----> R: ",  R[0], R[1], R[2])
             print("         ----> Direction cosines rotated: ", p1)
 
-        return coord, p1
-        #return coord, Ppi
+        return dcyCoord, coord, p1
+        #return dcyCoord, Ppi
 
 #.. Beam position, direction and corresponding rotation operator:
 
-    def BeamDir(self, s, nuStrt, Ppi):
-        PrdStrghtLngth = nuStrt.ProdStrghtLen()
-        Circumference  = nuStrt.Circumference()
-        ArcLen         = nuStrt.ArcLen()
+    def BeamDir(self, s, Ppi):
+        PrdStrghtLngth = nuSTRMCnst.ProdStrghtLen()
+        Circumference  = nuSTRMCnst.Circumference()
+        ArcLen         = nuSTRMCnst.ArcLen()
 
         #s_ring takes into account that s = 0. at target and s_ring=z for production straight
         s_ring         = s-tlCmplxLength
@@ -435,6 +456,9 @@ class PionEventInstance:
 
     def getTraceSpaceCoord(self):
         return deepcopy(self._TrcSpcCrd)
+
+    def getLclTraceSpaceCoord(self):
+        return deepcopy(self._LclTrcSpcCrd)
 
     def getmu4mmtm(self):
         return deepcopy(self._P_mu)
