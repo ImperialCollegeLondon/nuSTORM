@@ -311,7 +311,7 @@ void nuSIMtstRestFrame::EventLoop( bool Dbg ) {
 	      << nEvt << " entries" << std::endl;
   }
 
-  Float_t trgt[13], prdStrght[13], piDcy[13], muPrdctn[13], piFlshNu[13], muDcy[13], ePrdctn[13], numuPrdctn[13], nuePrdctn[13], numuDtctr[13], nueDtctr[13];
+  struct eventHistory trgt[13], prdStrght[13], piDcy[13], muPrdctn[13], piFlshNu[13], muDcy[13], ePrdctn[13], numuPrdctn[13], nuePrdctn[13], numuDtctr[13], nueDtctr[13];
   nuAnalysis::geteventHist_ch()->SetBranchAddress("target",  &trgt);
   nuAnalysis::geteventHist_ch()->SetBranchAddress("productionStraight", &prdStrght);
   nuAnalysis::geteventHist_ch()->SetBranchAddress("pionDecay", &piDcy);
