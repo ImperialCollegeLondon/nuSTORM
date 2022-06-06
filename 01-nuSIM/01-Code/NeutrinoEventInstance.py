@@ -64,6 +64,9 @@ Class NeutrinoEventInstance:
 
 Created on Sat 16Jan21;02:26: Version history:
 ----------------------------------------------
+ 1.4: 06Jun22: MP: Add muon momentum acceptance cut to Absorption,
+               fix errors with double smearing and beam direction 
+               and add nuSTORMConst as input for nuSTORM constants
  1.3: 28Aug21: KL: Review and tidy Omar's code and exploit TLorentzVector
                class from PyROOT to do bost to nuSTORM frame
  1.2: 18Jun21: Pass nuSTORM production straight parameter file name
