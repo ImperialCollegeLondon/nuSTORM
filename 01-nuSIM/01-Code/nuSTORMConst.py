@@ -57,12 +57,13 @@ class nuSTORMConst(object):
             cls._PrdStrghtFilename  = os.path.join(cls._nuSIMPATH, '11-Parameters/nuSTORM-PrdStrght-Params-v1.0.csv')
             cls._TrfLineParams      = cls.GetParams(cls._TrfLineFilename)
             cls._TrfLineCmplxLen    = cls._TrfLineParams.iat[0,2]
-            ##cls._piAcc              = cls._TrfLineParams.iat[1,2] / 100.
-            ##cls._epsilon            = cls._TrfLineParams.iat[2,2]
-            ##cls._beta               = cls._TrfLineParams.iat[3,2]
-            cls._delT0              = cls._TrfLineParams.iat[4,2]
-            cls._delT1              = cls._TrfLineParams.iat[5,2]
-            cls._delT2              = cls._TrfLineParams.iat[6,2]
+            cls._TrfLineCmplxAng    = cls._TrfLineParams.iat[1,2]
+            ##cls._piAcc              = cls._TrfLineParams.iat[2,2] / 100.
+            ##cls._epsilon            = cls._TrfLineParams.iat[3,2]
+            ##cls._beta               = cls._TrfLineParams.iat[4,2]
+            cls._delT0              = cls._TrfLineParams.iat[5,2]
+            cls._delT1              = cls._TrfLineParams.iat[6,2]
+            cls._delT2              = cls._TrfLineParams.iat[7,2]
             cls._PrdStrghtParams    = cls.GetParams(cls._PrdStrghtFilename)
             cls._Circumference      = cls._PrdStrghtParams.iat[0,2]
             cls._ProdStrghtLen      = cls._PrdStrghtParams.iat[1,2]
@@ -106,6 +107,9 @@ class nuSTORMConst(object):
 #Transfer Line Parameters
     def TrfLineCmplxLen(self):
         return deepcopy(self._TrfLineCmplxLen)
+
+    def TrfLineCmplxAng(self):
+        return deepcopy(self._TrfLineCmplxAng)
 
     #def piAcc(self):
     #    return deepcopy(self._piAcc)
