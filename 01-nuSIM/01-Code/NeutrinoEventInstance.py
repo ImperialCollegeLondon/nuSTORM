@@ -11,12 +11,12 @@ Class NeutrinoEventInstance:
   -----------------
   __MuonDecay: muon decay class
 
-      
+
   Instance attributes:
   --------------------
   _pmu      : Muon momentum; i/p argument at instance creation
   _ct       : Decay time * speed-of-light
-  _TrcSpcCrd: Trace space (s, x, y, z, x', y') in numpy array at 
+  _TrcSpcCrd: Trace space (s, x, y, z, x', y') in numpy array at
               point of decay
   _pmuGen   : Generated muon momentum
   _pmuDirCos: np.array([d, d, d]) with three direction cosines
@@ -24,7 +24,7 @@ Class NeutrinoEventInstance:
   _P_nue    : Electron-neutrino 4 momentum: (E, array(px, py, pz)), GeV
   _P_numu   : Muon-neuutrino 4 momentum: (E, array(px, py, pz)), GeV
 
-      
+
   Methods:
   --------
   Built-in methods __new__, __repr__ and __str__.
@@ -39,9 +39,9 @@ Class NeutrinoEventInstance:
     getPb             : Returns three vector (np.array) of beam momentum (GeV)
     gete4mmtm         : Returns electron 4 momentum: (E, array(px, py, pz))
                             (GeV)
-    getnue4mmtm       : Returns electron-neutrino 4 momentum: 
+    getnue4mmtm       : Returns electron-neutrino 4 momentum:
                             (E, array(px, py, pz)), GeV
-    getnumu4mmtm      : Returns muon-neutrino 4 momentum: 
+    getnumu4mmtm      : Returns muon-neutrino 4 momentum:
                             (E, array(px, py, pz)), GeV
 
 
@@ -53,7 +53,7 @@ Class NeutrinoEventInstance:
                            [trace space], [DirCos]
     GenerateLongiPos     : Returns s of decay
     BeamDir              : Returns position and momentum of the beam,
-                           rotation operator corresponding to the direction 
+                           rotation operator corresponding to the direction
                            of beam momentum and angle of beam wrt z axis at
                            decay.  Returns:
                            [R[3][3]], [Rinv[3][3]], [Pos. of decay], theta
@@ -78,13 +78,18 @@ from copy import deepcopy
 from ROOT import TLorentzVector as T4V
 
 import nuSTORMPrdStrght as nuPrdStrt
+import nuSTORMConst
 import MuonDecay as MuonDecay
 import MuonConst as MuonConst
 import numpy as np
 import math
 
 muCnst = MuonConst.MuonConst()
-    
+nuSTRMCnst = nuSTORMConst.nuSTORMConst()
+
+tlCmplxLength = nuSTRMCnst.TrfLineCmplxLen()
+tlCmplxAngle = nuSTRMCnst.TrfLineCmplxAng()
+
 class NeutrinoEventInstance:
 
     __mumass = muCnst.mass()/1000.
@@ -96,6 +101,8 @@ class NeutrinoEventInstance:
     def __init__(self, pmu=5., filename=None):
 
         nuStrt = nuPrdStrt.nuSTORMPrdStrght(filename)
+
+        self._tlAngle = tlCmplxAngle * math.pi / 180.
 
         self._pmu = pmu
         self._ct, self._TrcSpcCrd, self._pmuGen, self._pmuDirCos,  \
@@ -119,13 +126,13 @@ class NeutrinoEventInstance:
        self._P_e[0], self._P_e[1][0], self._P_e[1][1], self._P_e[1][2], \
        self._P_nue[0], self._P_nue[1][0],self._P_nue[1][1],self._P_nue[1][2], \
        self._P_numu[0], self._P_numu[1][0],self._P_numu[1][1],self._P_numu[1][2] )
-    
+
 #--------  Generation of neutrino-creation event:
 #.. Manager:
     def CreateNeutrinos(self, nuStrt):
-        PrdStrghtLngth = nuStrt.ProdStrghtLen()
-        Circumference  = nuStrt.Circumference()
-        ArcLen         = nuStrt.ArcLen()       
+        PrdStrghtLngth = nuSTRMCnst.ProdStrghtLen()
+        Circumference  = nuSTRMCnst.Circumference()
+        ArcLen         = nuSTRMCnst.ArcLen()
         ArcRad         = ArcLen / math.pi
 
         if NeutrinoEventInstance.__Debug:
@@ -136,13 +143,14 @@ class NeutrinoEventInstance:
         Dcy = 0
         if NeutrinoEventInstance.__Debug:
             print("    ----> Find valid decay")
-            
+
         if isinstance(Dcy, MuonDecay.MuonDecay):
             del Dcy
         Dcy = MuonDecay.MuonDecay()
 
         Pmu0             = self.getpmu()
-        PmuGen           = nuStrt.GeneratePiMmtm(Pmu0)
+        #PmuGen           = nuStrt.GeneratePiMmtm(Pmu0)
+        PmuGen           = Pmu0
         DcyCoord, DirCos = self.GenerateDcyPhaseSpace(Dcy, PmuGen, nuStrt)
 
         z  = DcyCoord[3]
@@ -154,7 +162,7 @@ class NeutrinoEventInstance:
 
         if NeutrinoEventInstance.__Debug:
             print("    ----> Decay at z =", z)
-            
+
         if NeutrinoEventInstance.__Debug:
             print("    ----> Rotate and boost to nuSTORM rest frame")
 
@@ -167,7 +175,7 @@ class NeutrinoEventInstance:
             print("         ----> P_numu:", P_numu)
 
         del Dcy
-        
+
         return ct, DcyCoord, PmuGen, DirCos, P_e, P_nue, P_numu
 
 #.. Trace space coordinate generation: array(s, x, y, z, x', y')
@@ -178,16 +186,16 @@ class NeutrinoEventInstance:
         #.. longitudinal position, "s", z:
         coord[0] = self.GenerateLongiPos(Dcy, Pmu)
 
-        R, Rinv, BeamPos, theta = self.BeamDir(coord[0], nuStrt, Pmu)
-        
+        R, Rinv, BeamPos, theta = self.BeamDir(coord[0], Pmu)
+
         x, y, xp, yp = nuStrt.GenerateTrans(coord[0])
-        
+
         coord[1] = x + BeamPos[0]
-       
+
         coord[2] = y + BeamPos[1]
-  
+
         coord[3] = BeamPos[2]
-      
+
         coord[4] = xp
         coord[5] = yp
 
@@ -203,7 +211,7 @@ class NeutrinoEventInstance:
             print("         ----> Direction cosines from trace space: ", p0)
             print("         ----> R: ",  R[0], R[1], R[2])
             print("         ----> Direction cosines rotated: ", p1)
-        
+
         return coord, p1
 
 #.. Trace space coordinate generation:
@@ -211,24 +219,41 @@ class NeutrinoEventInstance:
         Emu   = np.sqrt(Pmu**2 + NeutrinoEventInstance.__mumass**2)
         beta  = Pmu / Emu
         gamma = Emu / NeutrinoEventInstance.__mumass
-        
+
         v    = beta * NeutrinoEventInstance.__sol
 
         s   = v * gamma * Dcy.getLifetime()
-        
+
         return s
 
 #.. Beam position, direction and corresponding rotation operator:
 
-    def BeamDir(self, s, nuStrt, Pmu):
-        PrdStrghtLngth = nuStrt.ProdStrghtLen()
-        Circumference  = nuStrt.Circumference()
-        ArcLen         = nuStrt.ArcLen()
+    def BeamDir(self, s, Pmu):
+        PrdStrghtLngth = nuSTRMCnst.ProdStrghtLen()
+        Circumference  = nuSTRMCnst.Circumference()
+        ArcLen         = nuSTRMCnst.ArcLen()
 
-        where          = s%Circumference
+        #s_ring takes into account that s = 0. at target and s=z for production straight entrance
+        s_ring         = s-tlCmplxLength
+        #where corresponds to location within the ring
+        if (s_ring <= 0.):
+            where      = s_ring
+        else:
+            where      = s_ring%Circumference
         ArcRad         = ArcLen/math.pi
-        
-        if ( PrdStrghtLngth>=where):
+
+        if ( 0. >= where):
+            if NeutrinoEventInstance.__Debug:
+                print("         ---->", \
+                      "BeamDir: the muon decays in the transfer line complex")
+
+            theta         =  self._tlAngle          #Angle with respect to Z axis
+            z             =  math.cos(theta)*where
+            x             = -math.sin(theta)*where
+            y             = 0.
+            BeamPos       = [x, y, z]
+
+        elif ( PrdStrghtLngth >= where > 0.):
             if NeutrinoEventInstance.__Debug:
                 print("         ---->", \
                       "BeamDir: the muon decays in the production straight")
@@ -269,7 +294,7 @@ class NeutrinoEventInstance:
                               (ArcRad-ArcRad*math.cos(theta)), \
                               0., \
                               ArcRad*math.sin(theta)]
-          
+
         # R=rotation with respect to y axis through theta angle
         R    = np.array([ \
                           [math.cos(theta),  0., math.sin(theta)], \
@@ -279,22 +304,22 @@ class NeutrinoEventInstance:
                           [math.cos(theta),  0.,-math.sin(theta)], \
                           [0.,               1., 0.],              \
                           [math.sin(theta),  0., math.cos(theta)]])
-                        
-        if NeutrinoEventInstance.__Debug: 
+
+        if NeutrinoEventInstance.__Debug:
             print('               ----> theta, s:', theta, s)
-                
+
         return R, Rinv, BeamPos, theta
 
 
 #.. Boost from muon rest frame to nuSTORM frame:
     def Boost2nuSTORM(self, Dcy, Pmu, DirCos):
-       
+
         Emu = np.sqrt(Pmu**2 + NeutrinoEventInstance.__mumass**2)
         pB  = Pmu*DirCos
         mu4v = T4V.TLorentzVector(pB[0], pB[1], pB[2], Emu)
         b    = mu4v.BoostVector()
-        
-        
+
+
         if NeutrinoEventInstance.__Debug:
             print("        ----> Boost2nuSTORM: boost parameters:")
             print("            ----> Pmu, Emu, boost:", Pmu, Emu, \
@@ -304,7 +329,7 @@ class NeutrinoEventInstance:
         P_e    = Dcy.get4ve()
         P_e[0] = P_e[0]/1000.
         P_e[1] = P_e[1]/1000.
-     
+
         P_e4v  = T4V.TLorentzVector(P_e[1][0], \
                                     P_e[1][1], \
                                     P_e[1][2], \
@@ -316,13 +341,13 @@ class NeutrinoEventInstance:
         P_e4v.Boost(b)
 
         if NeutrinoEventInstance.__Debug:
-            print("            ----> nuSTORM frame P_e4v (GeV):", 
+            print("            ----> nuSTORM frame P_e4v (GeV):",
                   P_e4v.E(), P_e4v.Px(), P_e4v.Py(), P_e4v.Pz())
-        
+
         P_nue     = Dcy.get4vnue()
         P_nue[0]  = P_nue[0]/1000.
         P_nue[1]  = P_nue[1]/1000.
-    
+
         P_nue4v   = T4V.TLorentzVector(P_nue[1][0], \
                                        P_nue[1][1], \
                                        P_nue[1][2], \
@@ -332,16 +357,19 @@ class NeutrinoEventInstance:
             print("            ----> Rest frame P_nue4v (GeV):",
                   P_nue4v.E(), P_nue4v.Px(), P_nue4v.Py(), P_nue4v.Pz())
 
+            if (P_nue4v.E() > 0.05282856990628295):
+                print("Enue in RF higher than theory cutoff: ",P_nue4v.E())
+
         P_nue4v.Boost(b)
-        
+
         if NeutrinoEventInstance.__Debug:
-            print("            ----> nuSTORM frame P_nue4v (GeV):", 
+            print("            ----> nuSTORM frame P_nue4v (GeV):",
                   P_nue4v.E(), P_nue4v.Px(), P_nue4v.Py(), P_nue4v.Pz())
-        
+
         P_numu    = Dcy.get4vnumu()
         P_numu[0] = P_numu[0]/1000.
         P_numu[1] = P_numu[1]/1000.
-     
+
         P_numu4v  = T4V.TLorentzVector(P_numu[1][0], \
                                        P_numu[1][1], \
                                        P_numu[1][2], \
@@ -351,34 +379,38 @@ class NeutrinoEventInstance:
             print("            ----> Rest frame P_numu4v (GeV):",
                   P_numu4v.E(), P_numu4v.Px(), P_numu4v.Py(), P_numu4v.Pz())
 
+            if (P_numu4v.E() > 0.05282856990628295):
+                print("Enumu in RF higher than theory cutoff: ",P_numu4v.E())
+
         P_numu4v.Boost(b)
 
         if NeutrinoEventInstance.__Debug:
-            print("            ----> nuSTORM frame P_numu4v (GeV):", 
+            print("            ----> nuSTORM frame P_numu4v (GeV):",
                   P_numu4v.E(), P_numu4v.Px(), P_numu4v.Py(), P_numu4v.Pz())
 
         P_e[0]    = P_e4v.E()
         P_e[1][0] = P_e4v.Px()
         P_e[1][1] = P_e4v.Py()
         P_e[1][2] = P_e4v.Pz()
-        
+
         P_nue[0]    = P_nue4v.E()
         P_nue[1][0] = P_nue4v.Px()
         P_nue[1][1] = P_nue4v.Py()
         P_nue[1][2] = P_nue4v.Pz()
-        
+
         P_numu[0]    = P_numu4v.E()
         P_numu[1][0] = P_numu4v.Px()
         P_numu[1][1] = P_numu4v.Py()
         P_numu[1][2] = P_numu4v.Pz()
-        
+
         return P_e, P_nue, P_numu
-    
-    def Absorption(self, piTraceSpaceCoord, mu4mmtm, mucostheta):
+
+    def Absorption(self, piTraceSpaceCoord, mu4mmtm, mucostheta, mup0):
       n = 4.8 #how much rounded
-   
-      x0 = 0 # graph translation 
+
+      x0 = 0 # graph translation
       y0 = 0
+      Mup = np.sqrt(mu4mmtm[1][0]**2+mu4mmtm[1][1]**2+mu4mmtm[1][2]**2)
       Mux = piTraceSpaceCoord[1]         #Pion decay transverse position coordinates = Muon Decay transverse position coordinates
       Muy = piTraceSpaceCoord[2]
       Muxp= mu4mmtm[1][0]/mu4mmtm[1][2]  #xp and yp from generated muon momentum
@@ -392,19 +424,23 @@ class NeutrinoEventInstance:
       def f(x,y):
         return 0.1*g(-(x+x0)*math.cos(k(1))-(y+y0)*math.sin(k(1)))+0.1*g(-(x+x0)*math.cos(k(2))-(y+y0)*math.sin(k(2)))+0.1*g(-(x+x0)*math.cos(k(3))-(y+y0)*math.sin(k(3)))
 
+      muAcc = nuSTRMCnst.muAcc()
+      noAccCutFlag = False
+      if mup0 == 0.:
+          noAccCutFlag = True
 
-      if (Mux*Mux/(0.05*0.05))+(Muxp*Muxp/(0.004*0.004)) < 1. and f(Muy, Muyp) < 1.0 and mucostheta < 0:
+      if (Mux*Mux/(0.05*0.05))+(Muxp*Muxp/(0.004*0.004)) < 1. and f(Muy, Muyp) < 1.0 and mucostheta < 0 and ((noAccCutFlag) or ((Mup >= mup0*(1-muAcc)) and (Mup <= mup0*(1+muAcc)))):
             Absorbed = False
       else:
             Absorbed = True
-            
+
       return Absorbed
 
 
 #--------  get/set methods:
 
     def getAbsorbed(self):
-        return deepcopy(self._Absorbed)    
+        return deepcopy(self._Absorbed)
 
     def getLifeTime(self):
         return self._ct
@@ -417,13 +453,13 @@ class NeutrinoEventInstance:
 
     def getpmuGen(self):
         return deepcopy(self._pmuGen)
-    
+
     def getPb(self):
         Pb = np.array([self._pmuGen*self._pmuDirCos[0], \
                        self._pmuGen*self._pmuDirCos[1], \
                        self._pmuGen*self._pmuDirCos[2]  ])
         return Pb
-    
+
     def gete4mmtm(self):
         return deepcopy(self._P_e)
 

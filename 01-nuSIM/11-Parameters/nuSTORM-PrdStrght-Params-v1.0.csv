@@ -2,7 +2,7 @@ Parameter,Name,Value,Unit,Comment
 Circumference,Circumference,616,m,nuSIM-2021-01
 Length of production straight,ProdStrghtLen,180,m,nuSIM-2021-01
 Momentum acceptance,piAcc,10,%,nuSIM-2021-01
-Momentum acceptance,muAcc,15,%,nuSIM-2021-01
+Momentum acceptance,muAcc,16,%,nuSIM-2021-01
 Transverse acceptance (2D),epsilon,1,pi mm rad,nuSIM-2021-01
 Transverse beta function,beta,25000,mm,nuSIM-2021-01
 Distance from end of straighg to detector hall,HallWallDist,50,m,nuSIM-2021-01

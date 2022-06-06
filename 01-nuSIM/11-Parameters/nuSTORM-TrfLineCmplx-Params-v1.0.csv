@@ -1,5 +1,6 @@
 Parameter,Name,Value,Unit,Comment
 Length of transfer line complex,TrfLineCmplxLen,50,m,nuSIM-2021-01
+Transfer line complex angle,TrfLineCmplxAng,8.5,°,nuSIM-2021-01
 Momentum acceptance,piAcc,10,%,nuSIM-2021-01
 Transverse acceptance (2D),epsilon,1,pi mm rad,nuSIM-2021-01
 Transverse beta function,beta,25000,mm,nuSIM-2021-01
