@@ -311,7 +311,7 @@ void nuSIMtstRestFrame::EventLoop( bool Dbg ) {
 	      << nEvt << " entries" << std::endl;
   }
 
-  struct eventHistory trgt[13], prdStrght[13], piDcy[13], muPrdctn[13], piFlshNu[13], muDcy[13], ePrdctn[13], numuPrdctn[13], nuePrdctn[13], numuDtctr[13], nueDtctr[13];
+  struct eventHistory trgt, prdStrght, piDcy, muPrdctn, piFlshNu, muDcy, ePrdctn, numuPrdctn, nuePrdctn, numuDtctr, nueDtctr;
   nuAnalysis::geteventHist_ch()->SetBranchAddress("target",  &trgt);
   nuAnalysis::geteventHist_ch()->SetBranchAddress("productionStraight", &prdStrght);
   nuAnalysis::geteventHist_ch()->SetBranchAddress("pionDecay", &piDcy);
@@ -351,72 +351,72 @@ void nuSIMtstRestFrame::EventLoop( bool Dbg ) {
   double Enumu;
   double Epi;
   double Mmu;
+  double pmu;
   TVector3 b;
+
+  int detDist = 50;
+  int prodStrghtLen = 180;
 
   int count_nu = 0;
 
   for (int i=0 ; i<nEvt ; i++) {
     nuAnalysis::geteventHist_ch()->GetEntry(i);
 
-    Epi = sqrt(pow(trgt[12],2)+pow(trgt[7],2)+pow(trgt[8],2)+pow(trgt[9],2));
+    Epi = sqrt(pow(trgt.mass,2)+pow(trgt.px,2)+pow(trgt.py,2)+pow(trgt.pz,2));
 
-    Emu = sqrt(pow(muPrdctn[12],2)+pow(muPrdctn[7],2)+pow(muPrdctn[8],2)+pow(muPrdctn[9],2));
-    Pmu.SetPxPyPzE(muPrdctn[7], muPrdctn[8], muPrdctn[9], Emu);
+    Emu = sqrt(pow(muDcy.mass,2)+pow(muDcy.px,2)+pow(muDcy.py,2)+pow(muDcy.pz,2));
+    Pmu.SetPxPyPzE(muDcy.px, muDcy.py, muDcy.pz, Emu);
     Mmu = sqrt(Pmu*Pmu);
+    pmu = sqrt(pow(muDcy.px,2)+pow(muDcy.py,2)+pow(muDcy.pz,2));
+
+    Enue = sqrt(pow(nuePrdctn.mass,2)+pow(nuePrdctn.px,2)+pow(nuePrdctn.py,2)+pow(nuePrdctn.pz,2));
+    Enumu = sqrt(pow(numuPrdctn.mass,2)+pow(numuPrdctn.px,2)+pow(numuPrdctn.py,2)+pow(numuPrdctn.pz,2));
+    Pnue.SetPxPyPzE(nuePrdctn.px, nuePrdctn.py, nuePrdctn.pz, Enue);
+    Pnumu.SetPxPyPzE(numuPrdctn.px, numuPrdctn.py, numuPrdctn.pz, Enumu);
 
     hpiE->Fill(Epi);
-    hpimass->Fill(trgt[12]);
+    hpimass->Fill(trgt.mass);
 
-    if (muDcy[11] > 0.){
+    if (muDcy.eventWeight > 0.){
       hmumass->Fill(Mmu);
       hmuE->Fill(Emu);
     }
 
     b = -Pmu.BoostVector();
 
-    PmuRest = Pmu;
+    PmuRest = TLorentzVector(Pmu);
     PmuRest.Boost(b);
 
-    Enue = sqrt(pow(nuePrdctn[12],2)+pow(nuePrdctn[7],2)+pow(nuePrdctn[8],2)+pow(nuePrdctn[9],2));
-    Enumu = sqrt(pow(numuPrdctn[12],2)+pow(numuPrdctn[7],2)+pow(numuPrdctn[8],2)+pow(numuPrdctn[9],2));
-    Pnue.SetPxPyPzE(nuePrdctn[7], nuePrdctn[8], nuePrdctn[9], Enue);
-    Pnumu.SetPxPyPzE(numuPrdctn[7], numuPrdctn[8], numuPrdctn[9], Enumu);
-    PnueRest  = Pnue;
-    PnumuRest = Pnumu;
+    PnueRest  = TLorentzVector(Pnue);
+    PnumuRest = TLorentzVector(Pnumu);
     PnueRest.Boost(b);
     PnumuRest.Boost(b);
 
     //if ( nuAnalysis::getDebug() and i<10) {
-    if (nuePrdctn[11] > 0.) {
+    if (nuePrdctn.eventWeight > 0.) {
 
-      Xnue.SetXYZT(nuePrdctn[3],nuePrdctn[4],nuePrdctn[5],nuePrdctn[10]);
-      Xnumu.SetXYZT(numuPrdctn[3],numuPrdctn[4],numuPrdctn[5],numuPrdctn[10]);
+      Xnue.SetXYZT(nuePrdctn.x,nuePrdctn.y,nuePrdctn.z,nuePrdctn.t);
+      Xnumu.SetXYZT(numuPrdctn.x,numuPrdctn.y,numuPrdctn.z,numuPrdctn.t);
 
-      XnueDet = nuAnalysis::DetectorHitPosition(Xnue,Pnue,trgt[10],230.);
-      XnumuDet = nuAnalysis::DetectorHitPosition(Xnumu,Pnumu,trgt[10],230.);
+      XnueDet = nuAnalysis::DetectorHitPosition(Xnue,Pnue,trgt.t,prodStrghtLen+detDist);
+      XnumuDet = nuAnalysis::DetectorHitPosition(Xnumu,Pnumu,trgt.t,prodStrghtLen+detDist);
 
       if ( nuAnalysis::getDebug() && (count_nu++ < 10)) {
 
-        std::cout << "          ----> Run:   " << nuePrdctn[0] << std::endl;
-        std::cout << "          ----> Event: " << i << std::endl;
-        std::cout << "          ----> Weight:   " << nuePrdctn[11] << std::endl;
+        std::cout << "          ----> Run:   " << nuePrdctn.runNumber << std::endl;
+        std::cout << "          ----> Event: " << nuePrdctn.eventNumber << std::endl;
+        std::cout << "          ----> Weight:   " << nuePrdctn.eventWeight << std::endl;
 
         std::cout << "              ----> Nue.P: ";
-        for(int ii=7;ii<10;ii++){
-	         std::cout << nuePrdctn[ii] << ", ";
-         }
-         std::cout << std::endl;
+	      std::cout << nuePrdctn.px << ", " << nuePrdctn.py << ", " << nuePrdctn.pz;
+        std::cout << std::endl;
 
          std::cout << "              ----> NuMu.P: ";
-         for(int ii=7;ii<10;ii++){
-	          std::cout << numuPrdctn[ii] << ", ";
-         }
+         std::cout << numuPrdctn.px << ", " << numuPrdctn.py << ", " << numuPrdctn.pz;
          std::cout << std::endl;
 
          std::cout << "              ----> muon.P: ";
-         for(int ii=7;ii<10;ii++){
-	          std::cout << muPrdctn[ii] << ", ";
-         }
+         std::cout << muPrdctn.px << ", " << muPrdctn.py << ", " << muPrdctn.pz;
          std::cout << std::endl;
 
          std::cout << "                  ----> Mass of muon check: "<< Mmu << std::endl;
