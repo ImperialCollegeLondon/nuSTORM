@@ -12,15 +12,24 @@ Model for calculating normalised numbers
 
     @author  Paul Kyberd
 
+    Add differentiation between pion decay phase space and pion phase space at target;
+    Add right muon beam momentum to event history;
+    Add central muon momentum to introduce muon momentum acceptance cut;
+    Add argument parser for easier handling when running simulation as batch jobs;
+    Add correct momentum calculation from angles and absolute momentum;
+    Add nuSTORM constant handling through nuSTORM constant class;
+    @version    1.3
+    @date       09 June 2022
+    @author     Marvin Pfaff
 
     Add the event history at the end of the production straight
     @version     1.2
-    @date        07 January 2021
+    @date        07 January 2022
 
 
     Add python logging
     @version     1.1
-    @date        07 January 2021
+    @date        07 January 2022
 
 
     @version     1.0
@@ -32,31 +41,37 @@ Model for calculating normalised numbers
 #
 import os, sys
 from datetime import datetime
+from copy import deepcopy
+import argparse
 import numpy as np
 import math as math
 import logging
 import PionConst as PC
+import MuonConst as MC
+import nuSTORMConst
 import control
 import histoManager
 import nuSTORMPrdStrght as nuPrdStrt
 import nuSTORMTrfLineCmplx as nuTrfLineCmplx
 import PionEventInstance as piEvtInst
 import NeutrinoEventInstance as nuEvtInst
+import RandomGenerator as Rndm
 import plane as plane
 import particle as particle
 import eventHistory as eventHistory
 
 class normalisation:
 
-    __version__ = 1.1
-    def __init__(self):
+    __version__ = 1.3
+    def __init__(self, muonMom=0):
         self._tlDcyCount = 0
         self._byndPSCount = 0
         self._PSDcyCount = 0
         self._muDcyCount = 0
-        self._tlAngle = 8.5*math.pi/180.0       # should put the angle in the parameter file
+        self._tlAngle = tlCmplxAngle*math.pi/180.0
         self._sth = math.sin(self._tlAngle)
         self._cth = math.cos(self._tlAngle)
+        self._mup0 = muonMom
 
 # transform x,y,z and px,py,pz co-ordinates from the transfer line local co-ordinates to the
 # global ones
@@ -83,17 +98,17 @@ class normalisation:
       eH.addParticle("productionStraight", noParticle)
 # add a pion decay particle - set the time to the decay lifetime
       if (self._tlDcyCount < printLimit): print ("pi in tlDecay ", pi)
-      tsc = pi.getTraceSpaceCoord()
-      sd = tsc[0]
-      xdl = tsc[1]
-      ydl = tsc[2]
-      zdl = tsc[3]
-      xpd = 0.0
-      ypd = 0.0
+      dcytsc = pi.getTraceSpaceCoord()
+      sd = dcytsc[0]
+      xdl = dcytsc[1]
+      ydl = dcytsc[2]
+      zdl = dcytsc[3]
+      xpd = dcytsc[4]
+      ypd = dcytsc[5]
       pPion = pi.getppiGen()
-      pxdl = pPion*xpd
-      pydl = pPion*ypd
-      pzdl = np.sqrt(pPion*pPion - pxdl**2 - pydl**2)
+      pzdl = np.sqrt(pPion**2/(1+xpd**2+ypd**2))
+      pxdl = pzdl*xpd
+      pydl = pzdl*ypd
       pi.getLifetime()
       td = lifetime*1E9 + t
       zdl = zdl - tlCmplxLength
@@ -149,8 +164,8 @@ class normalisation:
       self._byndPSCount = self._byndPSCount + 1
 #  add a pion decay particle - set the time to the decay lifetime and the s to the pathlength, eventweight to full
 # x,y,z to 0.0 and px,py to 0.0, pz to 0.01 so constructor does not
-      tsc = pi.getTraceSpaceCoord()
-      sd = tsc[0]
+      dcytsc = pi.getTraceSpaceCoord()
+      sd = dcytsc[0]
       xd = 0.0
       yd = 0.0
       zd = 0.0
@@ -217,19 +232,19 @@ class normalisation:
     def decayPiInPS(self):
 
       self._PSDcyCount = self._PSDcyCount + 1
-      tsc = pi.getTraceSpaceCoord()
-      sd = tsc[0]
-      xd = tsc[1]
-      yd = tsc[2]
-      xpd = tsc[4]
-      ypd = tsc[5]
+      dcytsc = pi.getTraceSpaceCoord()
+      sd = dcytsc[0]
+      xd = dcytsc[1]
+      yd = dcytsc[2]
+      xpd = dcytsc[4]
+      ypd = dcytsc[5]
 #  need the lifetime in the nuStorm frame in ns
       piLifetime = pi.getLifetime()*1E9*Epion/(piMass)
       td = piLifetime + t
       zd = sd - tlCmplxLength
-      pxd = pPion*xpd
-      pyd = pPion*ypd
-      pzd = np.sqrt(pPion*pPion - pxd**2 - pyd**2)
+      pzd = np.sqrt(pPion**2/(1+xpd**2+ypd**2))
+      pxd = pzd*xpd
+      pyd = pzd*ypd
       pionPSDecay = particle.particle(runNumber, event, sd, xd, yd, zd, pxd, pyd, pzd, td, eventWeight, "pi+")
       if (td < 150.0):
         print ("error in the time")
@@ -316,7 +331,12 @@ class normalisation:
             print ("muon 4 momentum is ", mu4mom)
             print ('muoncostheta is ' , mucostheta)
 
-      Absorbed = nuEvt.Absorption(piTraceSpaceCoord, mu4mom, mucostheta)
+      mup0 = self._mup0
+      if self._mup0 == 0.:
+          print("ERROR: Muon central momentum is 0.! Interrupting simulation...")
+          exit()
+
+      Absorbed = nuEvt.Absorption(piTraceSpaceCoord, mu4mom, mucostheta, mup0)
 #        if (Absorbed == False): print ("absorbed is ", Absorbed, "  for event ", event)
 #  if the muon doesn't make it in the ring acceptance ... it is absorbed ... so for the
 #  muon we create a suitable muon - but the other particles are all put to null values so
@@ -338,9 +358,9 @@ class normalisation:
             xDcy = muTSC[1]
             yDcy = muTSC[2]
             zDcy = muTSC[3]
-            pzDcy = nuEvt.getpmu()
-            pxDcy = muTSC[4]*pzDcy
-            pyDcy = muTSC[5]*pzDcy
+            pxDcy = nuEvt.getPb()[0]
+            pyDcy = nuEvt.getPb()[1]
+            pzDcy = nuEvt.getPb()[2]
             tDcy = (pi.getLifetime()+nuEvt.getLifeTime())*1E9 + t
             muDecay = particle.particle(runNumber, event, sDcy, xDcy, yDcy, zDcy, pxDcy, pyDcy, pzDcy, tDcy, eventWeight, "mu+")
             eH.addParticle("muonDecay", muDecay)
@@ -418,9 +438,9 @@ class normalisation:
             xDcy = muTSC[1]
             yDcy = muTSC[2]
             zDcy = muTSC[3]
-            pzDcy = nuEvt.getpmu()
-            pxDcy = muTSC[4]*pzDcy
-            pyDcy = muTSC[5]*pzDcy
+            pxDcy = nuEvt.getPb()[0]
+            pyDcy = nuEvt.getPb()[1]
+            pzDcy = nuEvt.getPb()[2]
             tDcy = (pi.getLifetime()+nuEvt.getLifeTime())*1E9 + t
             muDecay = particle.particle(runNumber, event, sDcy, xDcy, yDcy, zDcy, pxDcy, pyDcy, pzDcy, tDcy, eventWeight, "mu+")
             eH.addParticle("muonDecay", muDecay)
@@ -487,6 +507,10 @@ class normalisation:
             if (self._muDcyCount < printLimit): print ("nue at detector")
 
 
+    def muDcyCount(self):
+        return deepcopy(self._muDcyCount)
+
+
 if __name__ == "__main__" :
 
 # Pions Flash in the production straight
@@ -498,18 +522,49 @@ if __name__ == "__main__" :
 # Flash from the transfer line
 #    controlFile = "102-Studies/pencilValidation/TLPiFlash.dict"
 # muons from transfer line
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--dict', help='Select which run condition dictionary to use. Default: MuRingDcy.dict', default='MuRingDcy.dict')
+    parser.add_argument('--run', help='Select which run number to use. If no run number is specified consecutive run number is used.', default='0')
+    parser.add_argument('--studyname', help='Select which study name to use. If no study name is specified study name from dictionary is used.', default='noName')
+    parser.add_argument('--p0', help='Select central pion momentum to be generated. If no central pion momentum is specified pion momentum from dictionary is used.',default='0.')
+    parser.add_argument('--Mup0', help='Select central muon momentum to be stored in the ring. If no central muon momentum is specified muon momentum from dictionary is used.',default='0.')
+    args = parser.parse_args()
+
     StudyDir = os.getenv('StudyDir')
-    StudyName = os.getenv('StudyName')
-    controlFile = os.path.join(StudyDir, StudyName, "PSPiFLash3.dict")
+    if args.studyname != "noName":
+        StudyName = args.studyname
+    else:
+        StudyName = os.getenv('StudyName')
+    controlFile = os.path.join(StudyDir, StudyName, args.dict)
 
     ctrlInst = control.control(controlFile)
-    normInst = normalisation()
+
+    #Initialise central pion and muon momenta
+    if float(args.p0) != 0.:
+        pionMom = float(args.p0)
+    else:
+        pionMom = ctrlInst.EPi()
+
+    if float(args.Mup0) != 0.:
+        muonMom = float(args.Mup0)
+    else:
+        muonMom = ctrlInst.EMu()
+
+    nuSTRMCnst = nuSTORMConst.nuSTORMConst()
+
+    tlCmplxLength = nuSTRMCnst.TrfLineCmplxLen()
+    tlCmplxAngle = nuSTRMCnst.TrfLineCmplxAng()
+
+    normInst = normalisation(muonMom)
 # run number needed because it labels various files
+    if int(args.run) != 0:
+        ctrlInst.setRunNumber(int(args.run))
     runNumber = ctrlInst.runNumber(True)
 
 
 #       logfile initialisation
-    logging.basicConfig(filename=ctrlInst.logFile(), encoding='utf-8', level=logging.INFO)
+    logging.basicConfig(filename=ctrlInst.logFile(), level=logging.INFO) #, encoding='utf-8'
 
 #       Histogram initialisation
     hm = histoManager.histoManager()
@@ -547,11 +602,14 @@ if __name__ == "__main__" :
 
 # initialise run number, number of events to generate, central pion momentum, and event weight
     printLimit = ctrlInst.printLimit()
-    pionMom = ctrlInst.EPi()
     crossSection = 50
     nEvents = ctrlInst.nEvents()
     eventWeight = crossSection
-    logging.info("Run Number: %s,  nEvents: %s,  pion central momentum: %s", runNumber, nEvents, pionMom)
+    logging.info("Run Number: %s,  nEvents: %s,  pion central momentum: %s,  muon central momentum: %s", runNumber, nEvents, pionMom, muonMom)
+    print("Run Number: ", runNumber)
+    print("nEvents: ", nEvents)
+    print("Pion central momentum: ", pionMom)
+    print("Muon central momentum: ", muonMom)
 
 # Get the nuSIM path name and use it to set names for the inputfile and the outputFile
     nuSIMPATH = os.getenv('nuSIMPATH')
@@ -567,11 +625,9 @@ if __name__ == "__main__" :
 
 
 # Get machine and run parameters
-    nuStrt = nuPrdStrt.nuSTORMPrdStrght(filename)
-    psLength = nuStrt.ProdStrghtLen()
+    psLength = nuSTRMCnst.ProdStrghtLen()
+    detectorPosZ = nuSTRMCnst.HallWallDist()
     nuTrLnCmplx = nuTrfLineCmplx.nuSTORMTrfLineCmplx(trfCmplxFile)
-    tlCmplxLength = nuTrLnCmplx.TrfLineCmplxLen()
-    detectorPosZ = nuStrt.HallWallDist()
 # set up the detector front face
     fluxPlane = plane.plane(psLength, detectorPosZ)
 # set up the event history - instantiate
@@ -587,23 +643,23 @@ for event in range(nEvents):
 # generate a pion
     pi = piEvtInst.PionEventInstance(pionMom)
 # set its values
-    s = 0.0
-    xl = 0.0
-    yl = 0.0
-    zl = -tlCmplxLength
-    xpl = 0.0
-    ypl = 0.0
+    tsc = pi.getLclTraceSpaceCoord()
+    s = tsc[0]
+    xl = tsc[1]
+    yl = tsc[2]
+    zl = tsc[3]
+    xpl = tsc[4]
+    ypl = tsc[5]
     pPion = pi.getppiGen()
-    pxl = pPion*xpl
-    pyl = pPion*ypl
-    pzl = np.sqrt(pPion*pPion - pxl**2 - pyl**2)
+    pzl = np.sqrt(pPion**2/(1+xpl**2+ypl**2))
+    pxl = pzl*xpl
+    pyl = pzl*ypl
     t = nuTrLnCmplx.GenerateTime()*1E9
 # transform to the global system
     xg, yg, zg, pxg, pyg, pzg = normInst.tltoGlbl(xl, yl, zl, pxl, pyl, pzl)
 #  pion at target is a point source but with a momentum spread
     pionTarget = particle.particle(runNumber, event, s, xg, yg, zg, pxg, pyg, pzg, t, eventWeight, "pi+")
     eH.addParticle('target', pionTarget)
-    tsc = pi.getTraceSpaceCoord()
 
 # get the decay length - in the transfer line, in the production straight - or lost beyond the straight
     lifetime = pi.getLifetime()
@@ -648,8 +704,16 @@ for event in range(nEvents):
         print ("event number is ", event)
     elif ((event <1000) and (event%100 ==0)):
         print ("event number is ", event)
+    elif ((event < 10000) and (event%1000 ==0)):
+        print ("event number is ", event)
+    elif ((event < 100000) and (event%10000 ==0)):
+        print ("event number is ", event)
     else:
-        if (event%1000 ==0): print ("event number is ", event)
+        if (event%100000 ==0): print ("event number is ", event)
+
+    if (event == nEvents-1):
+        print()
+        print(normInst.muDcyCount()," neutrinos have been created.")
 
 
 # Write to the root output file and close
