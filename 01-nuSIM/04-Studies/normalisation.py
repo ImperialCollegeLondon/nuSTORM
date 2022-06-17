@@ -720,7 +720,8 @@ for event in range(nEvents):
 eH.write()
 eH.outFileClose()
 # Write out histograms
-fileName = os.path.join(StudyDir, ctrlInst.studyName() + "/Normalplots" + str(ctrlInst.runNumber()) + ".root")
+fileName = os.path.join(StudyDir, StudyName + "/Normalplots" + str(ctrlInst.runNumber()) + ".root")
+print(f"filename is {fileName}")
 print (fileName)
 hm.histOutRoot(fileName)
 ##! Complete:

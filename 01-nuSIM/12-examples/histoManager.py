@@ -104,7 +104,7 @@ class histoManager:
         self.histParams.append("")
         return self.histVar
 
-    def histdo(self):
+    def histdo(self,path):
 # Output all histos to screen and file
         hPnt = 0
         for i in range(len(self.hists)):
@@ -127,14 +127,14 @@ class histoManager:
                 hCurr.Draw()
                 if hPnt == 4:
                     canvas.Draw()
-                    canvas.Print("plots/" + title + ".pdf")
+                    canvas.Print(path + "/plots/" + title + ".pdf")
                     hPnt = 0
                     self.action = ""
             else:
                 canvas = ROOT.TCanvas(title, title)
                 hCurr.Draw()
                 canvas.Draw()
-                canvas.Print("plots/" + title + ".pdf")
+                canvas.Print(path + "/plots/" + title + ".pdf")
 
 # create a tex file with all the plots
 

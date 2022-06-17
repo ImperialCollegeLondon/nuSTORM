@@ -148,8 +148,8 @@ class control:
 
 #logFile name
     def logFile(self):
-        sDir =os.environ['StudyDir']
-        return sDir + "/" + self._controlInfo['study'] + "/"+ self._controlInfo["files"]["logFile"] + str(self.runNumber()) + ".log"
+        sDir =os.environ['StudyDir'] + "/" + os.environ["StudyName"]
+        return sDir + "/" + "/"+ self._controlInfo["files"]["logFile"] + str(self.runNumber()) + ".log"
 
 #plots dictionary file name
     def plotsDict(self):

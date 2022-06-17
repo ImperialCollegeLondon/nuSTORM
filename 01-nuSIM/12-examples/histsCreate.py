@@ -26,6 +26,7 @@ class histsCreate():
         self._count = 0
         self._targetWeight = 0
         self._targetNoWeight = 0
+        self._t0 = 0
         self._NZWeight = {"target":0, "productionStraight": 0, "prodStraightEnd": 0, "pionDecay": 0, "muonProduction": 0,"piFlashNu": 0,
                 "muonDecay": 0, "eProduction": 0, "numuProduction":0, "nueProduction": 0, "numuDetector": 0, "nueDetector": 0}
         self._zeroWeight = {"target":0, "productionStraight": 0, "prodStraightEnd": 0, "pionDecay": 0, "muonProduction": 0,"piFlashNu": 0,
@@ -75,9 +76,9 @@ class histsCreate():
             hBins = 100
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
 
-        hLower = self._plotsInfo["tLower"][eventType]
-        hUpper = self._plotsInfo["tHigher"][eventType]
-        hTitle = eventType + ":t"
+        hLower = self._plotsInfo["tBunchLower"][eventType]
+        hUpper = self._plotsInfo["tBunchHigher"][eventType]
+        hTitle = eventType + ":t from bunch start"
         if eventType == "muonDecay" or eventType == "eProduction":
             hBins = 50
         elif eventType == "target":
@@ -86,6 +87,12 @@ class histsCreate():
         else:
             hBins = 100
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
+
+        hLower = self._plotsInfo["TOFLower"][eventType]
+        hUpper = self._plotsInfo["TOFHigher"][eventType]
+        hTitle = eventType + ":Time of Flight"
+        self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
+
 
         hBins = 100
         hTitle = eventType + ":px"
@@ -109,7 +116,15 @@ class histsCreate():
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
 
         hTitle = eventType + ":E_v_t"
-        self._hists.append(self._hm.book2(hTitle, 50, 0.0, 5.0, 50, 10000.0, 11000.0))
+        hLow1 = self._plotsInfo["eLower"][eventType]
+        hUp1 = self._plotsInfo["eHigher"][eventType]
+        hLow2 = self._plotsInfo["TOFLower"][eventType]
+        hUp2 = self._plotsInfo["TOFHigher"][eventType]
+
+        self._hists.append(self._hm.book2(hTitle, 50, hLow1, hUp1, 50, hLow2, hUp2))
+#        print ("self._hists ", len(self._hists))
+#        print ("self._hists ", self._hists[11])
+
 
 
 #        print (self._hists)
@@ -131,6 +146,10 @@ class histsCreate():
         s = particle.s()
         t = particle.t()
 
+#  if the location is target get the time as the start time
+        if (location == 'target'):
+            self._t0 = t
+
         if (wt !=0):
             n = self._NZWeight.get(location)
             self._NZWeight[location] = n + 1
@@ -138,17 +157,27 @@ class histsCreate():
             n = self._zeroWeight.get(location)
             self._zeroWeight[location] = n + 1
 
+        hoffset = 0
         if (wt > 0.0):
-            self._hists[hPnt+3].Fill(wt)
-            self._hists[hPnt+4].Fill(s)
-            self._hists[hPnt+5].Fill(t)
-            self._hists[hPnt+6].Fill(px)
-            self._hists[hPnt+7].Fill(py)
-            self._hists[hPnt+10].Fill(pz,t)
-
-            self._hists[hPnt+0].Fill(x)
-            self._hists[hPnt+1].Fill(y)
-            self._hists[hPnt+2].Fill(z)
+            self._hists[hPnt+hoffset].Fill(x)
+            hoffset = hoffset + 1
+            self._hists[hPnt+hoffset].Fill(y)
+            hoffset = hoffset + 1
+            self._hists[hPnt+hoffset].Fill(z)
+            hoffset = hoffset + 1
+            self._hists[hPnt+hoffset].Fill(wt)
+            hoffset = hoffset + 1
+            self._hists[hPnt+hoffset].Fill(s)
+            hoffset = hoffset + 1
+            self._hists[hPnt+hoffset].Fill(t)
+            hoffset = hoffset + 1
+            self._hists[hPnt+hoffset].Fill(t-self._t0)
+            hoffset = hoffset + 1
+            self._hists[hPnt+hoffset].Fill(px)
+            hoffset = hoffset + 1
+            self._hists[hPnt+hoffset].Fill(py)
+            hoffset = hoffset + 3
+            self._hists[hPnt+hoffset].Fill(pz,t)
 
             if (location == 'productionStraight'):
 # plots with non-zero weight - for production straight
@@ -157,11 +186,11 @@ class histsCreate():
             Enu = math.sqrt(px*px + py*py + pz*pz)
             if ((location == 'numuDetector') or (location == "nueDetector")):
                 if ((abs(x) < 2.5) and (abs(y) < 2.5)):
-                        self._hists[hPnt+8].Fill(pz)
-                        self._hists[hPnt+9].Fill(Enu)
+                        self._hists[hPnt+9].Fill(pz)
+                        self._hists[hPnt+10].Fill(Enu)
             else:
-                self._hists[hPnt+8].Fill(pz)
-                self._hists[hPnt+9].Fill(Enu)
+                self._hists[hPnt+9].Fill(pz)
+                self._hists[hPnt+10].Fill(Enu)
 
 
 

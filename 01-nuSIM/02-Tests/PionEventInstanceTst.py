@@ -66,13 +66,17 @@ PionEventInstanceTest = PionEventInstanceTest + 1
 print()
 print("PionEventInstanceTest:", PionEventInstanceTest, \
       "Test methods by which muon-creation event is generated.")
-decayPnt, PPi, Pmu, Pnumu = piEI.CreateMuon()
-print("    Muon event: trace-space coordinates of pion at decay, P_pi, P_mu, P_numu:", decayPnt, "\n", \
-           "    ", PPi,"    ", Pmu, "    ", Pnumu)
+decayPnt, Coord, PPi, Pmu, Pnumu = piEI.CreateMuon()
+print("    Muon event: ")
+print(f"       Trace-space coordinates of pion at decay {decayPnt}")
+print(f"       decay coordinates {Coord}")
+print(f"       P_pi {PPi}")
+print(f"       P_mu {Pmu}") 
+print(f"       P_mu {Pnumu}") 
 ETot = Pmu[0]+Pnumu[0]
 PTot = Pmu[1]+Pnumu[1]
-print ("totol energy is ", ETot)
-print ("total momentum is ", PTot)
+print ("       Totol energy is ", ETot)
+print ("       Total momentum is ", PTot)
 del piEI
 
 ##! Soak test:

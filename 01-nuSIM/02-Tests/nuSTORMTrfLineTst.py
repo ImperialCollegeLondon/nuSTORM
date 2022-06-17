@@ -36,8 +36,8 @@ nuSTORMTrfLineTest = 1
 print()
 print("nuSTORMTrfLineTest:", nuSTORMTrfLineTest, " check if class is a singleton.")
 nuSIMPATH = os.getenv('nuSIMPATH')
-#filename  = os.path.join(nuSIMPATH,r'11-Parameters/nuSTORM-PrdStrght-Params-v1.0.csv')
-filename = r'/home/marvin/Documents/masters_thesis/nuSTORM/11-Parameters/nuSTORM-TrfLine-Params-v1.0.csv'
+filename  = os.path.join(nuSIMPATH,r'11-Parameters/nuSTORM-Trfline-Params-v1.0.csv')
+#filename = r'/home/marvin/Documents/masters_thesis/nuSTORM/11-Parameters/nuSTORM-TrfLine-Params-v1.0.csv'
 nuTrfLine  = nuTrf.nuSTORMTrfLine(filename)
 nuTrfLine1 = nuTrf.nuSTORMTrfLine(filename)
 print("    nuTrfLine singleton test:", id(nuTrfLine), id(nuTrfLine1), id(nuTrfLine)-id(nuTrfLine1))
