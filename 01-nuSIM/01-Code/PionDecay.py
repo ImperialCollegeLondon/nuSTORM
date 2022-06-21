@@ -150,8 +150,8 @@ class PionDecay:
 
     def decaypion(self):
 #.. Calculate 3-vectors - muon is going forward:
-        f_mu = [0.0, 0.0, 29.79]
-        f_numu = [0.0, 0.0, -29.79]
+        f_mu = [0.0, 0.0, 29.7923147]
+        f_numu = [0.0, 0.0, -29.7923147]
 #        print ("muon 3 vectors ", f_mu, "    numu 3 vector ", f_numu)
 
 #.. Rotate to arbitrary axis orientation:
@@ -162,13 +162,13 @@ class PionDecay:
 #        print ("back from rotation ... p_mu ", p_mu, "    p_numu  ", p_numu)
 
         E_mu = mth.sqrt(muCnst.mass()*muCnst.mass() + p_mu[0]*p_mu[0] + p_mu[1]*p_mu[1] + p_mu[2]*p_mu[2])
-        E_numu = 29.79
+        E_numu = 29.7923147
 #  Energy conservation check - put the check in the debug check when happy
         if self.__Debug == True:
             ETot = E_mu + E_numu
             print ("Check energy conservation Emu = ", E_mu, "    Enumu = ", E_numu, "    ETotal = ", ETot)
         ETot = E_mu + E_numu
-        if abs(ETot-piCnst.mass()) > 0.01:
+        if abs(ETot-piCnst.mass()) > 0.0001:
             print ("Energy not conserved, delta E is ", ETot-piCnst.mass())
         
         v_mu   = [E_mu,  p_mu]

@@ -116,6 +116,7 @@ class PionEventInstance:
         self._phi=-10.0
         self._costheta=-10.0
         self._lifetime = 0.0
+        self._P_pi=np.array([0., np.array([0., 0., 0.])])
         self._tlAngle = tlCmplxAngle * math.pi / 180.
         self._TrcSpcCrd, self._LclTrcSpcCrd, self._ppiGen, self._P_mu, self._P_numu = self.CreateMuon()
 
@@ -126,9 +127,11 @@ class PionEventInstance:
 
     def __str__(self):
         return "PionEventInstance: p_pi (GeV) = %g, s (m) = %g, z (m) = %g, generated momentum=%g, \r\n \
+                P_pi (%g, [%g, %g, %g]), \r\n \
                 P_mu (%g, [%g, %g, %g]), \r\n \
                 P_numu (%g, [%g, %g, %g]), \r\n" % \
             (self._ppi, self._TrcSpcCrd[0], self._TrcSpcCrd[3], self._ppiGen, \
+             self._P_pi[0], self._P_pi[1][0],self._P_pi[1][1],self._P_pi[1][2], \
              self._P_mu[0], self._P_mu[1][0],self._P_mu[1][1],self._P_mu[1][2], \
              self._P_numu[0], self._P_numu[1][0],self._P_numu[1][1],self._P_numu[1][2] )
 
@@ -164,6 +167,10 @@ class PionEventInstance:
         beta  = Ppi / Epi
         gamma = Epi / PionEventInstance.__pimass
         v    = beta * PionEventInstance.__sol
+        if (self.__Debug): 
+            print(f"PionEventInstance.CreatePion: Ppi {Ppi}   Epi {Epi}   beta {beta}   gamma {gamma}   v {v}")
+            gammaChck = 1.0/math.sqrt(1-beta*beta)
+            print(f"     delta gamma {gammaChck - gamma}\n\n")
 
 # no TMax at present
 #        Tmax = nuStrt.ProdStrghtLen() / (gamma * v)
@@ -173,9 +180,14 @@ class PionEventInstance:
         self._costheta = Dcy.getcostheta()
         if (self.__Debug): print("PionEventInstance.CreatePion: Dcy ", Dcy)
         DcyCoord, Coord, DirCos = self.GenerateDcyPhaseSpace(Dcy,Ppi)
+        if self._mode == 'random':
+            self._P_pi[0] = Epi 
+            self._P_pi[1][0] = Ppi*DirCos[0]
+            self._P_pi[1][1] = Ppi*DirCos[1]
+            self._P_pi[1][2] = Ppi*DirCos[2]
         self._lifetime = Dcy.getLifetime()
         if (self.__Debug): print("PionEventInstance.CreatePion: Ppi ", Ppi)
-        if (self.__Debug): print("PionEventInstance.CreatePion: DcyCoord ", DcyCoord)
+        if (self.__Debug): print(f"PionEventInstance.CreatePion: DcyCoord  {DcyCoord} \n          Coord {Coord} \n          DirCos {DirCos}")
         z = DcyCoord[3]
 #  This test is no longer valid - may re-introduce
 #        if z > PrdStrghtLngth:
@@ -186,7 +198,7 @@ class PionEventInstance:
 
         #.. Boost to nuSTORM frame:
         if PionEventInstance.__Debug:
-            print("PionEventInstance.CreateMuon: rotate and boost to nuSTORM rest frame:")
+            print(f"PionEventInstance.CreateMuon: rotate and boost to nuSTORM rest frame:Ppi is {Ppi}")
         P_mu, P_numu = self.Boost2nuSTORM(Dcy,Ppi, DirCos)
 
         del Dcy
@@ -459,6 +471,9 @@ class PionEventInstance:
 
     def getLclTraceSpaceCoord(self):
         return deepcopy(self._LclTrcSpcCrd)
+
+    def getpi4mmtm(self):
+        return deepcopy(self._P_pi)
 
     def getmu4mmtm(self):
         return deepcopy(self._P_mu)

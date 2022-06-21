@@ -283,6 +283,8 @@ class normalisation:
       pxnu = numu[1][0]
       pynu = numu[1][1]
       pznu = numu[1][2]
+      eNu = numu[0]
+
       nuFlash = particle.particle(runNumber, event, sd, xd, yd, zd, pxnu, pynu, pznu, td, eventWeight, "numu")
       eH.addParticle("piFlashNu", nuFlash)
       if (self._PSDcyCount < printLimit):  print ("piFlashNu PS")
