@@ -15,6 +15,9 @@ Class RandomGenerator
   _rootfilename = Filename, including path, to ROOT file containing
                   histgrams that should be used to generate random
                   numbers.
+  _hist         = 1D histogram containing e.g. absolute momentum distribution
+  _hist2Dx      = 2D histogram containing phase space distribution in x
+  _hist2Dy      = 2D histogram containing phase space distribution in y
 
   Methods:
   --------
@@ -30,11 +33,15 @@ Class RandomGenerator
 
   Simulation methods:
       getRandom    : Generates one random number  according to a 1D histogram
-      getRandom2D  : Generates two random numbers according to a 2D histogram
+      getRandom2Dx : Generates two random numbers according to a 2D histogram (in x)
+      getRandom2Dy : Generates two random numbers according to a 2D histogram (in y)
 
 Created on Mon 27Dec21: Version history:
 ----------------------------------------------
  1.0: 27Dec21: First implementation
+
+ 1.1: 22Jun21: Implemented differentiation of x and y to be able to generate phase space
+               in the two different coordinates from two different histograms
 
 @author: MarvinPfaff
 """
@@ -49,7 +56,7 @@ class RandomGenerator(object):
     __instance = None
 
 #--------  "Built-in methods":
-    def __new__(cls, rootfilename, histname, histname2D):
+    def __new__(cls, rootfilename, histname, histname2Dx, histname2Dy):
         if cls.__instance is None:
             print('RandomGenerator.__new__: creating the RandomGenerator object')
             print('-------------------')
@@ -59,8 +66,10 @@ class RandomGenerator(object):
             rootFile = ROOT.TFile(cls._rootfilename, 'READ', 'ROOT file with Histograms')
             cls._hist = rootFile.Get(histname)
             cls._hist.SetDirectory(0)
-            cls._hist2D = rootFile.Get(histname2D)
-            cls._hist2D.SetDirectory(0)
+            cls._hist2Dx = rootFile.Get(histname2Dx)
+            cls._hist2Dx.SetDirectory(0)
+            cls._hist2Dy = rootFile.Get(histname2Dy)
+            cls._hist2Dy.SetDirectory(0)
             rootFile.Close()
 
             # Summarise initialisation
@@ -82,19 +91,27 @@ class RandomGenerator(object):
         x = self._hist.GetRandom()
         return x
 
-    def getRandom2D(self):
+    def getRandom2Dx(self):
         x = ctypes.c_double(0.0)
         y = ctypes.c_double(0.0)
         #rootFile = ROOT.TFile(self._rootfilename, 'READ', 'ROOT file with Histograms')
         #hist2D = rootFile.Get(histname)
-        self._hist2D.GetRandom2(x,y)
+        self._hist2Dx.GetRandom2(x,y)
+        return x.value, y.value
+
+    def getRandom2Dy(self):
+        x = ctypes.c_double(0.0)
+        y = ctypes.c_double(0.0)
+        #rootFile = ROOT.TFile(self._rootfilename, 'READ', 'ROOT file with Histograms')
+        #hist2D = rootFile.Get(histname)
+        self._hist2Dy.GetRandom2(x,y)
         return x.value, y.value
 
 #--------  "Get methods" only; version, reference, and constants
 #.. Methods believed to be self documenting(!)
 
     def CdVrsn(self):
-        return 1.0
+        return 1.1
 
     def getRootFilename(self):
         return self._rootfilename
@@ -102,4 +119,4 @@ class RandomGenerator(object):
 #--------  Utilities:
     def print(self):
         print("    RandomGenerator.print: version:", self.CdVrsn(self))
-        print("      ROOT filename for histogram input  :", self._rootfilename)
+        print("    ROOT filename for histogram input  :", self._rootfilename)
