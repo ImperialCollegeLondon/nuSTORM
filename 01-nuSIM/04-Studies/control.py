@@ -97,6 +97,12 @@ class control:
 # Track the flash neutrinos to the detector
     def flashAtDetector(self):
         return (self._controlInfo["flags"]["flashAtDetector"] == "True")
+# Get pion momentum distribution at target from histogram input
+    def pDistInput(self):
+        return (self._controlInfo["flags"]["pDistInput"] == "True")
+# Get pion phase space distribution at target from histogram input
+    def psDistInput(self):
+        return (self._controlInfo["flags"]["psDistInput"] == "True")
 
 # Add possibility to set static runNumber
     def setRunNumber(self, runNum):
@@ -139,12 +145,12 @@ class control:
 
 
 # Pion energy
-    def EPi(self):
-        return self._controlInfo["EPi"]
+    def PPi(self):
+        return self._controlInfo["PPi"]
 
 # Central muon energy stored in the ring
-    def EMu(self):
-        return self._controlInfo["EMu"]
+    def PMu(self):
+        return self._controlInfo["PMu"]
 
 #logFile name
     def logFile(self):

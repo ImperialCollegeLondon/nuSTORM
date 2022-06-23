@@ -546,12 +546,12 @@ if __name__ == "__main__" :
     if float(args.p0) != 0.:
         pionMom = float(args.p0)
     else:
-        pionMom = ctrlInst.EPi()
+        pionMom = ctrlInst.PPi()
 
     if float(args.Mup0) != 0.:
         muonMom = float(args.Mup0)
     else:
-        muonMom = ctrlInst.EMu()
+        muonMom = ctrlInst.PMu()
 
     nuSTRMCnst = nuSTORMConst.nuSTORMConst()
 

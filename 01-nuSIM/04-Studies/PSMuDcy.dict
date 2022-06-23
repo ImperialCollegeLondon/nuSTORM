@@ -1,10 +1,10 @@
-{   
+{
     "description":"pion decay and muon decay in production straight: Pion Flash neutrinos ignored. Muon background to flash",
-    
+
     "flags":
     {
     "tlFlag":"False", "psFlag":"True", "lstFlag":"False", "muDcyFlag":"True", "flashAtDetector":"False",
-    "PSMuons":"True","ringMuons":"False","pencilBeam":"True","tEqualsZero":"False"
+    "PSMuons":"True","ringMuons":"False","tEqualsZero":"False","pencilBeam":"False","pDistInput":"False","psDistInput":"False"
     },
 
     "files":
@@ -14,11 +14,11 @@
     "plotsDict":"<studyDir>/<studyname>/plotsPSMuDcy.dict"
     },
 
-    "printLimit":0,
     "study": "<studyname>",
-    "EPi": 3.0,
-    "EMu": 1.79,
 
+    "printLimit":0,
+    "PPi": 5.0,
+    "PMu": 3.12,
     "runNumber": "runNumber",
     "nEvents":5000
 }
