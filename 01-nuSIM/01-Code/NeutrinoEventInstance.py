@@ -18,6 +18,7 @@ Class NeutrinoEventInstance:
   _ct       : Decay time * speed-of-light
   _TrcSpcCrd: Trace space (s, x, y, z, x', y') in numpy array at
               point of decay
+  _muProdTSC: Trace space at point of muon production
   _pmuGen   : Generated muon momentum
   _pmuDirCos: np.array([d, d, d]) with three direction cosines
   _P_e      : Electron 4 momentum: (E, array(px, py, pz)), GeV
@@ -35,6 +36,7 @@ Class NeutrinoEventInstance:
   Get/set methods:
     getpmu            : Returns nominal muon momentum (GeV)
     getTraceSpaceCoord: Returns trace space: (s, x, y, z, x', y') (m)
+    getProdTraceSpaceCoord: Returns trace space at muon production (s, x, y, z, x', y') (m)
     getpmuGen         : Returns generated muon momentum (GeV)
     getPb             : Returns three vector (np.array) of beam momentum (GeV)
     gete4mmtm         : Returns electron 4 momentum: (E, array(px, py, pz))
@@ -64,8 +66,10 @@ Class NeutrinoEventInstance:
 
 Created on Sat 16Jan21;02:26: Version history:
 ----------------------------------------------
+ 1.5: 27Jun22: MP: Add correct dynamical (momentum) acceptance to Absorption
+                   and add muon production s & z to muon trace space calculation
  1.4: 06Jun22: MP: Add muon momentum acceptance cut to Absorption,
-               fix errors with double smearing and beam direction 
+               fix errors with double smearing and beam direction
                and add nuSTORMConst as input for nuSTORM constants
  1.3: 28Aug21: KL: Review and tidy Omar's code and exploit TLorentzVector
                class from PyROOT to do bost to nuSTORM frame
@@ -101,13 +105,14 @@ class NeutrinoEventInstance:
     __Debug  = False
 
 #--------  "Built-in methods":
-    def __init__(self, pmu=5., filename=None):
+    def __init__(self, pmu=5., muProdTSC=[0.,0.,0.,0.,0.], filename=None):
 
         nuStrt = nuPrdStrt.nuSTORMPrdStrght(filename)
 
         self._tlAngle = tlCmplxAngle * math.pi / 180.
 
         self._pmu = pmu
+        self._muProdTSC = muProdTSC
         self._ct, self._TrcSpcCrd, self._pmuGen, self._pmuDirCos,  \
             self._P_e, self._P_nue, self._P_numu \
                 = self.CreateNeutrinos(nuStrt)
@@ -160,11 +165,12 @@ class NeutrinoEventInstance:
         ct = Dcy.getLifetime()
         s  = DcyCoord[0]
 
-        if z > (PrdStrghtLngth+ArcRad+1.):
-            print("     ----> !!!! CreateNeutrinos Alarm:", z)
+        # if z > (PrdStrghtLngth+ArcRad+1.):
+        #     print("     ----> !!!! CreateNeutrinos Alarm:", z)
 
         if NeutrinoEventInstance.__Debug:
-            print("    ----> Decay at z =", z)
+            print("    ----> Muon production at s =", self._muProdTSC[0])
+            print("    ----> Muon decay at s =", s)
 
         if NeutrinoEventInstance.__Debug:
             print("    ----> Rotate and boost to nuSTORM rest frame")
@@ -187,7 +193,7 @@ class NeutrinoEventInstance:
         coord = np.array([0., 0., 0., 0., 0., 0.])
 
         #.. longitudinal position, "s", z:
-        coord[0] = self.GenerateLongiPos(Dcy, Pmu)
+        coord[0] = self.GenerateLongiPos(Dcy, Pmu) + self._muProdTSC[0]
 
         R, Rinv, BeamPos, theta = self.BeamDir(coord[0], Pmu)
 
@@ -197,7 +203,7 @@ class NeutrinoEventInstance:
 
         coord[2] = y + BeamPos[1]
 
-        coord[3] = BeamPos[2]
+        coord[3] = BeamPos[2] + self._muProdTSC[3]
 
         coord[4] = xp
         coord[5] = yp
@@ -409,17 +415,21 @@ class NeutrinoEventInstance:
         return P_e, P_nue, P_numu
 
     def Absorption(self, piTraceSpaceCoord, mu4mmtm, mucostheta, mup0):
+      #take care of physical acceptance
       n = 4.8 #how much rounded
 
       x0 = 0 # graph translation
       y0 = 0
       Mup = np.sqrt(mu4mmtm[1][0]**2+mu4mmtm[1][1]**2+mu4mmtm[1][2]**2)
+      Mup_spread = abs(Mup-mup0)/mup0
       Mux = piTraceSpaceCoord[1]         #Pion decay transverse position coordinates = Muon Decay transverse position coordinates
       Muy = piTraceSpaceCoord[2]
       Muxp= mu4mmtm[1][0]/mu4mmtm[1][2]  #xp and yp from generated muon momentum
       Muyp= mu4mmtm[1][1]/mu4mmtm[1][2]
+      muy = Muy
+      muyp= Muyp
       Muy = Muy*2.5/0.15
-      Muyp = Muyp*2./0.006
+      Muyp= Muyp*2./0.006
       def k(i):
         return (2*math.pi*i)/3
       def g(t):
@@ -427,12 +437,29 @@ class NeutrinoEventInstance:
       def f(x,y):
         return 0.1*g(-(x+x0)*math.cos(k(1))-(y+y0)*math.sin(k(1)))+0.1*g(-(x+x0)*math.cos(k(2))-(y+y0)*math.sin(k(2)))+0.1*g(-(x+x0)*math.cos(k(3))-(y+y0)*math.sin(k(3)))
 
+      #take care of dynamical acceptance
       muAcc = nuSTRMCnst.muAcc()
-      noAccCutFlag = False
-      if mup0 == 0.:
-          noAccCutFlag = True
+      #muon dynamical acceptance as a function of momentum spread (i.e. x = abs(p-p0)/p0)
+      def epsilon(x):
+          epsilon_max = 0.001 #[m]
+          beta_sept = 8.03 #[m]
+          D_sept = 1.36 #[m]
+          epsilon_kink = muAcc-np.sqrt(epsilon_max*beta_sept)/D_sept # percent momentum spread
+          #for second part - linear function: epsilon = epsilon0 - a*x
+          a = epsilon_max/(muAcc-epsilon_kink)
+          epsilon0 = a*muAcc
+          return np.heaviside(x,1)*np.heaviside(epsilon_kink-x,0)*epsilon_max+np.heaviside(x-epsilon_kink,1)*np.heaviside(muAcc-x,1)*(epsilon0-a*x)
+      def emittance(x,xp,beta):
+          return x*x/beta+beta*xp*xp
 
-      if (Mux*Mux/(0.05*0.05))+(Muxp*Muxp/(0.004*0.004)) < 1. and f(Muy, Muyp) < 1.0 and mucostheta < 0 and ((noAccCutFlag) or ((Mup >= mup0*(1-muAcc)) and (Mup <= mup0*(1+muAcc)))):
+      noDynAccCutFlag = False
+      if mup0 == 0.:
+          noDynAccCutFlag = True
+
+      betaX_quad = 19.98 #[m]
+      betaY_quad = 22.96 #[m]
+      #cut on previous calculations
+      if ((Mux*Mux/(0.05*0.05))+(Muxp*Muxp/(0.004*0.004)) < 1.) and (f(Muy, Muyp) < 1.0) and (mucostheta < 0) and ((noDynAccCutFlag) or ((emittance(Mux,Muxp,betaX_quad) <= epsilon(Mup_spread)) and (emittance(muy,muyp,betaY_quad) <= epsilon(Mup_spread)))):
             Absorbed = False
       else:
             Absorbed = True
@@ -453,6 +480,9 @@ class NeutrinoEventInstance:
 
     def getTraceSpaceCoord(self):
         return deepcopy(self._TrcSpcCrd)
+
+    def getProdTraceSpaceCoord(self):
+        return deepcopy(self._muProdTSC)
 
     def getpmuGen(self):
         return deepcopy(self._pmuGen)
