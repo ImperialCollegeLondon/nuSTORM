@@ -162,8 +162,8 @@ class normalisation:
     def beyondPS(self):
 
       self._byndPSCount = self._byndPSCount + 1
-#  add a pion decay particle - set the time to the decay lifetime and the s to the pathlength, eventweight to full
-# x,y,z to 0.0 and px,py to 0.0, pz to 0.01 so constructor does not
+      #  add a pion decay particle - set the time to the decay lifetime and the s to the pathlength, eventweight to full
+      # x,y,z to 0.0 and px,py to 0.0, pz to 0.01 so constructor does not
       dcytsc = pi.getTraceSpaceCoord()
       sd = dcytsc[0]
       xd = 0.0
@@ -266,16 +266,22 @@ class normalisation:
 # extraoplate the muon to the end of the production straight
       dZ = psLength - zd
       zEnd = psLength
-      xEnd = xd + dZ*pxMu/pzMu
-      yEnd = yd + dZ*pyMu/pzMu
+      xEnd = xd #+ dZ*pxMu/pzMu
+      yEnd = yd #+ dZ*pyMu/pzMu
       sEnd = tlCmplxLength + psLength
       dFlown = math.sqrt((xEnd-xd)*(xEnd-xd) + (yEnd-yd)*(yEnd-yd) + dZ*dZ)
       muVel = math.sqrt(pxMu*pxMu + pyMu*pyMu + pzMu*pzMu)*c/eMu
       tFlown = dFlown/muVel
       tEnd = td + tFlown
-      muEnd = particle.particle(runNumber, event, sEnd, xEnd, yEnd, zEnd, pxMu, pyMu, pzMu, tEnd, eventWeight, "mu+")
-      eH.addParticle("prodStraightEnd", muEnd)
 
+      muTSC = nuEvt.getTraceSpaceCoord()
+      sDcy = muTSC[0]
+      if (sDcy > tlCmplxLength+psLength):
+          muEnd = particle.particle(runNumber, event, sEnd, xEnd, yEnd, zEnd, pxMu, pyMu, pzMu, tEnd, eventWeight, "mu+")
+          eH.addParticle("prodStraightEnd", muEnd)
+      else:
+          testParticle = particle.particle(runNumber, event, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0,   "mu+")
+          eH.addParticle("prodStraightEnd", testParticle)
 
       if (self._PSDcyCount < printLimit): print ("muonProduction in production straight")
 # add the pion flash neutrino
@@ -313,15 +319,6 @@ class normalisation:
 #
     def decayMuons(self):
 
-# get the muon momentum
-      mu = pi.getmu4mmtm()
-      pxMu = mu[1][0]
-      pyMu = mu[1][1]
-      pzMu = mu[1][2]
-      pMu = math.sqrt(pxMu*pxMu + pyMu*pyMu + pzMu*pzMu)
-# and decay the muon
-      nuEvt = nuEvtInst.NeutrinoEventInstance(pMu)
-
 # ... We can allow any muon which is created in the production straight to decay without worrying about
 # ... acceptance
 
@@ -351,12 +348,11 @@ class normalisation:
           muTSC = nuEvt.getTraceSpaceCoord()
           sDcy = muTSC[0]
 #TL decay
-          if (sDcy < 50.0):
+#          if (sDcy < tlCmplxLength):
 # ps decay
-#          if (sDcy < 230.0):
+          if (sDcy < tlCmplxLength+psLength):
             print (f"muon in production: {sDcy}")
 # Muon Decay
-            sDcy = muTSC[0]
             xDcy = muTSC[1]
             yDcy = muTSC[2]
             zDcy = muTSC[3]
@@ -703,6 +699,18 @@ for event in range(nEvents):
 # get the decay length - in the transfer line, in the production straight - or lost beyond the straight
     lifetime = pi.getLifetime()
     pathLength = lifetime*pPion*c/piMass
+
+# get the muon momentum
+    mu = pi.getmu4mmtm()
+    eMu  = mu[0]
+    pxMu = mu[1][0]
+    pyMu = mu[1][1]
+    pzMu = mu[1][2]
+    pMu  = math.sqrt(pxMu*pxMu + pyMu*pyMu + pzMu*pzMu)
+# and decay the muon
+    nuEvt = nuEvtInst.NeutrinoEventInstance(pMu,pi.getTraceSpaceCoord())
+
+    Absorbed = nuEvt.Absorption(pi.getTraceSpaceCoord(), pi.getmu4mmtm(), pi.getcostheta(), muonMom)
 
 # decay in the transferline
     if ((tlFlag) and (pathLength < tlCmplxLength)):
