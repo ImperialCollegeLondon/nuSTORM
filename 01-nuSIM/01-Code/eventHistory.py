@@ -303,7 +303,7 @@ class eventHistory:
 #  the particles in the empty structure are all pi+
 	def makeHistory(self):
 #  make sure the data structure is complete
-		testParticle = particle.particle(-1, -1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, "pi+")
+		testParticle = particle.particle(-1, -1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, "none")
 		self.addParticle("target", testParticle)
 		self.addParticle("productionStraight", testParticle)
 		self.addParticle("prodStraightEnd", testParticle)
