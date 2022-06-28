@@ -66,6 +66,7 @@ Class NeutrinoEventInstance:
 
 Created on Sat 16Jan21;02:26: Version history:
 ----------------------------------------------
+ 1.6: 28Jun22: PK: Remove the cut to include only backward going muons
  1.5: 27Jun22: MP: Add correct dynamical (momentum) acceptance to Absorption
                    and add muon production s & z to muon trace space calculation
  1.4: 06Jun22: MP: Add muon momentum acceptance cut to Absorption,
@@ -459,7 +460,7 @@ class NeutrinoEventInstance:
       betaX_quad = 19.98 #[m]
       betaY_quad = 22.96 #[m]
       #cut on previous calculations
-      if ((Mux*Mux/(0.05*0.05))+(Muxp*Muxp/(0.004*0.004)) < 1.) and (f(Muy, Muyp) < 1.0) and (mucostheta < 0) and ((noDynAccCutFlag) or ((emittance(Mux,Muxp,betaX_quad) <= epsilon(Mup_spread)) and (emittance(muy,muyp,betaY_quad) <= epsilon(Mup_spread)))):
+      if ((Mux*Mux/(0.05*0.05))+(Muxp*Muxp/(0.004*0.004)) < 1.) and (f(Muy, Muyp) < 1.0) and ((noDynAccCutFlag) or ((emittance(Mux,Muxp,betaX_quad) <= epsilon(Mup_spread)) and (emittance(muy,muyp,betaY_quad) <= epsilon(Mup_spread)))):
             Absorbed = False
       else:
             Absorbed = True
