@@ -195,15 +195,15 @@ class normalisation:
       pzd = 0.01
       td = pi.getLifetime()*1E9 + t
       if (self._byndPSCount < printLimit): print ("pi in beyondPS: decayLength ", sd)
-      pionLostDecay = particle.particle(runNumber, event, sd, xd, yd, zd, pxd, pyd, pzd, td, eventWeight, "pi+")
+      pionLostDecay = particle.particle(runNumber, event, sd, xd, yd, zd, pxd, pyd, pzd, td, eventWeight, "none")
       eH.addParticle("pionDecay", pionLostDecay)
       if (self._byndPSCount < printLimit):  print ("at pionDecay lost")
 # add the pion flash neutrino ... set everything to zero - including eventWeight
-      nuFlashLost = particle.particle(runNumber, event, sd, xd, yd, zd, pxd, pyd, pzd, td, 0.0, "numu")
+      nuFlashLost = particle.particle(runNumber, event, sd, xd, yd, zd, pxd, pyd, pzd, td, 0.0, "none")
       if (self._byndPSCount < printLimit):  print ("at piFlashNu lost")
       eH.addParticle("piFlashNu", nuFlashLost)
 # add the muon from the pion flash ... set everything to zero - including eventWeight
-      muonProdLost = particle.particle(runNumber, event, sd, xd, yd, zd, pxd, pyd, pzd, td, 0.0, "mu+")
+      muonProdLost = particle.particle(runNumber, event, sd, xd, yd, zd, pxd, pyd, pzd, td, 0.0, "none")
       if (self._byndPSCount < printLimit):  print ("at muonProduction lost")
       eH.addParticle("muonProduction",muonProdLost)
       return
@@ -360,7 +360,7 @@ class normalisation:
 #  muon we create a suitable muon - but the other particles are all put to null values so
 #  all values bar run and event are put to zero
       if (Absorbed):
-        testParticle = particle.particle(runNumber, event, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0,   "mu+")
+        testParticle = particle.particle(runNumber, event, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0,   "none")
         eH.addParticle("muonDecay", testParticle)
         if (self._muDcyCount < printLimit): print ("absorbed")
         if (PSMuonsFlag):
