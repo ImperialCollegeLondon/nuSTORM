@@ -162,6 +162,7 @@ class normalisation:
     def beyondPS(self):
 
       self._byndPSCount = self._byndPSCount + 1
+
       # extraoplate the muon to the end of the production straight
       tscTrgtLcl = pi.getLclTraceSpaceCoord()
       xtl  = tscTrgtLcl[1]
@@ -295,6 +296,7 @@ class normalisation:
       tFlown = dFlown/muVel
       tEnd = td + tFlown
 
+
       muTSC = nuEvt.getTraceSpaceCoord()
       sDcy = muTSC[0]
       if (sDcy > tlCmplxLength+psLength):
@@ -339,7 +341,6 @@ class normalisation:
 # Muon decays -------------------------------------------------
 #
     def decayMuons(self):
-
 # ... We can allow any muon which is created in the production straight to decay without worrying about
 # ... acceptance
 
