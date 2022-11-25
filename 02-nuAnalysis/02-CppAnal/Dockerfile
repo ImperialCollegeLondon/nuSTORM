@@ -13,5 +13,8 @@ RUN groupadd -g $GID -o $USERNAME \
 # Run in dedicated directory
 WORKDIR /nustorm
 
-RUN source ./startup.bash
+# Copy the source code in to the container
+COPY --chown=$USERNAME . /nustorm
+
+RUN ./startup.bash
 
