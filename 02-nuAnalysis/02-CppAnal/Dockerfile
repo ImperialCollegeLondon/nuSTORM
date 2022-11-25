@@ -18,3 +18,6 @@ COPY --chown=$USERNAME . /nustorm
 
 RUN ./startup.bash
 
+RUN ./02-Tests/RunControlTst-compile.bash
+
+ENTRYPOINT ["/bin/bash"]
