@@ -4,7 +4,7 @@ The code in this directory tree provides a c++ analysis skeleton that can be use
 
 ## To set up and run:
 Execute "startup.bash" from this directory (i.e. run the bash command "source startup.bash").  This will:
-  * Set the "nuAnalysisPATH" to this director; and
+  * Set the "nuAnalysisPATH" to this directory; and
   * Set "nuAnalysisCPATH" so that g++ can see the 01-Code directory.  The scripts in "02-Tests" may then be run using the compile scriptis included in 02-Tests.  A sample user analysis programme is included in "03-Skeleton"
 
 ## Directories:
