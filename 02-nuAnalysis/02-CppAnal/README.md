@@ -16,5 +16,22 @@ Execute "startup.bash" from this directory (i.e. run the bash command "source st
 ## Dependencies:
  * g++11 and assumes ROOT is installed.
 
+## Docker Support
+
+A Dockerfile is provided for the convenient writing, building, and testing of code without the need to install the entire ROOT project.
+The latest image published by the ROOT project on DockerHub is utilised as the base which simplifies and speeds up getting started.
+The Dockerfile is at the root of this 02-CppAnal folder and an image can be built simply by running `docker build -t nustorm_docker .` from within this directory.
+This image can then be used and explored by running it with: `docker run --rm -it nustorm_docker` which opens a `bash` shell inside the image. 
+Note that any changes made within the image are lost once you exit.
+
+The Dockerfile can also be used to run tests. A script to assist with this is provided - `run_tests_in_docker.sh`
+This builds a fresh Dockerfile if required and runs the integration test within it.
+
+### Dependencies:
+ * A suitable Docker daemon must be installed. See [Docker](https://www.docker.com/) for instructions
+
+
 ## History
  * 06 December 2021:  First version.
+ * 25 November 2022:  Add Docker Support.
+
