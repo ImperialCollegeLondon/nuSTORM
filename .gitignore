@@ -1,7 +1,1 @@
-02-nuAnalysis/02-CppAnal/12-Bin/*
-02-nuAnalysis/02-CppAnal/99-Scratch/*
-02-nuAnalysis/02-CppAnal/*.root
-02-nuAnalysis/02-CppAnal/*.png
-02-nuAnalysis/02-CppAnal/compile-output*
-02-nuAnalysis/02-CppAnal/31-Data/normalisation*.root
-02-nuAnalysis/02-CppAnal/04-User/*
+02-nuAnalysis/02-CppAnalysis/build
