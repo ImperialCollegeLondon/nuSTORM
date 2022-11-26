@@ -15,6 +15,8 @@
 //                   is specified, <dir name> must exist or execution is
 //                   terminated
 // Note that -f and -c can be used together, all files will be read.
+#pragma once
+
 class RunControl {
 
 private:

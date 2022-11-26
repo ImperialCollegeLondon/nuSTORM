@@ -15,8 +15,8 @@
 //#include "TVector.h"
 #include "TLorentzVector.h"
 
-#include "RunControl.hpp"
-#include "nuAnalysis.hpp"
+#include "run_control.h"
+#include "nu_analysis.h"
 
 nuAnalysis::nuAnalysis(bool Dbg) {
 

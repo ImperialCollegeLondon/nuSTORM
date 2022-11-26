@@ -5,8 +5,8 @@
 
 // #include <all other packages that you need>
 
-#include "RunControl.hpp"
-#include "nuAnalysis.hpp"
+#include "run_control.h"
+#include "nu_analysis.h"
 
 nuSIMUserAnal::nuSIMUserAnal(bool Dbg) {
 

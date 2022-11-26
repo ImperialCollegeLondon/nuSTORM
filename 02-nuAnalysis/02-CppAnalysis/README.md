@@ -30,6 +30,8 @@ This builds a fresh Dockerfile if required and runs the integration test within 
 ### Dependencies:
  * A suitable Docker daemon must be installed. See [Docker](https://www.docker.com/) for instructions
 
+## Style Guide:
+This project aspires to follow the [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html)
 
 ## History
  * 06 December 2021:  First version.

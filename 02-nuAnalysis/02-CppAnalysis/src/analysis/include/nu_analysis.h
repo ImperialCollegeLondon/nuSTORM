@@ -1,4 +1,5 @@
 /*    nuAnalysis class header file */
+#pragma once
 
 #include "TChain.h"
 #include "TH1.h"

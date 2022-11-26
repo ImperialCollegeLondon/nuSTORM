@@ -7,7 +7,7 @@
 #include <string.h>
 #include "sys/stat.h"
 
-#include "RunControl.hpp"
+#include "run_control.h"
 
 RunControl* RunControl::instance = NULL;
 
