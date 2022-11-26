@@ -43,7 +43,9 @@ DOCKER_TAG=$(git rev-parse HEAD)
 echo "Building Docker Image"
 
 # Build the nuStorm container image
-docker build -t "nustorm:${DOCKER_TAG}" \
+docker build \
+    -t "nustorm:${DOCKER_TAG}" \
+    -t "nustorm:latest" \
     -f "${DOCKERFILE}" "${DIR}"
 
 # Run the container and the tests inside
