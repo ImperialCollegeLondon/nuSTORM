@@ -1,0 +1,5 @@
+
+  add_test(NAME ${name_with_prefix}
+    COMMAND ${TEST_NAME} ${ARGS_COMMAND_ARGS}
+    WORKING_DIRECTORY $<TARGET_FILE_DIR:${TEST_NAME}>
+  )
