@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 
 # --------------------------------------------------------------
-project( analysis )
+project( nuStorm-analysis )
 
 # Locate the ROOT package and define a number of useful targets and variables.
 find_package(ROOT REQUIRED COMPONENTS
@@ -57,6 +57,12 @@ target_link_libraries(nuStorm_analysis
     ROOT::MathCore
     ROOT::Thread
     ROOT::MultiProc
+)
+
+install(
+  TARGETS
+    nuStorm_analysis
+  EXPORT nuStorm-analysis
 )
 
 add_subdirectory(apps)

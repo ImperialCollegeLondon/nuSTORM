@@ -22,6 +22,9 @@ set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 # Default to using ninja for building
 set(CMAKE_GENERATOR "Ninja")
 
+# Output apps to the bin folder
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 # ------------------------------------------------------------------------------
 # if user specifies the build type, use theirs, otherwise RelWithDebInfo.
 # Note: this needs to be defined before the project() call, otherwise

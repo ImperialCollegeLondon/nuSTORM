@@ -15,5 +15,5 @@ target_link_libraries(nuAnalysis
 install(
   TARGETS
     nuAnalysis
-  EXPORT analysis
+  EXPORT nuStorm-analysis
 )
