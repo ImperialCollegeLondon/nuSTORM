@@ -3,10 +3,10 @@ import uproot
 import pandas as pd
 import awkward as ak
 
-def rootToDf(filepath, keysDict=[], eventWeight = False):
+def eventHistoryDf(filepath,treeName='eventHistory', keysDict=[], eventWeight = False):
 
     """
-    Converts a .root file to a pandas dataframe 
+    Converts a eventHistory .root file to a pandas dataframe 
 
     Args:
         filepath : location of the root file 
@@ -17,7 +17,7 @@ def rootToDf(filepath, keysDict=[], eventWeight = False):
         dataframe: All recorded events. 
     """
     file = uproot.open(filepath)
-    eventHistory = file['eventHistory']
+    eventHistory = file[treeName]
 
     if not keysDict:
         keys = eventHistory.keys()
