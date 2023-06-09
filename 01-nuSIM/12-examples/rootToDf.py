@@ -3,13 +3,14 @@ import uproot
 import pandas as pd
 import awkward as ak
 
-def eventHistoryDf(filepath,treeName='eventHistory', keysDict=[], eventWeight = False):
+def eventHistoryToDf(filepath,treeName='eventHistory', keysDict=[], eventWeight = False):
 
     """
     Converts a eventHistory .root file to a pandas dataframe 
 
     Args:
         filepath : location of the root file 
+        treeName : Tree to look for in the .root file. Defaults to eventHistory
         keys_dict (list, optional): keys (branches) of root files. Defaults to [] for all branches.
         eventWeight (bool, optional): True only allows for recorded events. Defaults to False.
 
