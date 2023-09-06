@@ -78,6 +78,12 @@ print(f"runNumber is {con.runNumber(True)}")
 print(f"number of Events to generate is {con.nEvents()}")
 
 
+##! Test print flags : ###############################################################
+
+print(f"\n\n========= Print flags check")
+
+print(f"main routine print flag {con.mainPrnt()}")
+print(f"neutrinoEventInstance routine print flag {con.nuEvtInstPrnt()}")
 
 
 ##! Complete:
