@@ -1,6 +1,6 @@
 {   
     "description":"pion decay in production straight; Pion Flash",
-    
+   
     "flags":
     {
     "tlFlag":"False", "psFlag":"True", "lstFlag":"False", "muDcyFlag":"False", "flashAtDetector":"True",
@@ -12,6 +12,11 @@
     "rootFile":"someFile.root",
     "logFile":"normalisation",
     "plotsDict":"<studyDir>/<studyname>/plotsPSPiFlash.dict"
+    },
+
+    "print":
+    {
+    "main":"True", "nuEvtInst": "True"
     },
 
     "study": "<studyname>",
