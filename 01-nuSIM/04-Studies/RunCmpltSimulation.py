@@ -563,7 +563,11 @@ if __name__ == "__main__" :
         StudyName = args.studyname
     else:
         StudyName = os.getenv('StudyName')
+    print (" StudyDir is ", StudyDir)
+    print (" StudyName is ", StudyName)
+
     controlFile = os.path.join(StudyDir, StudyName, args.dict+".dict")
+    print (" controlFile is ", controlFile)
 
     ctrlInst = control.control(controlFile)
 
