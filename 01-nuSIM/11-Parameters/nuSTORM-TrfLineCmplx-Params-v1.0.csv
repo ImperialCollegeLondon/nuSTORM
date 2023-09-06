@@ -6,4 +6,4 @@ Transverse acceptance (2D),epsilon,1,pi mm rad,nuSIM-2021-01
 Transverse beta function,beta,25000,mm,nuSIM-2021-01
 Bunch length at target,delT0,2,ns,nuSIM-2021-01
 Bunch spacing at target,delT1,5,ns,nuSIM-2021-01
-Length of extraction,delT2,10.5,us,nuSIM-2021-01
+Length of extraction,delT2,2.0,us,nuSIM-2021-01
