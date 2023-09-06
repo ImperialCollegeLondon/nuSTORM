@@ -197,8 +197,6 @@ class particle:
 
         return mass, lifetime
 
-
-
     def __repr__(self):
         return "particle(x, y, z, s, px, py, pz, t, weight, mass)"
 
