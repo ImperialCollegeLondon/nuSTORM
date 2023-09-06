@@ -58,7 +58,7 @@ print(nuTrfLineCmplx)
 nuSTORMTrfLineCmplxTest = 3
 print()
 print("nuSTORMTrfLineCmplxTest:", nuSTORMTrfLineCmplxTest, " check get methods.")
-print("----> printParams() method; reports parameters loaded")
+print("----> printParams() method; reports parameters loaded - but not unpacked")
 nuTrfLineCmplx.printParams()
 
 ##! Check momentum, z, and transverse distributions:
