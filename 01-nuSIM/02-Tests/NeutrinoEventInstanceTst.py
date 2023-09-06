@@ -12,6 +12,8 @@ Test script for "NeutrinoEventInstance" class
 
  03Apr21: Fix relativistic treatment of muon lifetime
 
+ 23May23: Calling sequence is altered and needs fixing
+
 """
 
 import os
@@ -38,7 +40,8 @@ print("NeutrinoEventInstanceTest:", NeutrinoEventInstanceTest, \
 nuSIMPATH = os.getenv('nuSIMPATH')
 filename  = os.path.join(nuSIMPATH, \
                          '11-Parameters/nuSTORM-PrdStrght-Params-v1.0.csv')
-nuEI = nuEvtInst.NeutrinoEventInstance(5., filename)
+muProdTSC=[0.,0.,0.,0.,0.,0.]
+nuEI = nuEvtInst.NeutrinoEventInstance(5., muProdTSC, filename)
 print("    __str__: \n", nuEI)
 print("    --repr__: \n", repr(nuEI))
 
@@ -72,7 +75,7 @@ print("    ----> Muon momentum:", Pmu)
 nuEI = []
 for i in range(10000):
 #for i in range(5):
-    nuEI.append(nuEvtInst.NeutrinoEventInstance(Pmu, filename))
+    nuEI.append(nuEvtInst.NeutrinoEventInstance(Pmu, muProdTSC, filename))
 for i in range(5):
     print("    nuEI[",i, "]: \n", nuEI[i])
 
@@ -126,6 +129,16 @@ ArcRad         = ArcLen/mth.pi
 
 for nuEvt in nuEI:
     s     = np.append(s,     nuEvt.getTraceSpaceCoord()[0])
+#   check if the flight distance and the lifetime times the velocity are the same
+    sp = nuEvt.getTraceSpaceCoord()[0]
+    tLT     = nuEvt.getLifeTime()
+    gammaBeta  = Pmu*1000/mc.mass()
+    soL = mc.SoL()
+    dist = gammaBeta*tLT*soL
+    if (abs(sp/dist)-1) > 0.0000001:
+        print ("lifetime and flight distance do not agree")
+        exit("test failed: correct and rerun")
+
     where = nuEvt.getTraceSpaceCoord()[0]%Circumference
     
     xi    = nuEvt.getTraceSpaceCoord()[1]
