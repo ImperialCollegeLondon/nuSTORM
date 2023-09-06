@@ -93,19 +93,19 @@ class plane:
         DecayPntX = nuEvt.getTraceSpaceCoord()[1]
         DecayPntY = nuEvt.getTraceSpaceCoord()[2]
         DecayPntZ = nuEvt.getTraceSpaceCoord()[3]
-        if self.__Debug: print (f"Decay at  {DecayPntX}, {DecayPntY}, {DecayPntZ}")
+        if self.__Debug: print (f"findHitPositionMuEvt: Decay at  {DecayPntX}, {DecayPntY}, {DecayPntZ}")
 
 #  Now the information for both neutrinos
         eE = nuEvt.getnue4mmtm()[0]         # number
         pE = nuEvt.getnue4mmtm()[1]         # 3 vector
-        if self.__Debug: print (f"  nuE   {pE[0]},   {pE[1]},   {pE[2]}")
+        if self.__Debug: print (f"findHitPositionMuEvt:   nuE   {pE[0]},   {pE[1]},   {pE[2]}")
         eMu = nuEvt.getnumu4mmtm()[0]
         pMu = nuEvt.getnumu4mmtm()[1]
-        if self.__Debug: print (f"  nuMu   {pMu[0]},   {pMu[1]},   {pMu[2]}")
+        if self.__Debug: print (f"findHitPositionMuEvt:   nuMu   {pMu[0]},   {pMu[1]},   {pMu[2]}")
 
 #  Distance to the plane centre
         deltaX = self.pos[0] - DecayPntX
-        deltaY = self.pos[1] - DecayPntZ
+        deltaY = self.pos[1] - DecayPntY
         deltaZ = self.pos[2] - DecayPntZ
         if self.__Debug: print ("deltaZ is ", deltaZ)
 #  Position of the nue hit               # need to check by hand - no test
@@ -123,7 +123,7 @@ class plane:
         hitE.append(pE[2])                                # pz
         hitE.append(eE)                                   # E
 
-        if self.__Debug: print (" hit: x, y, R, phi, E ", hitE[0], " ", hitE[1], " ", hitE[2], " ", hitE[3], " ", hitE[4])
+        if self.__Debug: print ("findHitPositionMuEvt: hit: x, y, R, phi, E ", hitE[0], " ", hitE[1], " ", hitE[2], " ", hitE[3], " ", hitE[4])
 
 #  Position of the numu hit               # need to check by hand - no test
         hitMu=[]
@@ -140,7 +140,7 @@ class plane:
         hitMu.append(eMu)                                  # E
 
 
-        if self.__Debug: print (" hit: x, y, R, phi, E ", hitMu[0], " ", hitMu[1], " ", hitMu[2], " ", hitMu[3], " ", hitMu[4])
+        if self.__Debug: print ("findHitPositionMuEvt: hit: x, y, R, phi, E ", hitMu[0], " ", hitMu[1], " ", hitMu[2], " ", hitMu[3], " ", hitMu[4])
 
         return hitE, hitMu
 
@@ -151,23 +151,26 @@ class plane:
         DecayPntX = piEvt.getTraceSpaceCoord()[1]
         DecayPntY = piEvt.getTraceSpaceCoord()[2]
         DecayPntZ = piEvt.getTraceSpaceCoord()[3]
+        if self.__Debug: print (f"findHitPositionpiEvt: Decay at  {DecayPntX}, {DecayPntY}, {DecayPntZ}")
 
 #  Now the information for the neutrino
         eMu = piEvt.getnumu4mmtm()[0]       # number
         pMu = piEvt.getnumu4mmtm()[1]       # 3 vector
+        if self.__Debug: print (f"findHitPositionpiEvt:  nuMu   {pMu[0]},   {pMu[1]},   {pMu[2]}")
 
 #  Distance to the plane centre
         deltaX = self.pos[0] - DecayPntX
-        deltaY = self.pos[1] - DecayPntZ
+        deltaY = self.pos[1] - DecayPntY
         deltaZ = self.pos[2] - DecayPntZ
-        if self.__Debug: print ("deltaZ is ", deltaZ)
+        if self.__Debug: print ("detector centre is :  ", pos)
+        if self.__Debug: print ("findHitPositionpiEvt:   deltaZ is ", deltaZ)
 #  Position of the numu hit               # need to check by hand - no test
         hitMu=[]
         xPnt = (DecayPntX + pMu[0]*deltaZ/pMu[2])
         yPnt = (DecayPntY + pMu[1]*deltaZ/pMu[2])
         if (xPnt < -200.0):
-            print ("xPnt is ", xPnt, "   yPnt is ", yPnt)
-            print ("piEvt is ", piEvt)
+            print ("findHitPositionpiEvt:    xPnt is ", xPnt, "   yPnt is ", yPnt)
+            print ("findHitPositionpiEvt:    piEvt is ", piEvt)
         hitMu.append(xPnt - self.pos[0])             # x
         hitMu.append(yPnt - self.pos[1])             # y
         hitMu.append(0.0)                            # z
@@ -178,6 +181,8 @@ class plane:
         hitMu.append(pMu[2])                               # pz
         hitMu.append(eMu)                                  # E
 
+        print ("position of the hit x : ", xPnt, "   yPnt ", yPnt)
+        print ("findHitPositionpiEvt: hit: x, y, R, phi, E ", hitMu[0], " ", hitMu[1], " ", hitMu[2], " ", hitMu[3], " ", hitMu[4])
 
         if self.__Debug: print (" hit: x, y, R, phi, E ", hitMu[0], " ", hitMu[1], " ", hitMu[2], " ", hitMu[3], " ", hitMu[4])
 
@@ -188,14 +193,17 @@ class plane:
         DecayPntX = nuFlash.x()
         DecayPntY = nuFlash.y()
         DecayPntZ = nuFlash.z()
+        if self.__Debug: print (f"findHitPositionPiFlash: Decay at  {DecayPntX}, {DecayPntY}, {DecayPntZ}")
+
         pMu = nuFlash.p()[1]
         eMu = nuFlash.p()[0]
+        if self.__Debug: print (f"findHitPositionPiFlash:  nuMu   {pMu[0]},   {pMu[1]},   {pMu[2]}")
 
 #  Distance to the plane centre
         deltaX = self.pos[0] - DecayPntX
-        deltaY = self.pos[1] - DecayPntZ
+        deltaY = self.pos[1] - DecayPntY
         deltaZ = self.pos[2] - DecayPntZ
-        if self.__Debug: print ("deltaZ is ", deltaZ)
+        if self.__Debug: print ("findHitPositionPiFlash:   deltaZ is ", deltaZ)
 
 #  Position of the numu hit               # need to check by hand - no test
         hitMu=[]
@@ -214,7 +222,7 @@ class plane:
         hitMu.append(pMu[2])                               # pz
         hitMu.append(eMu)                                  # E
 
-
-        if self.__Debug: print (" hit: x, y, R, phi, E ", hitMu[0], " ", hitMu[1], " ", hitMu[2], " ", hitMu[3], " ", hitMu[4])
+#        print ("position of the hit x : ", xPnt, "   yPnt ", yPnt)
+#        print ("findHitPositionPiFlash: hit: x, y, R, phi, E ", hitMu[0], " ", hitMu[1], " ", hitMu[2], " ", hitMu[3], " ", hitMu[4])
 
         return hitMu
