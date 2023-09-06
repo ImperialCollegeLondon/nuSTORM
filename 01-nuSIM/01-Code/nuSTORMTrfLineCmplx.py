@@ -106,6 +106,8 @@ Class nuSTORMTrfLineCmplx:
 
 Created on Mo 01Nov21. Version history:
 ----------------------------------------
+ 1.2: 12May23: Include unpacking the transfer line angle from the csv file. to make it consistent
+               with the data file
  1.1: 22Nov21: Update to accommodate multiple bunches by importing PionTimeDistribution class,
                generating bunch structure over certain extraction length.
  1.0: 01Nov21: First implementation
@@ -141,20 +143,59 @@ class nuSTORMTrfLineCmplx(object):
 
 #--------  "Built-in methods":
     def __new__(cls, filename):
+        constrErr = False
         if cls.__instance is None:
             print('nuSTORMTrfLineCmplx.__new__: creating the nuSTORMTrfLineCmplx object')
             cls.__instance = super(nuSTORMTrfLineCmplx, cls).__new__(cls)
             print('instance okay')
             cls._filename        = filename
             cls._TrfLineParams   = cls.GetTrfLineParams(filename)
+#   as the data values are unpacked check that they are going into the correct variables - messy, but I don't
+#   have a better solution
+            if cls._TrfLineParams.iat[0,1] != "TrfLineCmplxLen":
+                print("transfer line complex parameter 0 is inconsistent: TrfLineCmplxLen expected ", cls._TrfLineParams.iat[1,1], " found") 
+                constrErr = True               
             cls._TrfLineCmplxLen = cls._TrfLineParams.iat[0,2]
-            cls._piAcc           = cls._TrfLineParams.iat[1,2] / 100.
-            cls._epsilon         = cls._TrfLineParams.iat[2,2]
-            cls._beta            = cls._TrfLineParams.iat[3,2]
-            cls._delT0           = cls._TrfLineParams.iat[4,2]
-            cls._delT1           = cls._TrfLineParams.iat[5,2]
-            cls._delT2           = cls._TrfLineParams.iat[6,2]
-            print('creation of new object: okay')
+
+            if cls._TrfLineParams.iat[1,1] != "TrfLineCmplxAng":
+                print("transfer line complex parameter 1 is inconsistent: TrfLineCmplxLen expected ", cls._TrfLineParams.iat[1,1], " found")  
+                constrErr = True               
+            cls._TrfLineCmplxLen = cls._TrfLineParams.iat[1,2]
+
+            if cls._TrfLineParams.iat[2,1] != "piAcc":
+                print("transfer line complex parameter 1 is inconsistent: piAcc expected ", cls._TrfLineParams.iat[2,1], " found")
+                constrErr = True  
+            cls._piAcc           = cls._TrfLineParams.iat[2,2] / 100.
+
+            if cls._TrfLineParams.iat[3,1] != "epsilon":
+                print("transfer line complex parameter 2 is inconsistent: epsilon expected ", cls._TrfLineParams.iat[3,1], " found")
+                constrErr = True
+            cls._epsilon         = cls._TrfLineParams.iat[3,2]
+
+            if cls._TrfLineParams.iat[4,1] != "beta":
+                print("transfer line complex parameter 3 is inconsistent: beta expected ", cls._TrfLineParams.iat[4,1], " found")
+                constrErr = True
+            cls._beta            = cls._TrfLineParams.iat[4,2]
+
+            if cls._TrfLineParams.iat[5,1] != "delT0":
+                print("transfer line complex parameter 4 is inconsistent: delT0 expected ", cls._TrfLineParams.iat[5,1], " found")
+                constrErr = True
+            cls._delT0           = cls._TrfLineParams.iat[5,2]
+
+            if cls._TrfLineParams.iat[6,1] != "delT1":
+                print("transfer line complex parameter 5 is inconsistent: delT1 expected ", cls._TrfLineParams.iat[6,1], " found")
+                constrErr = True
+            cls._delT1           = cls._TrfLineParams.iat[6,2]
+
+            if cls._TrfLineParams.iat[7,1] != "delT2":
+                print("transfer line complex parameter 6 is inconsistent: delT2 expected ", cls._TrfLineParams.iat[7,1], " found")
+                constrErr = True
+            cls._delT2           = cls._TrfLineParams.iat[7,2]
+            if constrErr == True:
+                print('creation of new object nuSTORMTrfLineCmplx fails ')
+                exit()
+            else:
+                print('creation of new nuSTORMTrfLineCmplx object: okay ')
         return cls.__instance
 
     def __repr__(self):
