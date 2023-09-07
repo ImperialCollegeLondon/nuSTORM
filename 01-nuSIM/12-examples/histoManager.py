@@ -172,7 +172,7 @@ class histoManager:
                 f.write("\n" + slash + "subsection*{" + curHead + "}\n" + slash + "noindent\n")
                 hPnt = 1
 
-            f.write(slash + "includegraphics[scale=0.4]{plots/" + title +  ".pdf}\n")
+            f.write(slash + "includegraphics[scale=0.40]{plots/" + title +  ".pdf}\n")
             if (hPnt%2 == 0): f.write("\n")
 
         f.write("\n")

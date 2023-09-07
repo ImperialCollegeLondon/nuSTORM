@@ -75,7 +75,7 @@ class histsCreate():
         else:
             hBins = 100
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
-
+#   meant to show the bunch structure
         hLower = self._plotsInfo["tBunchLower"][eventType]
         hUpper = self._plotsInfo["tBunchHigher"][eventType]
         hTitle = eventType + ":t from bunch start"
@@ -87,6 +87,13 @@ class histsCreate():
         else:
             hBins = 100
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
+
+#   meant to show the spill structure
+        hLower = self._plotsInfo["tSpillLower"][eventType]
+        hUpper = self._plotsInfo["tSpillHigher"][eventType]
+        hTitle = eventType + ":t for spill"
+        self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
+
 
         hLower = self._plotsInfo["TOFLower"][eventType]
         hUpper = self._plotsInfo["TOFHigher"][eventType]
@@ -168,6 +175,8 @@ class histsCreate():
             self._hists[hPnt+hoffset].Fill(wt)
             hoffset = hoffset + 1
             self._hists[hPnt+hoffset].Fill(s)
+            hoffset = hoffset + 1
+            self._hists[hPnt+hoffset].Fill(t)
             hoffset = hoffset + 1
             self._hists[hPnt+hoffset].Fill(t)
             hoffset = hoffset + 1
