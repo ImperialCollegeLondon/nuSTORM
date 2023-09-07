@@ -15,6 +15,10 @@ Script for going through the eventHistory and making plots
     @version     1.0
     @date        12 November 2021
 
+    @version     1.1
+    @date        19 May 2023
+
+    Add a parser to the interface to explicitly set the run number
 
 """
 
@@ -33,10 +37,17 @@ import histsCreate as histsCreate
 import particle as particle
 import control
 import logging
+import argparse
 
 ##! Start:
 
-aHVersion = 1.0;
+aHVersion = 1.1;
+
+#   Define parser to allow the user to choose the run number to analyse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--run', help='Run number to use. If no run number specified the current run number is used', default='0')
+args = parser.parse_args()
 
 nTests = 0
 testFails = 0
@@ -44,16 +55,20 @@ descriptions=[]
 locations=[]
 testStatus=[]
 
-
 # muons from transfer line
 StudyDir = os.getenv('StudyDir')
 StudyName = os.getenv('StudyName')
 
 # get the current run number
-rNFile = StudyDir  + "/runNumber"
-rN = open(rNFile, "r")
-runNumber = int(rN.readline())
-rN.close()
+if (int(args.run) == 0):
+  rNFile = StudyDir  + "/runNumber"
+  rN = open(rNFile, "r")
+  runNumber = int(rN.readline())
+  rN.close()
+else:
+  runNumber = int(args.run)
+
+print ("run number is ", runNumber)
 
 # find and open logfile for reading
 logFileName =os.environ['StudyDir'] + "/" + os.environ["StudyName"] + "/" + "normalisation"  + str(runNumber) + ".log"
@@ -85,7 +100,6 @@ objRd = eventHistory.eventHistory()
 # Get the nuSIM path name and use it to set names for the inputfile and the outputFile
 nuSIMPATH = os.getenv('nuSIMPATH')
 rootFilename = os.path.join(StudyDir, StudyName, 'normalisation' + str(ctrlInst.runNumber())+'.root')
-#rootFilename = os.path.join(nuSIMPATH, 'Scratch/normalisation365.root')
 logging.info("  input file %s ", rootFilename)
 
 objRd.inFile(rootFilename)
@@ -161,12 +175,12 @@ flshNuSrcPZ = hm.book(hTitle, hBins, hLower, hUpper)
 #  Data file for genie analysis
 hTitle = "Enumu"
 hLower = 0.0
-hUpper = 4.0
+hUpper = 6.0
 eNumuData = hmDataOut.book(hTitle, hBins, hLower, hUpper)
 
 hTitle = "Enue"
 hLower = 0.0
-hUpper = 4.0
+hUpper = 6.0
 eNueData = hmDataOut.book(hTitle, hBins, hLower, hUpper)
 
 
