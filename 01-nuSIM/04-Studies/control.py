@@ -32,6 +32,14 @@ Version history:
 
  1.1: 06Jun22: include central stored muon energy and the ability to set a static runNumber
 @author: MarvinPfaff
+
+ 1.2: 24May23: Include print flags to turn on and off printing of specific routines, but the code
+               sets the flag to false if the corresponding flag is not defined in the dictionary file.
+               This means that the code is backwards compatable and print flags do not have to be present
+               in the dict file
+
+ 1.3: 03Sept23: Add a flag to set the x position of the detector centre
+@author: PaulKyberd
 """
 
 import math, sys
@@ -139,10 +147,19 @@ class control:
     def nEvents(self):
         return self._controlInfo["nEvents"]
 
+# x position of the centre of the detector in metres
+    def detXPosition(self):
+        try:
+            xPos = self._controlInfo["detectorXPosition"]
+            print(xPos)
+        except KeyError as ke:
+            print('Key Not Found in control dicitionary: providing zero as default', ke)
+            xPos = 0.0
+        return xPos
+
 # print limit
     def printLimit(self):
         return self._controlInfo["printLimit"]
-
 
 # Pion energy
     def PPi(self):
@@ -168,3 +185,22 @@ class control:
 #run description study name
     def description(self):
         return self._controlInfo["description"]
+
+#   Print out flags - main routine
+    def mainPrnt(self):
+        try:
+            flag = self._controlInfo["print"]["main"]
+        except KeyError as ke:
+            flag = False
+        print("in control mainPrnt flag set to ", flag)
+        return flag
+
+#   neutrino event instance
+    def nuEvtInstPrnt(self):
+        try:
+            flag = self._controlInfo["print"]["nuEvtInst"]
+        except KeyError as ke:
+            flag = "False"
+        return flag
+
+
