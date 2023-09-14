@@ -84,6 +84,8 @@ import RandomGenerator as Rndm
 import plane as plane
 import particle as particle
 import eventHistory as eventHistory
+import analyse
+import json
 
 class normalisation:
 
@@ -371,10 +373,12 @@ class normalisation:
             eW = eventWeight
             ENumuSpectra = math.sqrt(pxnu*pxnu + pynu*pynu + pznu*pznu)
             if (self._PSDcyCount < printLimit): print ("  >>>>>>>>>>>>>>> filling the histogram <<<<<<<<<<<<<<<<<")
-            hNumuDet.Fill(ENumuSpectra)          
+            print(" ========== main: main filling numu spectra - pion flash - energy is ", ENumuSpectra)
+            hNumuDet.Fill(ENumuSpectra)
           else:
             eW = 0.0
           numuDetector = particle.particle(runNumber, event, sNumu, numuX, numuY, numuZ, pxnu, pynu, pznu, tNumu, eW, "numu")
+          an.processNumuDet(numuDetector)
           if (self.__history): eH.addParticle("numuDetector", numuDetector)
           if (self._PSDcyCount < printLimit): print ("numu at detector", numuDetector)
 
@@ -415,7 +419,9 @@ class normalisation:
 #          if (sDcy < tlCmplxLength):
 # ps decay
           if (sDcy < tlCmplxLength+psLength):
+            print("")
             print (f"========= muon decay in the production straight ============ {sDcy}")
+            print("")
 # Muon Decay
             xDcy = muTSC[1]
             yDcy = muTSC[2]
@@ -474,13 +480,19 @@ class normalisation:
             sNumu = sDcy + dsNumu
             tNumu = tDcy + dsNumu*1E9/c
             if (self._muDcyCount < printLimit): print ( "sNumu is ", sNumu, "    dsNumu is ", dsNumu, "     tNumu is ", tNumu, "     tDecay is ", tDcy)
-            if ((abs(numuX) < 2.50) and (abs(numuY) < 2.50)):
+            print(" ++ main: testing numu - mu back - x,y is ", hitMu[0], ",  ", hitMu[1])
+            if ((abs(hitMu[0]) < 2.50) and (abs(hitMu[1]) < 2.50)):
                 eW = eventWeight
                 ENumuSpectra = math.sqrt(numuPx*numuPx + numuPy*numuPy + numuPz*numuPz)
+                print("       ++ main filling numu spectra - muon background - energy,x,y is ", ENumuSpectra, ",  ", numuX, ",  ", numuY)
                 hNumuDet.Fill(ENumuSpectra)
             else:
+                print("       ++ main: Not filling nuMu")
                 eW = 0.0
+
             numuDetector = particle.particle(runNumber, event, sNumu, numuX, numuY, numuZ, numuPx, numuPy, numuPz, tNumu, eW, "numu")
+#   Pass the history record to the analysis class
+            an.processNumuDet(numuDetector)
             if (self.__history): eH.addParticle("numuDetector", numuDetector)
             if (self._muDcyCount < printLimit): print ("numu at detector")
 #  nue extrapolation to the detector
@@ -490,13 +502,19 @@ class normalisation:
             dsNue = math.sqrt((xDcy-nueX)**2 + (yDcy-nueY)**2 + (zDcy-nueZ)**2)
             sNue = sDcy + dsNue
             tNue = tDcy + dsNue*1E9/c
-            if ((abs(nueX) < 2.50) and (abs(nueY) < 2.50)):
+            print(" ++ main: testing nue - mu back - x,y is ", hitE[0], ",  ", hitE[1])
+            if ((abs(hitE[0]) < 2.50) and (abs(hitE[1]) < 2.50)):
                 eW = eventWeight
                 ENueSpectra = math.sqrt(nuePx*nuePx + nuePy*nuePy + nuePz*nuePz)
+                print("       ++ main: Filling: E nue ", ENueSpectra)
                 hNueDet.Fill(ENueSpectra)
             else:
+                print("       ++ main: Not filling nuE")
                 eW = 0.0
+
             nueDetector = particle.particle(runNumber, event, sNue, nueX, nueY, nueZ, nuePx, nuePy, nuePz, tNue, eW, "nue")
+#   Pass the history record to the analysis class
+            an.processNueDet(nueDetector)
             if (self.__history): eH.addParticle("nueDetector", nueDetector)
             if (self._muDcyCount < printLimit): print ("nue at detector")
 
@@ -566,13 +584,16 @@ class normalisation:
             sNumu = sDcy + dsNumu
             tNumu = tDcy + dsNumu*1E9/c
             if (self._muDcyCount < printLimit): print ( "sNumu is ", sNumu, "    dsNumu is ", dsNumu, "     tNumu is ", tNumu)
-            if ((abs(numuX) < 2.50) and (abs(numuY) < 2.50)):
+            if ((abs(hitMu[0]) < 2.50) and (abs(hitMu[1]) < 2.50)):
                 eW = eventWeight
                 ENumuSpectra = math.sqrt(numuPx*numuPx + numuPy*numuPy + numuPz*numuPz)
+                print(" ========== main: main filling numu spectra - muon signal - energy is ", ENumuSpectra)
                 hNumuDet.Fill(ENumuSpectra)
             else:
                 eW = 0.0
             numuDetector = particle.particle(runNumber, event, sNumu, numuX, numuY, numuZ, numuPx, numuPy, numuPz, tNumu, eW, "numu")
+#   Pass the history record to the analysis class
+            an.processNumuDet(numuDetector)
             if (self.__history): eH.addParticle("numuDetector", numuDetector)
             if (self._muDcyCount < printLimit): print ("numu at detector")
 
@@ -583,13 +604,16 @@ class normalisation:
             dsNue = math.sqrt((xDcy-nueX)**2 + (yDcy-nueY)**2 + (zDcy-nueZ)**2)
             sNue = sDcy + dsNue
             tNue = tDcy + dsNue*1E9/c
-            if ((abs(nueX) < 2.50) and (abs(nueY) < 2.50)):
+            if ((abs(hitE[0]) < 2.50) and (abs(hitE[1]) < 2.50)):
                 eW = eventWeight
                 ENueSpectra = math.sqrt(nuePx*nuePx + nuePy*nuePy + nuePz*nuePz)
+                print(" ========== main: main filling nue spectra - muon signal - energy is ", ENueSpectra)
                 hNueDet.Fill(ENueSpectra)
             else:
                 eW = 0.0
             nueDetector = particle.particle(runNumber, event, sNue, nueX, nueY, nueZ, nuePx, nuePy, nuePz, tNue, eW, "nue")
+#   Pass the history record to the analysis class
+            an.processNueDet(nueDetector)
             if (self.__history): eH.addParticle("nueDetector", nueDetector)
             if (self._muDcyCount < printLimit): print ("nue at detector")
 
@@ -780,6 +804,9 @@ if __name__ == "__main__" :
 # initialise the python arrays to something sensible
     if (__history): eH.makeHistory()
 
+#   initialise the analyse class
+    an = analyse.analyse(detectorPosition)
+
 # event loop
 for event in range(nEvents):
 # generate a pion
@@ -901,6 +928,13 @@ for event in range(nEvents):
     if (event == nEvents-1):
         print()
         print(normInst.muDcyCount()," neutrinos have been created.")
+
+#   Finish analysis
+
+
+anRootoutFile = os.path.join(StudyDir, StudyName,"analyseTest.root")
+print(f"anRootoutFile is {anRootoutFile}")
+an.conclude(anRootoutFile)
 
 #   Normalisation code
 #   Constants for normalisation
