@@ -85,7 +85,10 @@ import plane as plane
 import particle as particle
 import eventHistory as eventHistory
 import analyse
+<<<<<<< HEAD
 import json
+=======
+>>>>>>> scripts
 
 class normalisation:
 
@@ -378,7 +381,11 @@ class normalisation:
           else:
             eW = 0.0
           numuDetector = particle.particle(runNumber, event, sNumu, numuX, numuY, numuZ, pxnu, pynu, pznu, tNumu, eW, "numu")
+<<<<<<< HEAD
           an.processNumuDet(numuDetector)
+=======
+          an1.processNumuDet(numuDetector)
+>>>>>>> scripts
           if (self.__history): eH.addParticle("numuDetector", numuDetector)
           if (self._PSDcyCount < printLimit): print ("numu at detector", numuDetector)
 
@@ -793,6 +800,10 @@ if __name__ == "__main__" :
     yPlPos = 0.0
     detectorPosition = [xPlPos, yPlPos, zPlPos]
     fluxPlane = plane.plane(detectorPosition)
+
+#   Initialise analyse class
+    an1 = analyse.analyse(detectorPosition)
+
     if (nEvents < printLimit): print (f"detector plane position:  {fluxPlane}")
 #    fluxPlane = plane.plane(psLength, detectorPosZ)
 # set up the event history - instantiate
@@ -929,6 +940,7 @@ for event in range(nEvents):
         print()
         print(normInst.muDcyCount()," neutrinos have been created.")
 
+<<<<<<< HEAD
 #   Finish analysis
 
 
@@ -936,6 +948,9 @@ anRootoutFile = os.path.join(StudyDir, StudyName,"analyseTest.root")
 print(f"anRootoutFile is {anRootoutFile}")
 an.conclude(anRootoutFile)
 
+=======
+    an1.conclude('analyse.root')
+>>>>>>> scripts
 #   Normalisation code
 #   Constants for normalisation
 normValidate = True
