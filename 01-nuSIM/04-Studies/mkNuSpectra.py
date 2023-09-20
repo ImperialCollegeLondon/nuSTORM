@@ -483,6 +483,7 @@ class normalisation:
             else:
                 eW = 0.0
             numuDetector = particle.particle(runNumber, event, sNumu, numuX, numuY, numuZ, numuPx, numuPy, numuPz, tNumu, eW, "numu")
+            an1.processNumuDet(numuDetector)
             if (self.__history): eH.addParticle("numuDetector", numuDetector)
             if (self._muDcyCount < printLimit): print ("numu at detector")
 #  nue extrapolation to the detector
@@ -499,6 +500,7 @@ class normalisation:
             else:
                 eW = 0.0
             nueDetector = particle.particle(runNumber, event, sNue, nueX, nueY, nueZ, nuePx, nuePy, nuePz, tNue, eW, "nue")
+            an1.processNueDet(nueDetector)
             if (self.__history): eH.addParticle("nueDetector", nueDetector)
             if (self._muDcyCount < printLimit): print ("nue at detector")
 
@@ -575,6 +577,7 @@ class normalisation:
             else:
                 eW = 0.0
             numuDetector = particle.particle(runNumber, event, sNumu, numuX, numuY, numuZ, numuPx, numuPy, numuPz, tNumu, eW, "numu")
+            an1.processNumuDet(numuDetector)
             if (self.__history): eH.addParticle("numuDetector", numuDetector)
             if (self._muDcyCount < printLimit): print ("numu at detector")
 
@@ -592,6 +595,7 @@ class normalisation:
             else:
                 eW = 0.0
             nueDetector = particle.particle(runNumber, event, sNue, nueX, nueY, nueZ, nuePx, nuePy, nuePz, tNue, eW, "nue")
+            an1.processNueDet(nueDetector)
             if (self.__history): eH.addParticle("nueDetector", nueDetector)
             if (self._muDcyCount < printLimit): print ("nue at detector")
 
@@ -771,6 +775,8 @@ if __name__ == "__main__" :
     yPlPos = 0.0
     detectorPosition = [xPlPos, yPlPos, zPlPos]
     fluxPlane = plane.plane(detectorPosition)
+    logging.info("     Postion of detector centre x: %s, y: %s, z: %s", xPlPos, yPlPos, zPlPos)
+
 
 #   Initialise analyse class
     an1 = analyse.analyse(detectorPosition)
