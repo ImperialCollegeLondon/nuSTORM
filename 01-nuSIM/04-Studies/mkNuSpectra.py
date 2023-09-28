@@ -419,9 +419,10 @@ class normalisation:
 #          if (sDcy < tlCmplxLength):
 # ps decay
           if (sDcy < tlCmplxLength+psLength):
-            print("")
-            print (f"========= muon decay in the production straight ============ {sDcy}")
-            print("")
+            if (self._muDcyCount < printLimit): 
+                print("")
+                print (f"========= muon decay in the production straight ============ {sDcy}")
+                print("")
 # Muon Decay
             xDcy = muTSC[1]
             yDcy = muTSC[2]
@@ -479,15 +480,16 @@ class normalisation:
             dsNumu = math.sqrt((xDcy-numuX)**2 + (yDcy-numuY)**2 + (zDcy-numuZ)**2)
             sNumu = sDcy + dsNumu
             tNumu = tDcy + dsNumu*1E9/c
-            if (self._muDcyCount < printLimit): print ( "sNumu is ", sNumu, "    dsNumu is ", dsNumu, "     tNumu is ", tNumu, "     tDecay is ", tDcy)
-            print(" ++ main: testing numu - mu back - x,y is ", hitMu[0], ",  ", hitMu[1])
+            if (self._muDcyCount < printLimit): 
+                print ( "sNumu is ", sNumu, "    dsNumu is ", dsNumu, "     tNumu is ", tNumu, "     tDecay is ", tDcy)
+                print(" ++ main: testing numu - mu back - x,y is ", hitMu[0], ",  ", hitMu[1])
             if ((abs(hitMu[0]) < 2.50) and (abs(hitMu[1]) < 2.50)):
                 eW = eventWeight
                 ENumuSpectra = math.sqrt(numuPx*numuPx + numuPy*numuPy + numuPz*numuPz)
-                print("       ++ main filling numu spectra - muon background - energy,x,y is ", ENumuSpectra, ",  ", numuX, ",  ", numuY)
+                if (self._muDcyCount < printLimit): print("       ++ main filling numu spectra - muon background - energy,x,y is ", ENumuSpectra, ",  ", numuX, ",  ", numuY)
                 hNumuDet.Fill(ENumuSpectra)
             else:
-                print("       ++ main: Not filling nuMu")
+                if (self._muDcyCount < printLimit): print("       ++ main: Not filling nuMu")
                 eW = 0.0
 
             numuDetector = particle.particle(runNumber, event, sNumu, numuX, numuY, numuZ, numuPx, numuPy, numuPz, tNumu, eW, "numu")
