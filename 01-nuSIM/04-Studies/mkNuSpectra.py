@@ -505,14 +505,14 @@ class normalisation:
             dsNue = math.sqrt((xDcy-nueX)**2 + (yDcy-nueY)**2 + (zDcy-nueZ)**2)
             sNue = sDcy + dsNue
             tNue = tDcy + dsNue*1E9/c
-            print(" ++ main: testing nue - mu back - x,y is ", hitE[0], ",  ", hitE[1])
+            if (self._muDcyCount < printLimit): print(" ++ main: testing nue - mu back - x,y is ", hitE[0], ",  ", hitE[1])
             if ((abs(hitE[0]) < 2.50) and (abs(hitE[1]) < 2.50)):
                 eW = eventWeight
                 ENueSpectra = math.sqrt(nuePx*nuePx + nuePy*nuePy + nuePz*nuePz)
-                print("       ++ main: Filling: E nue ", ENueSpectra)
+                if (self._muDcyCount < printLimit): print("       ++ main: Filling: E nue ", ENueSpectra)
                 hNueDet.Fill(ENueSpectra)
             else:
-                print("       ++ main: Not filling nuE")
+                if (self._muDcyCount < printLimit): print("       ++ main: Not filling nuE")
                 eW = 0.0
 
             nueDetector = particle.particle(runNumber, event, sNue, nueX, nueY, nueZ, nuePx, nuePy, nuePz, tNue, eW, "nue")
