@@ -942,7 +942,10 @@ for event in range(nEvents):
 
 #   Finish analysis
 
-anRootoutFile = os.path.join(StudyDir, StudyName,"analyseTest.root")
+    rootFilename = os.path.join(StudyDir, StudyName, 'normalisation' + str(ctrlInst.runNumber())+'.root')
+
+
+anRootoutFile = os.path.join(StudyDir, StudyName,'analyse'+ str(ctrlInst.runNumber()) +'.root')
 print(f"anRootoutFile is {anRootoutFile}")
 an1.conclude(anRootoutFile)
 
