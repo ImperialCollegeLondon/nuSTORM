@@ -59,7 +59,7 @@ class analyse:
         self.hNumuDet = self.anHm.book(hTitle, hBins, hLower, hUpper)
         hTitle = "Energy of electron neutrinos at the detector plane"
         self.hNueDet = self.anHm.book(hTitle, hBins, hLower, hUpper)
-#   Plot energy v position
+#   Plot energy v mu position
         hTitle = "munu Energy v Radius"
         hBins1 = 100
         hLower1 = 0.0
@@ -68,6 +68,16 @@ class analyse:
         hLower2 = 0.0
         hUpper2 = 20.0
         self.hEnumuPosition = self.anHm.book2(hTitle, hBins1, hLower1, hUpper1, hBins2, hLower2, hUpper2)
+
+#   Plot energy v e position
+        hTitle = "nue Energy v Radius"
+        hBins1 = 100
+        hLower1 = 0.0
+        hUpper1 = 5.0
+        hBins2 = 100
+        hLower2 = 0.0
+        hUpper2 = 20.0
+        self.hEnuePosition = self.anHm.book2(hTitle, hBins1, hLower1, hUpper1, hBins2, hLower2, hUpper2)
 
         self._var = 1.0
 
@@ -106,6 +116,10 @@ class analyse:
             nueP = nueDet.p()
             ENueSpectra = nueP[0]
             self.hNueDet.Fill(ENueSpectra)
+
+#   Fill the scatter plot for all entries
+        radiusE = math.sqrt(hitPosX*hitPosX + hitPosY*hitPosY)
+        self.hEnuePosition.Fill(nueDet.p()[0],radiusE)
 
         return
 

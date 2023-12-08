@@ -12,6 +12,17 @@ Model for calculating normalised numbers
 
     @author  Paul Kyberd
 
+    @version    2.4
+    @date       27 November 2023
+    @author     Paul Kyberd
+
+    Print out the production straight length and detector distance in the log file. Change back to v1 target
+
+    @version    2.3
+    @date       16 September 2023
+    @author     Paul Kyberd
+
+    Change the target distribution directory to 31-Target/v2/ from v1
 
     @version    2.2
     @date       03 September 2023
@@ -89,7 +100,7 @@ import json
 
 class normalisation:
 
-    __version__ = 1.3
+    __version__ = 2.3
 
     def __init__(self, hFlag, muonMom=0):
         self._tlDcyCount = 0
@@ -372,8 +383,9 @@ class normalisation:
           if ((abs(hitMu[0]) < 2.5) and (abs(hitMu[1]) < 2.5)):
             eW = eventWeight
             ENumuSpectra = math.sqrt(pxnu*pxnu + pynu*pynu + pznu*pznu)
-            if (self._PSDcyCount < printLimit): print ("  >>>>>>>>>>>>>>> filling the histogram <<<<<<<<<<<<<<<<<")
-            print(" ========== main: main filling numu spectra - pion flash - energy is ", ENumuSpectra)
+            if (self._PSDcyCount < printLimit): 
+                print ("  >>>>>>>>>>>>>>> filling the histogram <<<<<<<<<<<<<<<<<")
+                print(" ========== main: main filling numu spectra - pion flash - energy is ", ENumuSpectra)
             hNumuDet.Fill(ENumuSpectra)
           else:
             eW = 0.0
@@ -590,7 +602,6 @@ class normalisation:
             if ((abs(hitMu[0]) < 2.50) and (abs(hitMu[1]) < 2.50)):
                 eW = eventWeight
                 ENumuSpectra = math.sqrt(numuPx*numuPx + numuPy*numuPy + numuPz*numuPz)
-                print(" ========== main: main filling numu spectra - muon signal - energy is ", ENumuSpectra)
                 hNumuDet.Fill(ENumuSpectra)
             else:
                 eW = 0.0
@@ -611,7 +622,6 @@ class normalisation:
             if ((abs(hitE[0]) < 2.50) and (abs(hitE[1]) < 2.50)):
                 eW = eventWeight
                 ENueSpectra = math.sqrt(nuePx*nuePx + nuePy*nuePy + nuePz*nuePz)
-                print(" ========== main: main filling nue spectra - muon signal - energy is ", ENueSpectra)
                 hNueDet.Fill(ENueSpectra)
             else:
                 eW = 0.0
@@ -787,10 +797,12 @@ if __name__ == "__main__" :
     RndmGen = Rndm.RandomGenerator(rootInputFilename,histName,histName2Dx,histName2Dy)
     psLength = nuSTRMCnst.ProdStrghtLen()
     detectorPosZ = nuSTRMCnst.HallWallDist()
+    logging.info("Production Straight Length: %s,       Detector Front Face (distance beyond the end of the straight: %s,  \n", psLength,  detectorPosZ)
+
     nuTrLnCmplx = nuTrfLineCmplx.nuSTORMTrfLineCmplx(trfCmplxFile)
     print ("Transfer Line Complex object is ", nuTrLnCmplx)
 # set up the detector front face
-    zPlPos = 230.0
+    zPlPos = psLength + detectorPosZ
     xPlPos = ctrlInst.detXPosition()
 #    xPlPos = 0.0
     print("Detector x position of centre: ", xPlPos)
