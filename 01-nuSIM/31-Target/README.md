@@ -1,4 +1,11 @@
-This directory contains code for the nuSTORM target and horn.
+This directory contains code for the nuSTORM target and horn - and the resulting target 
+distributions
+
+### v1
+The dirctory with single pion momentum central energies from the Marvin and Tiago generation
+
+### v2
+The dirctory with single pion momentum central energies from the Paul Jurj generation
 
 ### Geometry
     

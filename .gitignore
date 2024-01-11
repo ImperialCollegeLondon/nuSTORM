@@ -7,8 +7,10 @@
 02-nuAnalysis/02-CppAnal/04-User/*
 01-nuSIM/04-Studies/__pycache__/*
 01-nuSIM/12-examples/__pycache__/*
+01-nuSIM/04-Studies/mkNuSpectraTest.py
 01-nuSIM/lastjob
 01-nuSIM/runNumber
+
 .DS_Store
 .gitignore
 gitignore

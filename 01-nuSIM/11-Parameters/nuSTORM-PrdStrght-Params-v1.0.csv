@@ -5,7 +5,7 @@ Momentum acceptance,piAcc,10,%,nuSIM-2021-01
 Momentum acceptance,muAcc,16,%,nuSIM-2021-01
 Transverse acceptance (2D),epsilon,1,pi mm rad,nuSIM-2021-01
 Transverse beta function,beta,25000,mm,nuSIM-2021-01
-Distance from end of straighg to detector hall,HallWallDist,50,m,nuSIM-2021-01
+Distance from end of straight to detector hall,HallWallDist,50,m,nuSIM-2021-01
 Detector half width,DetHlfWdth,2.5,m,nuSIM-2021-01
 Detector length,DetLngth,4,m,nuSIM-2021-01
 Distance from hall wall to detector entrance,Hall2Det,5,m,nuSIM-2021-01
