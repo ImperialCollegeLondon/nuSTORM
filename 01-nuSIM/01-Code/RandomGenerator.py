@@ -66,7 +66,7 @@ class RandomGenerator(object):
             rootFile = ROOT.TFile(cls._rootfilename, 'READ', 'ROOT file with Histograms')
             cls._hist = rootFile.Get(histname)
             if type(cls._hist) == ROOT.TObject:
-                raise ValueError("Histogram not found in ROOT file; check target and pion momenta!")
+                raise ValueError(histname + " Histogram not found in ROOT file; check target and pion momenta!")
 
             cls._hist.SetDirectory(0)
             cls._hist2Dx = rootFile.Get(histname2Dx)
