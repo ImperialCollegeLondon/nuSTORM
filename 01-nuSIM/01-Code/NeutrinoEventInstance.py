@@ -468,7 +468,8 @@ class NeutrinoEventInstance:
         return 0.1*g(-(x+x0)*math.cos(k(1))-(y+y0)*math.sin(k(1)))+0.1*g(-(x+x0)*math.cos(k(2))-(y+y0)*math.sin(k(2)))+0.1*g(-(x+x0)*math.cos(k(3))-(y+y0)*math.sin(k(3)))
 
       #take care of dynamical acceptance
-      muAcc = nuSTRMCnst.muAcc()
+      #muAcc = nuSTRMCnst.muAcc()
+      muAcc = 0.16
       #muon dynamical acceptance as a function of momentum spread (i.e. x = abs(p-p0)/p0)
       def epsilon(x):
           epsilon_max = 0.001 #[m]
@@ -479,6 +480,8 @@ class NeutrinoEventInstance:
           a = epsilon_max/(muAcc-epsilon_kink)
           epsilon0 = a*muAcc
           return np.heaviside(x,1)*np.heaviside(epsilon_kink-x,0)*epsilon_max+np.heaviside(x-epsilon_kink,1)*np.heaviside(muAcc-x,1)*(epsilon0-a*x)
+      
+
       def emittance(x,xp,beta):
           return x*x/beta+beta*xp*xp
 
@@ -489,7 +492,8 @@ class NeutrinoEventInstance:
       betaX_quad = 19.98 #[m]
       betaY_quad = 22.96 #[m]
       #cut on previous calculations
-      if ((Mux*Mux/(0.05*0.05))+(Muxp*Muxp/(0.004*0.004)) < 1.) and (f(Muy, Muyp) < 1.0) and ((noDynAccCutFlag) or ((emittance(Mux,Muxp,betaX_quad) <= epsilon(Mup_spread)) and (emittance(muy,muyp,betaY_quad) <= epsilon(Mup_spread)))):
+      #if ((Mux*Mux/(0.05*0.05))+(Muxp*Muxp/(0.004*0.004)) < 1.) and (f(Muy, Muyp) < 1.0) and 
+      if ((noDynAccCutFlag) or ((emittance(Mux,Muxp,betaX_quad) <= epsilon(Mup_spread)) and (emittance(muy,muyp,betaY_quad) <= epsilon(Mup_spread)))):
             Absorbed = False
       else:
             Absorbed = True

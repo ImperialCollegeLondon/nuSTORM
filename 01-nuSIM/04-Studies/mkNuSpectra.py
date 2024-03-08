@@ -658,8 +658,10 @@ if __name__ == "__main__" :
     parser.add_argument('--studyname', help='Select which study name to use. If no study name is specified study name from dictionary is used.', default='noName')
     parser.add_argument('--p0', help='Select central pion momentum to be generated. If no central pion momentum is specified pion momentum from dictionary is used.',default='0.')
     parser.add_argument('--Mup0', help='Select central muon momentum to be stored in the ring. If no central muon momentum is specified muon momentum from dictionary is used.',default='0.')
-    parser.add_argument('--inputFile', help='Specify root file with input histograms. Assumed to be in 31-Target/v1/ Default: target40.root',default='target40.root')
+    parser.add_argument('--inputFile', help='Specify root file with input histograms. Assumed to be in 31-Target/v1/ Default: target40.root',default='target50.root')
     args = parser.parse_args()
+
+
 
     StudyDir = os.getenv('StudyDir')
     if args.studyname != "noName":
@@ -784,7 +786,16 @@ if __name__ == "__main__" :
     outFilename = rootFilename
     logging.info("Parameters: %s,  \n     transfer line parameters: %s,  \n     histogram input file: %s \n     output file: %s", filename,  trfCmplxFile, rootInputFilename, rootFilename)
 
+    if not os.path.isfile(rootInputFilename):
+        raise FileNotFoundError(f"Input file '{rootInputFilename}' does not exist.")
+    if not os.path.isfile(trfCmplxFile):
+        raise FileNotFoundError(f"Input file '{trfCmplxFile}' does not exist.")
+    if not os.path.isfile(filename): 
+        raise FileNotFoundError(f"Input file '{filename}' does not exist.")
+    if not os.path.isfile(trfCmplxFile):
+        raise FileNotFoundError(f"Input file '{trfCmplxFile}' does not exist.")
 
+    
 # Get machine and run parameters
     geV = int(pionMom)
 #   fractional part
