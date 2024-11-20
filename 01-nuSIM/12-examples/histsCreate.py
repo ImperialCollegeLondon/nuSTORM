@@ -13,6 +13,7 @@ Model for calculating normalised numbers
 from pathlib import Path
 import math
 import json
+import numpy as np
 
 class histsCreate():
 
@@ -42,8 +43,8 @@ class histsCreate():
     def histAdd(self, eventType):
         self._locsStart.append(len(self._hists))
         self._locs.append(eventType)
-#        print ("locStart is ", self._locsStart)
-#        print ("locs ", self._locs)
+        print ("locStart is ", self._locsStart)
+        print ("locs ", self._locs)
         hTitle = eventType + ":x"
         hBins  = 100
 
@@ -75,6 +76,55 @@ class histsCreate():
         else:
             hBins = 100
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
+
+#   r v rx
+        hTitle = eventType + ":x v px"
+        hLow1 = self._plotsInfo["xLower"][eventType]
+        hUp1 = self._plotsInfo["xHigher"][eventType]
+        hLow2 = self._plotsInfo["pxLower"][eventType]
+        hUp2 = self._plotsInfo["pxHigher"][eventType]
+        self._hists.append(self._hm.book2(hTitle, 100, hLow1, hUp1, 100, hLow2, hUp2))
+        hTitle = eventType + ":y v py"
+        hLow1 = self._plotsInfo["yLower"][eventType]
+        hUp1 = self._plotsInfo["yHigher"][eventType]
+        hLow2 = self._plotsInfo["pyLower"][eventType]
+        hUp2 = self._plotsInfo["pyHigher"][eventType]
+        self._hists.append(self._hm.book2(hTitle, 100, hLow1, hUp1, 100, hLow2, hUp2))
+
+#   phase space
+
+        hTitle = eventType + ":x v xp"
+        hLow1 = self._plotsInfo["xLower"][eventType]
+        hUp1 = self._plotsInfo["xHigher"][eventType]
+#       hLow2 = self._plotsInfo["xpLower"][eventType]
+#       hUp2 = self._plotsInfo["xpHigher"][eventType]
+        hLow2 = -0.05
+        hUp2 = 0.05
+        print ("xpLower is ", hLow2, "    xpHigher is ", hUp2)
+        self._hists.append(self._hm.book2(hTitle, 100, hLow1, hUp1, 100, hLow2, hUp2))
+        hTitle = eventType + ":y v yp"
+        hLow1 = self._plotsInfo["yLower"][eventType]
+        hUp1 = self._plotsInfo["yHigher"][eventType]
+        hLow2 = self._plotsInfo["ypLower"][eventType]
+        hUp2 = self._plotsInfo["ypHigher"][eventType]
+        self._hists.append(self._hm.book2(hTitle, 100, hLow1, hUp1, 100, hLow2, hUp2))
+
+#   correlations
+        hTitle = eventType + ":x v y"
+        hLow1 = self._plotsInfo["xLower"][eventType]
+        hUp1 = self._plotsInfo["xHigher"][eventType]
+        hLow2 = self._plotsInfo["yLower"][eventType]
+        hUp2 = self._plotsInfo["yHigher"][eventType]
+        self._hists.append(self._hm.book2(hTitle, 100, hLow1, hUp1, 100, hLow2, hUp2))
+
+        hTitle = eventType + ":xp v yp"
+        hLow1 = self._plotsInfo["xpLower"][eventType]          # don't check here, should have alread been caught
+        hUp1 = self._plotsInfo["xpHigher"][eventType]
+        hLow2 = self._plotsInfo["ypLower"][eventType]
+        hUp2 = self._plotsInfo["ypHigher"][eventType]
+        self._hists.append(self._hm.book2(hTitle, 100, hLow1, hUp1, 100, hLow2, hUp2))
+
+
 #   meant to show the bunch structure
         hLower = self._plotsInfo["tBunchLower"][eventType]
         hUpper = self._plotsInfo["tBunchHigher"][eventType]
@@ -93,13 +143,10 @@ class histsCreate():
         hUpper = self._plotsInfo["tSpillHigher"][eventType]
         hTitle = eventType + ":t for spill"
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
-
-
         hLower = self._plotsInfo["TOFLower"][eventType]
         hUpper = self._plotsInfo["TOFHigher"][eventType]
         hTitle = eventType + ":Time of Flight"
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
-
 
         hBins = 100
         hTitle = eventType + ":px"
@@ -115,26 +162,28 @@ class histsCreate():
         hTitle = eventType + ":pz"
         hLower = self._plotsInfo["pzLower"][eventType]
         hUpper = self._plotsInfo["pzHigher"][eventType]
-        self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
+        print ("hLower for pz is ", hLower, "   hUpper for pz is ", hUpper)
+        print ("hTtile is ", hTitle)
+        hist = self._hm.book(hTitle, hBins, hLower, hUpper)
+        print ("hist is ", hist)
+        self._hists.append(hist)
 #  Energy plot
-        hTitle = eventType + ":E"
-        hLower = self._plotsInfo["eLower"][eventType]
-        hUpper = self._plotsInfo["eHigher"][eventType]
+        hTitle = eventType + ":p"
+        try:
+            hLower = self._plotsInfo["pLower"][eventType]
+            hUpper = self._plotsInfo["pHigher"][eventType]
+        except:
+            print ("error is ", OSError)
+            exit("Change plotsXXX.dict ... probably need to replace eLower and eHigher by pLower and pHigher")
         self._hists.append(self._hm.book(hTitle, hBins, hLower, hUpper))
 
-        hTitle = eventType + ":E_v_t"
-        hLow1 = self._plotsInfo["eLower"][eventType]
-        hUp1 = self._plotsInfo["eHigher"][eventType]
+        hTitle = eventType + ":p_v_t"
+        hLow1 = self._plotsInfo["pLower"][eventType]
+        hUp1 = self._plotsInfo["pHigher"][eventType]
         hLow2 = self._plotsInfo["TOFLower"][eventType]
         hUp2 = self._plotsInfo["TOFHigher"][eventType]
-
         self._hists.append(self._hm.book2(hTitle, 50, hLow1, hUp1, 50, hLow2, hUp2))
-#        print ("self._hists ", len(self._hists))
-#        print ("self._hists ", self._hists[11])
 
-
-
-#        print (self._hists)
         return
 
     def histsFill(self, location, particle):
@@ -149,6 +198,7 @@ class histsCreate():
         px = particle.p()[1][0]
         py = particle.p()[1][1]
         pz = particle.p()[1][2]
+        p = np.sqrt(px*px + py*py +pz*pz)
         wt = particle.weight()
         s = particle.s()
         t = particle.t()
@@ -163,30 +213,51 @@ class histsCreate():
         else:
             n = self._zeroWeight.get(location)
             self._zeroWeight[location] = n + 1
+#   book order ... fill must be same
+#0;#1; 2;      3; 4;      5;      6;      7;      8;     9;      10;     11;     12;  13; 14; 15; 16;17;    18;   
+#x; y; z; weight; s; x v px; y v py; x v xp; y v yp; x v y; xp v yp; tbunch; tSpill; TOF; px; py; pz; p; p v t;
 
         hoffset = 0
         if (wt > 0.0):
-            self._hists[hPnt+hoffset].Fill(x)
+            self._hists[hPnt+hoffset].Fill(x)       # 0
             hoffset = hoffset + 1
-            self._hists[hPnt+hoffset].Fill(y)
+            self._hists[hPnt+hoffset].Fill(y)       # 1
             hoffset = hoffset + 1
-            self._hists[hPnt+hoffset].Fill(z)
+            self._hists[hPnt+hoffset].Fill(z)       # 2
             hoffset = hoffset + 1
-            self._hists[hPnt+hoffset].Fill(wt)
+            self._hists[hPnt+hoffset].Fill(wt)      # 3
             hoffset = hoffset + 1
-            self._hists[hPnt+hoffset].Fill(s)
+            self._hists[hPnt+hoffset].Fill(s)       # 4
             hoffset = hoffset + 1
-            self._hists[hPnt+hoffset].Fill(t)
+            self._hists[hPnt+hoffset].Fill(x,px)    # 5
             hoffset = hoffset + 1
-            self._hists[hPnt+hoffset].Fill(t)
+            self._hists[hPnt+hoffset].Fill(y,py)    # 6
             hoffset = hoffset + 1
-            self._hists[hPnt+hoffset].Fill(t-self._t0)
+            xp = px/pz
+            yp = py/pz
+            self._hists[hPnt+hoffset].Fill(x,xp)    # 7
             hoffset = hoffset + 1
-            self._hists[hPnt+hoffset].Fill(px)
+            self._hists[hPnt+hoffset].Fill(y,yp)    # 8
             hoffset = hoffset + 1
-            self._hists[hPnt+hoffset].Fill(py)
-            hoffset = hoffset + 3
-            self._hists[hPnt+hoffset].Fill(pz,t)
+            self._hists[hPnt+hoffset].Fill(x,y)     # 9
+            hoffset = hoffset + 1
+            self._hists[hPnt+hoffset].Fill(xp,yp)   # 10
+            hoffset = hoffset + 1
+            self._hists[hPnt+hoffset].Fill(t)       # 11
+            hoffset = hoffset + 1
+            self._hists[hPnt+hoffset].Fill(t-self._t0)  # 12
+            hoffset = hoffset + 1
+            # TOF                                   # 13            
+            hoffset = hoffset + 1
+            self._hists[hPnt+hoffset].Fill(px)      # 14
+            hoffset = hoffset + 1
+            self._hists[hPnt+hoffset].Fill(py)      # 15
+            hoffset = hoffset + 1
+            self._hists[hPnt+hoffset].Fill(pz)      # 16
+            hoffset = hoffset + 1
+            self._hists[hPnt+hoffset].Fill(p)      # 17
+            hoffset = hoffset + 1
+            self._hists[hPnt+hoffset].Fill(pz,t)    # 18
 
             if (location == 'productionStraight'):
 # plots with non-zero weight - for production straight
@@ -195,11 +266,11 @@ class histsCreate():
             Enu = math.sqrt(px*px + py*py + pz*pz)
             if ((location == 'numuDetector') or (location == "nueDetector")):
                 if ((abs(x) < 2.5) and (abs(y) < 2.5)):
-                        self._hists[hPnt+9].Fill(pz)
-                        self._hists[hPnt+10].Fill(Enu)
+                        self._hists[hPnt+13].Fill(pz)
+                        self._hists[hPnt+14].Fill(Enu)
             else:
-                self._hists[hPnt+9].Fill(pz)
-                self._hists[hPnt+10].Fill(Enu)
+                self._hists[hPnt+13].Fill(pz)
+                self._hists[hPnt+14].Fill(Enu)
 
 
 

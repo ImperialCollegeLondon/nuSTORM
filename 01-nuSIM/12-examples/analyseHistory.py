@@ -1,3 +1,5 @@
+
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -20,6 +22,19 @@ Script for going through the eventHistory and making plots
 
     Add a parser to the interface to explicitly set the run number
 
+    @version     1.2
+    @date        18 October 2024
+
+    Remove override of nEvent ... if we reinstate make sure that the override is
+    less than or equal to the number of events in the data set
+
+    @version     1.3
+    @date        18 October 2024
+
+    Add comments to help the make sure the filling is done in the correct order
+
+
+
 """
 
 # Generic Python imports
@@ -41,13 +56,14 @@ import argparse
 
 ##! Start:
 
-aHVersion = 1.1;
+aHVersion = 1.3;
 
 #   Define parser to allow the user to choose the run number to analyse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--run', help='Run number to use. If no run number specified the current run number is used', default='0')
 args = parser.parse_args()
+
 
 nTests = 0
 testFails = 0
@@ -96,17 +112,17 @@ dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
 logging.info("========  analysing the eventHistory: start  ======== Version %s... %s", aHVersion, dt_string)
 logging.info("Control file %s", controlFile)
 
-objRd = eventHistory.eventHistory()
 # Get the nuSIM path name and use it to set names for the inputfile and the outputFile
 nuSIMPATH = os.getenv('nuSIMPATH')
 rootFilename = os.path.join(StudyDir, StudyName, 'normalisation' + str(ctrlInst.runNumber())+'.root')
 logging.info("  input file %s ", rootFilename)
 
+objRd = eventHistory.eventHistory()
 objRd.inFile(rootFilename)
 
 nEvent = objRd.getEntries()
 print ("number of entries is ", nEvent)
-
+logging.info("  number of entries is  %i ", nEvent)
 
 dbgFlag = False
 
@@ -172,6 +188,9 @@ hLower = 1.0
 hUpper = 6.0
 flshNuSrcPZ = hm.book(hTitle, hBins, hLower, hUpper)
 
+strXXP = hm.book2("Prod strght: x v xp", 100, -0.1, 0.1, 100, -0.05, 0.05)
+strYYP = hm.book2("Prod strght: y v yp", 100, -0.1, 0.1, 100, -0.05, 0.05)
+
 #  Data file for genie analysis
 hTitle = "Enumu"
 hLower = 0.0
@@ -182,7 +201,6 @@ hTitle = "Enue"
 hLower = 0.0
 hUpper = 6.0
 eNueData = hmDataOut.book(hTitle, hBins, hLower, hUpper)
-
 
 for pnt in range(nEvent):
 # read an event
@@ -238,6 +256,14 @@ for pnt in range(nEvent):
     hC.histsFill("nueDetector", partNueDetect)
     if (dbgFlag): print ("nueProduction Particle is ", partNueDetect)
 
+# trying hack round a problem
+    sx = partPS.x()
+    sxp = partPS.p()[1][0]/partPS.p()[1][2]
+    strXXP.Fill(sx, sxp)
+    sy = partPS.y()
+    syp = partPS.p()[1][1]/partPS.p()[1][2]
+    strYYP.Fill(sy, syp)
+
 # some specfic analysis - neutrinos from muon decay if only muon decays in the ring are included
     if (partNumuDetect.weight() > 0.0):
       xs = partNumuProd.x()
@@ -289,18 +315,18 @@ for pnt in range(nEvent):
       flshNuSrcPZ.Fill(p[1][2])
       arrivalT.Fill(partNumuDetect.t())
 
-
-
 histFile = os.path.join(StudyDir, ctrlInst.studyName())
+print ("about to do ---- hm.histdo(histFile)")
 hm.histdo(histFile)
+print ("done ---- hm.histdo(histFile)")
 fileName = os.path.join(StudyDir, ctrlInst.studyName() + "/plots" + str(ctrlInst.runNumber()) + ".root")
 print (fileName)
+print ("about to do ---- hm.histOutRoot(histFile)")
 hm.histOutRoot(fileName)
 fileName01 = os.path.join(StudyDir, ctrlInst.studyName() + "/nuDetector" + str(ctrlInst.runNumber()) + ".root")
-#hmDataOut.histOutRoot("nuDetector.root")
 hmDataOut.histOutRoot(fileName01)
-# write plots to individual .pdf files
-#hm.histdo()
+print ("done ---- hm.histOutRoot(histFile)")
+
 fileName02 = os.path.join(StudyDir, ctrlInst.studyName() + "/plots" + str(ctrlInst.runNumber()) + ".tex")
 hm.texCreate(fileName02)
 fileName03 = os.path.join(StudyDir, ctrlInst.studyName() + "/summary" + str(ctrlInst.runNumber()) + ".tex")

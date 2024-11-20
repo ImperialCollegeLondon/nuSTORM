@@ -60,7 +60,7 @@ aHVersion = 1.0;
 parser = argparse.ArgumentParser()
 parser.add_argument("--set", metavar="KEY=VALUE", 
                     nargs='+', 
-                    help="Set a number of key-VALUEW PAIRS", 
+                    help="Set a number of key-VALUE PAIRS", 
                     action=keyvalue)
 args = parser.parse_args()
 print(args.set)
@@ -74,23 +74,23 @@ if args.set:
   else:
     print ("runNumber not in dict")
 
+  if "dict" in args.set.keys():
+    print ("run dict in args dict")
+    dictFlag = True 
+    dictionary = args.set["dict"]
+  else:
+    print ("dictionary not in args.dict")
+
 nTests = 0
 testFails = 0
 descriptions=[]
 locations=[]
 testStatus=[]
 
-# Pions Flash in the production straight
-#controlFile = "102-Studies/pencilValidation/PSPiFlash.dict"
-# Muons decay in ring, after first pass of the production straight
-#controlFile = "102-Studies/pencilValidation/PSMuRingDcy.dict"
-# Muons decay in production straight with pions.
-#controlFile = "102-Studies/pencilValidation/TLPiFlash.dict"
-#controlFile = "102-Studies/pencilValidation/PSMuDcy.dict"
-# muons from transfer line
 StudyDir = os.getenv('StudyDir')
 StudyName = os.getenv('StudyName')
-controlFile = os.path.join(StudyDir, StudyName,"PSPiFLash3.dict")
+
+controlFile = os.path.join(StudyDir, StudyName,"MuRingDcy50-38.dict")
 ctrlInst = control.control(controlFile)
 
 #       logfile initialisation
@@ -122,7 +122,7 @@ print ("number of entries is ", nEvent)
 dbgFlag = False
 
 print("start reading")
-# Now read the input from the csv file, create the eventHistory and com[are it to the one recovered from the root file
+# Now read the input from the csv file, create the eventHistory and compare it to the one recovered from the root file
 #  get the first event fromnext event from root
 locRecord=[]
 locStatus=[]

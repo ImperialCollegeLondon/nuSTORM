@@ -108,10 +108,15 @@ class histoManager:
 # Output all histos to screen and file
         hPnt = 0
         for i in range(len(self.hists)):
+            print ("i is ", i)
             hPnt = hPnt + 1
+            print ("hPnt is ", hPnt)
             hCurr = self.hists[i]
+            print ("hCurr  is ", hCurr)
             pCurr = self.histParams[i]
+            print ("pCurr is ", pCurr)
             title = hCurr.GetTitle()
+            print ("title is ", title)
             if pCurr == "m":
                 self.action = "m"
                 hPnt = 1
