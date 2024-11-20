@@ -113,6 +113,8 @@ class normalisation:
         self._mup0 = muonMom
         self.__history = hFlag
 
+        print ("normalisation initialisation: hFlag is ", hFlag, "  self.__history is ", self.__history)
+
 # transform x,y,z and px,py,pz co-ordinates from the transfer line local co-ordinates to the
 # global ones
 
@@ -407,6 +409,10 @@ class normalisation:
       piTraceSpaceCoord = pi.getTraceSpaceCoord()
       mucostheta = pi.getcostheta()
       mu4mom = pi.getmu4mmtm()
+      muPx = mu4mom[1][0]
+      muPy = mu4mom[1][1]
+      muPz = mu4mom[1][2]
+      muMagMom = math.sqrt(muPx*muPx + muPy*muPy + muPz*muPz )
       if (self._muDcyCount < printLimit):
             print ("piTraceSpaceCoord is ", piTraceSpaceCoord)
             print ("muon 4 momentum is ", mu4mom)
@@ -536,6 +542,7 @@ class normalisation:
 # finished dealing with muon decays in the production straight
       else:
         if (ringMuonsFlag):
+            an1.processMuDcy(muMagMom)
             self._muDcyCount = self._muDcyCount + 1
             if (self._muDcyCount < printLimit): print ("========= muon decay in the ring ===========")
             muTSC = nuEvt.getTraceSpaceCoord()
@@ -650,7 +657,11 @@ if __name__ == "__main__" :
 
     __mainPrint = False
 
+    __DcyPrint = False
+
     __history = False
+
+    __validate = False
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--dict', help='Select which run condition dictionary to use. Default: MuRingDcy[.dict]', default='MuRingDcy')
@@ -658,10 +669,8 @@ if __name__ == "__main__" :
     parser.add_argument('--studyname', help='Select which study name to use. If no study name is specified study name from dictionary is used.', default='noName')
     parser.add_argument('--p0', help='Select central pion momentum to be generated. If no central pion momentum is specified pion momentum from dictionary is used.',default='0.')
     parser.add_argument('--Mup0', help='Select central muon momentum to be stored in the ring. If no central muon momentum is specified muon momentum from dictionary is used.',default='0.')
-    parser.add_argument('--inputFile', help='Specify root file with input histograms. Assumed to be in 31-Target/v1/ Default: target40.root',default='target50.root')
+    parser.add_argument('--inputFile', help='Specify root file with input histograms. Assumed to be in 31-Target/v1/ Default: target40.root',default='target40.root')
     args = parser.parse_args()
-
-
 
     StudyDir = os.getenv('StudyDir')
     if args.studyname != "noName":
@@ -692,6 +701,7 @@ if __name__ == "__main__" :
     tlCmplxLength = nuSTRMCnst.TrfLineCmplxLen()
     tlCmplxAngle = nuSTRMCnst.TrfLineCmplxAng()
 
+    print ("initialisae normalisation: history flag is ", __history)
     normInst = normalisation( __history, muonMom)
 # run number needed because it labels various files
     if int(args.run) != 0:
@@ -704,6 +714,19 @@ if __name__ == "__main__" :
 
 #       Histogram initialisation
     hm = histoManager.histoManager()
+# ---> new stuff to check agreement
+    hBins = 120
+    hLower = 0.0
+    hUpper = 7.2
+    piMomLower = pionMom*0.8
+    piMomHigher = pionMom*1.2
+    muMomLower = pionMom*0.4
+    muMomHigher = pionMom*1.2
+    hPmuCut = hm.book("pMuon passed cut", hBins,  muMomLower,  muMomHigher)
+    hPmu = hm.book("pMuon All", hBins,  muMomLower,  muMomHigher)
+    hPpi = hm.book("pion momentum", hBins, piMomLower, piMomHigher)
+    hPmuNotCut = hm.book("pMuon failed cut", hBins,  muMomLower,  muMomHigher)
+# ---> end new stuff
     hBins = 360
     hLower = 0.0
     hUpper = 7.2
@@ -713,7 +736,6 @@ if __name__ == "__main__" :
     eNumuDataNorm = hm.book(hTitle, hBins, hLower, hUpper)
     hTitle = "EnueNorm"
     eNueDataNorm = hm.book(hTitle, hBins, hLower, hUpper)
-
 
 #    hmuDcyPnt = hm.book("mu decay z (m)", 100, 0.0, 300.0)
 #    hLifetime = hm.book("life time", 100, 0.0, 1000.0)
@@ -786,21 +808,12 @@ if __name__ == "__main__" :
     outFilename = rootFilename
     logging.info("Parameters: %s,  \n     transfer line parameters: %s,  \n     histogram input file: %s \n     output file: %s", filename,  trfCmplxFile, rootInputFilename, rootFilename)
 
-    if not os.path.isfile(rootInputFilename):
-        raise FileNotFoundError(f"Input file '{rootInputFilename}' does not exist.")
-    if not os.path.isfile(trfCmplxFile):
-        raise FileNotFoundError(f"Input file '{trfCmplxFile}' does not exist.")
-    if not os.path.isfile(filename): 
-        raise FileNotFoundError(f"Input file '{filename}' does not exist.")
-    if not os.path.isfile(trfCmplxFile):
-        raise FileNotFoundError(f"Input file '{trfCmplxFile}' does not exist.")
 
-    
 # Get machine and run parameters
     geV = int(pionMom)
 #   fractional part
-    fracE = int((pionMom*10 - geV*10))          # if you subtract and then multiply can get a error  
-
+#    fracE = int((pionMom*10 - geV*10))          # 2 sig fig
+    fracE = int((pionMom*100 - geV*100)) # 3 sig fig
     histName = 'histP'+str(geV)+str(fracE)+'GeV'
     histName2Dx = 'histXPS'+str(geV)+str(fracE)+'GeV'
     histName2Dy = 'histYPS'+str(geV)+str(fracE)+'GeV'
@@ -909,13 +922,17 @@ for event in range(nEvents):
         print (f"----> main: tsc for neutrinoEventInstance is {pi.getTraceSpaceCoord()}")
 
     nuEvt = nuEvtInst.NeutrinoEventInstance(pMu,pi.getTraceSpaceCoord())
-
-    Absorbed = nuEvt.Absorption(pi.getTraceSpaceCoord(), pi.getmu4mmtm(), pi.getcostheta(), muonMom)
+#   replace muonMom the mean momentum, with pMu the actuall momentum so we only cut on the angle
+    Absorbed = nuEvt.Absorption(pi.getTraceSpaceCoord(), pi.getmu4mmtm(), pi.getcostheta(), pMu)
+#    Absorbed = nuEvt.Absorption(pi.getTraceSpaceCoord(), pi.getmu4mmtm(), pi.getcostheta(), muonMom)
+    if (not Absorbed): hPmuCut.Fill(pMu)
+    if (Absorbed): hPmuNotCut.Fill(pMu)
 
 # decay in the transferline
     if ((tlFlag) and (pathLength < tlCmplxLength)):
       normInst.tlDecay()
       if (muDcyFlag):normInst.decayMuons()
+      if (__DcyPrint): print(" === main:  decay in transfer line")
     else:
 # pion reaches end of transfer line just write out a new pion with altered s and z - all other pions must do this
 # the magnets bend the beam so that the local co-ordinates are now the global ones
@@ -930,16 +947,15 @@ for event in range(nEvents):
 # decay beyond the end of the production straight
     if ((lstFlag) and (pathLength > tlCmplxLength + psLength)):
         normInst.beyondPS()
-
+        if (__DcyPrint): print(" === main:  decay beyond production straight")
 # decay in the production straight
     if ((psFlag) and (pathLength >= tlCmplxLength) and (pathLength <= tlCmplxLength + psLength)):
         normInst.decayPiInPS()
+        if (__DcyPrint): print(" === main:  decay in production straight")
 # decay the muons
         if (muDcyFlag): normInst.decayMuons()
-
-
-
-#  write to the root structure
+        if (__DcyPrint) and (muDcyFlag): print(" === main:  muon decay in production straight")
+#    eH.display()
     if (__history): eH.fill()
 # tell the user what is happening
     if (event < 10):
@@ -968,6 +984,14 @@ for event in range(nEvents):
     rootFilename = os.path.join(StudyDir, StudyName, 'normalisation' + str(ctrlInst.runNumber())+'.root')
 
 
+# Write to the root output file and close
+if (__history): 
+    eH.write()
+    eH.outFileClose()
+    print ("history file just output")
+
+print("\n\n\n\n")
+
 anRootoutFile = os.path.join(StudyDir, StudyName,'analyse'+ str(ctrlInst.runNumber()) +'.root')
 print(f"anRootoutFile is {anRootoutFile}")
 an1.conclude(anRootoutFile)
@@ -980,7 +1004,11 @@ nPions = nEvents
 # 1 GeV: 0.1163    2 Gev: 0.1338    3 GeV: 0.1240    4 GeV: 0.1120    5 GeV: 0.0985    6 GeV: 0.0865    7 GeV: 0.0760    8 GeV: 0.0671
 #ppp = [0.1163, 0.1338, 0.1240, 0.1120, 0.0985, 0.0865, 0.0760, 0.0671]
 #   Create a dictionary linking mean energy to appropriate protons per pion number - 5.5 is a mean number as is 5.8 
-ppp = {1.0: 0.1163, 2.0: 0.1338, 3.0: 0.1240, 4.0: 0.1120, 5.0: 0.0985, 5.5: 0.0925, 5.8: 0.0889, 6.0: 0.0865, 7.0: 0.0760, 8.0: 0.0671}
+ppp = { 1.00: 0.1207, 1.32: 0.1315, 1.40: 0.1338, 1.60: 0.1376, 1.80: 0.1394, 1.90: 0.1393, 1.95: 0.1392, 2.00: 0.1338, 2.10: 0.1389, 2.30: 0.1373, 2.40: 0.1367, 2.50: 0.1357, 2.60: 0.1347, 2.80: 0.1323,   
+        3.00: 0.1293, 3.15: 0.1163, 3.20: 0.1262, 3.30: 0.1245, 3.40: 0.1234, 3.50: 0.1218, 3.55: 0.1209, 3.60: 0.1200, 3.75: 0.1180, 3.90: 0.1159, 3.95: 0.1152,
+        4.00: 0.1146, 4.10: 0.1132, 4.20: 0.1120, 4.35: 0.1103, 4.40: 0.1096, 4.50: 0.1080, 4.60: 0.1066, 4.70: 0.1054, 4.75: 0.1047, 4.90: 0.1025,4.95: 0.1018,
+        5.00: 0.1011, 5.20: 0.0981, 5.40: 0.0958, 5.50: 0.0947, 5.60: 0.0933, 5.70: 0.0919, 5.75: 0.0914, 5.80: 0.0908, 5.90: 0.0895,
+        6.00: 0.0884, 6.10: 0.0871, 6.20: 0.0860, 6.30: 0.0848, 6.80: 0.0788, 6.85: 0.0785, 7.00: 0.0760, 7.80: 0.0693, 8.00: 0.0675, 8.20: 0.0659, 8.40: 0.0643}
 #   Get the pion momentum from the input file
 ePi = float(pionMom)
 pionPerProton = ppp[ePi]
@@ -1095,8 +1123,11 @@ eNueDataNorm.SetStats(0)
 
 
 # Write to the root output file and close
-if (__history): eH.write()
-if (__history): eH.outFileClose()
+#if (__history): 
+#    eH.write()
+#    eH.outFileClose()
+#    print ("history file just output")
+
 # Write out histograms
 fileName = os.path.join(StudyDir, StudyName + "/Normalplots" + str(ctrlInst.runNumber()) + ".root")
 print(f"filename is {fileName}")

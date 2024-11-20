@@ -79,6 +79,12 @@ class analyse:
         hUpper2 = 20.0
         self.hEnuePosition = self.anHm.book2(hTitle, hBins1, hLower1, hUpper1, hBins2, hLower2, hUpper2)
 
+# Plot muon decay momenta
+        hBins =  300
+        hLower = 0.0
+        hUpper = 8.0
+        self.hMuMom = self.anHm.book("Muon momenta", hBins, hLower, hUpper)
+
         self._var = 1.0
 
         return
@@ -123,7 +129,11 @@ class analyse:
 
         return
 
+    def processMuDcy(self, muonMomentum):
 
+        self.hMuMom.Fill(muonMomentum)
+
+        return
 
     def conclude(self, fileName):
 

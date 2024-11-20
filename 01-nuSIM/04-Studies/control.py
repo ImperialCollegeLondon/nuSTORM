@@ -39,6 +39,8 @@ Version history:
                in the dict file
 
  1.3: 03Sept23: Add a flag to set the x position of the detector centre
+
+ 1.4: 22Oct24:  Add a method to return the generation type
 @author: PaulKyberd
 """
 
@@ -111,6 +113,10 @@ class control:
 # Get pion phase space distribution at target from histogram input
     def psDistInput(self):
         return (self._controlInfo["flags"]["psDistInput"] == "True")
+
+# Get the genPion generation type
+    def genType(self):
+        return self._controlInfo["flags"]["genType"]
 
 # Add possibility to set static runNumber
     def setRunNumber(self, runNum):
