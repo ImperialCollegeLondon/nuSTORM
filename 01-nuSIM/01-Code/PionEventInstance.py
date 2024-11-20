@@ -64,10 +64,15 @@ Created on Tue 30Mar21;02:26: Version history:
                TLorentzVector class from PyROOT to do bost to nuSTORM frame
  @author: MarvinPfaff
 
- 1.3: 06Jun22: Output two trace spaces, one at pion generation (Coord, _LclTrcSpcCrd) and one at pion decay
+ 1.4: 06Jun22: Output two trace spaces, one at pion generation (Coord, _LclTrcSpcCrd) and one at pion decay
                (DcyCoord, _TrcSpcCrd) and get nuSTORM constants from nuSTORMConst.py
  @author: MarvinPfaff
-"""
+
+ 1.4: 23Jun24: Add code so that particleTarLocal actually files the energy and momentum for the pion
+
+ @author: Paul Kyberd
+
+ """
 
 from copy import deepcopy
 from ROOT import TLorentzVector as T4V
@@ -247,6 +252,10 @@ class PionEventInstance:
             pzl = self._pion.p()[1][2]
             xpl = pxl/pzl
             ypl = pyl/pzl
+            self._P_pi[0] = np.sqrt(PionEventInstance.__pimass**2 + pxl*pxl + pyl*pyl + pzl*pzl)
+            self._P_pi[1][0] = pxl
+            self._P_pi[1][1] = pyl
+            self._P_pi[1][2] = pzl
 
         coord[0] = s
         coord[1] = xl

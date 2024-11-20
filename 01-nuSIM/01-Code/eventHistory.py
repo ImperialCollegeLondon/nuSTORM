@@ -315,9 +315,10 @@ class eventHistory:
 	__Validated__ = False
 
 # built in methods
-	def __init__(self ):
-		self._outputFilename = "null"
+	def __init__(self):
 		self._inputFilename = "null"
+		self._outputFilename = "null"
+		self._outTFile = "null"
 		self._eHTree = "null"
 		self._runNum = -1
 		self._particles = [None]*14
@@ -512,6 +513,7 @@ class eventHistory:
 
 #  Close the output file
 	def outFileClose(self ):
+
 		self._outTFile.Close()
 
 	def fill(self):

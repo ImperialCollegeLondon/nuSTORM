@@ -31,6 +31,7 @@ Class pion:
 
 Created on Tue 29Aug21;21:35: Version history:
 ----------------------------------------------
+ 3.0: 23Oct24: Add method to return px, py, pz
  2.1: 12Nov21: Add a 'none' particle to help with the eventHistory
  2.0: 24Sep21: Unify all the particles and just distinguish with a pdg code
  1.1: 21Sep21: Add a constructor with the momentum vector
@@ -292,6 +293,15 @@ eventweight = %g, run = %g, event = %g, PDG=%g" % \
 
     def z(self):
         return deepcopy(self._TrcSpc.z())
+
+    def px(self):
+        return deepcopy(self._p[1][0])
+
+    def py(self):
+        return deepcopy(self._p[1][1])
+
+    def pz(self):
+        return deepcopy(self._p[1][2])
 
     def xp(self):
         return deepcopy(self._TrcSpc.xp())
