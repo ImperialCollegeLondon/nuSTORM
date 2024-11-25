@@ -728,18 +728,16 @@ if __name__ == "__main__" :
     ringMuonsFlag = ctrlInst.ringMuons()
     tEqualsZeroFlag = ctrlInst.tEqualsZero()
     pencilBeamFlag = ctrlInst.pencilBeam()
-    pDistInputFlag = ctrlInst.pDistInput()
-    psDistInputFlag = ctrlInst.psDistInput()
     generator = ctrlInst.genType()
     logging.info("     generator is : %s", generator)
 
     print (f"Processing flags -- tlflag: {tlFlag} / psFlag: {psFlag} / lstFlag: {lstFlag} / muDcyFlag: {muDcyFlag} / FlshAtDetFlg: \
         {FlshAtDetFlg} / PSMuonsFlag: {PSMuonsFlag} / ringMuonsFlag: {ringMuonsFlag} / pencilBeamFlag: {pencilBeamFlag} / tEqualsZeroFlag: \
-        {tEqualsZeroFlag} / pDistInputFlag: {pDistInputFlag} / psDistInputFlag: {psDistInputFlag} / generator: {generator}")
+        {tEqualsZeroFlag} / generator: {generator}")
     logging.info("Processing flags -- tlflag: %s,  psFlag: %s,  lstFlag: %s,  muDcyFlag: %s, FlshAtDetFlg: %s, PSMuonsFlag: %s, ringMuonsFlag: %s", \
         tlFlag, psFlag, lstFlag, muDcyFlag, FlshAtDetFlg, PSMuonsFlag, ringMuonsFlag)
     logging.info("     tEqualsZero: %s", tEqualsZeroFlag)
-    logging.info("     pencilBeam: %s, pDistInput: %s, psDistInput: %s", pencilBeamFlag, pDistInputFlag, psDistInputFlag)
+    logging.info("     pencilBeam: %s", pencilBeamFlag)
 
 # get constants
     piCnst  = PC.PionConst()
