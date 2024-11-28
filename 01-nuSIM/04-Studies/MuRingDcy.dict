@@ -3,7 +3,7 @@
 
     "flags":
     {
-    "tlFlag":"False", "psFlag":"True", "lstFlag":"False", "muDcyFlag":"True", "flashAtDetector":"False",
+    "tlFlag":"True", "psFlag":"True", "lstFlag":"False", "muDcyFlag":"True", "flashAtDetector":"False",
     "PSMuons":"False","ringMuons":"True","tEqualsZero":"False","pencilBeam":"False","pDistInput":"False","psDistInput":"False"
     },
 
@@ -18,7 +18,7 @@
 
     "printLimit":0,
     "PPi": 5.0,
-    "PMu": 3.12,
+    "PMu": 3.8,
     "runNumber": "runNumber",
     "nEvents":5000
 }
