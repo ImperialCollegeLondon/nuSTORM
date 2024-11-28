@@ -93,7 +93,18 @@ else
 	# Set the StudyDir
 	StudyDir="$PWD"
 	export StudyDir
+	runNumberPath="${nuSIMPATH}/runNumber"
 
+	if [ -e "$runNumberPath" ] && [[ $(<"$runNumberPath") =~ ^-?[0-9]+$ ]]; then
+		echo "runNumber exists at $runNumberPath and is an integer. Doing nothing."
+	elif [ -L "$runNumberPath" ] || ! [[ $(<"$runNumberPath") =~ ^-?[0-9]+$ ]]; then
+		echo "runNumber is a symbolic link or is not an integer. Deleting it and setting to 0."
+		rm -f "$runNumberPath"
+		echo 0 > "$runNumberPath"
+	else
+		echo "runNumber does not exist. Creating it and setting to 0."
+		echo 0 > "$runNumberPath"
+	fi
 	# now copy across the runNumber file from nuSIM
 	ln -sf ${nuSIMPATH}/runNumber runNumber
 
