@@ -60,7 +60,8 @@ Model for calculating normalised numbers
     @date       23 October 2024
     @author     Paul Kyberd
 
-    Name of the file which contains the KDE pions read from the control file
+    Name of the file which contains the KDE pions read from the control file and iof not present
+    defauly contructed
     @version    1.8
     @date       02 December 2024
     @author     Paul Kyberd
@@ -760,7 +761,12 @@ if __name__ == "__main__" :
     nuSIMPATH = os.getenv('nuSIMPATH')
     filename  = os.path.join(nuSIMPATH, '11-Parameters/nuSTORM-PrdStrght-Params-v1.0.csv')
     mcInputFile = os.path.join(nuSIMPATH, args.inputFile)       # This file should be for the root or KDE input file as appropriate
-    KDEFile = ctrlInst.flukaFileDir() + "flukaDist" + str(ctrlInst.runNumber()) + ".txt"
+#   Get the name of the KDE file from the dictionary. If not present construct a default using the StudyDir and StudyName
+    try:
+        KDEFile = ctrlInst.flukaFileDir() + "flukaDist" + str(ctrlInst.runNumber()) + ".txt"
+    except KeyError:
+        KDEFile = os.path.join(StudyDir, StudyName, "flukaDist" + str(ctrlInst.runNumber()) + ".txt")
+    print ("KDEFile is ", KDEFile)
     rootFilename = os.path.join(StudyDir, StudyName, 'normalisation' + str(ctrlInst.runNumber())+'.root')
     trfCmplxFile = os.path.join(nuSIMPATH, '11-Parameters/nuSTORM-TrfLineCmplx-Params-v1.0.csv')
     print ("numSIMPATH, filename, mcInputfile, rootfilename, trfCmplxFile \n", nuSIMPATH, "\n", filename, "\n", mcInputFile, "\n", rootFilename,

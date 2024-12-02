@@ -42,8 +42,10 @@ print(f"{testTitle} :  {descString}")
 con = control.control("02-Tests/referenceOutput/PiFlash40-304.dict")
 
 print(f"con is {con} ... ")
-
-print(f"flukaFileDir is {con.flukaFileDir()} ... ")
+try:
+    print(f"flukaFileDir is {con.flukaFileDir()} ... ")
+except KeyError:
+    print("key error thrown")
 
 ##! Create particle and check get methods #############################################################################
 nTests = nTests + 1

@@ -42,7 +42,8 @@ Version history:
 
  1.4: 22Oct24:  Add a method to return the generation type
 
- 1.5: 02Dec24:  Add a method for KDE generation to provide a directory to store the KDE pions
+ 1.5: 02Dec24:  Add a method for KDE generation to provide a directory to store the KDE pions. Catch and
+                rethrow if the key is not present
 
 
 
@@ -187,7 +188,11 @@ class control:
 
 #   Directory to put the fluka file in
     def flukaFileDir(self):
-        return self._controlInfo["files"]["flukaFileDir"]
+        try:
+            flukaDir = self._controlInfo["files"]["flukaFileDir"]
+        except KeyError:
+            raise KeyError
+        return flukaDir
 
 
 #plots dictionary file name
