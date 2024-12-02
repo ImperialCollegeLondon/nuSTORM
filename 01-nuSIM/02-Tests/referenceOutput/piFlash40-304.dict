@@ -1,0 +1,26 @@
+{
+    "description":"pion decay in production straight and pion flash - 3.04 Gev muons",
+
+    "flags":
+    {
+    "tlFlag":"False", "psFlag":"True", "lstFlag":"False", "muDcyFlag":"False", "flashAtDetector":"True",
+    "PSMuons":"False","ringMuons":"False","tEqualsZero":"False","pencilBeam":"False",
+    "genType":"flukaKDE"},
+
+    "files":
+    {
+    "rootFile":"someFile.root",
+    "logFile":"normalisation",
+    "flukaFileDir":"/Users/paulkyberd/work/development/cluster/",
+    "plotsDict":"/Users/paulkyberd/work/paper/fluka/cutsPiFlash40.dict"
+    },
+
+    "study": "fluka",
+
+    "printLimit":0,
+    "PPi": 4.0,
+    "PMu": 3.04,
+    "runNumber": "runNumber",
+    "detectorXPosition":0.0,
+    "nEvents":200000
+}

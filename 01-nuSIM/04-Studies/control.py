@@ -41,6 +41,11 @@ Version history:
  1.3: 03Sept23: Add a flag to set the x position of the detector centre
 
  1.4: 22Oct24:  Add a method to return the generation type
+
+ 1.5: 02Dec24:  Add a method for KDE generation to provide a directory to store the KDE pions
+
+
+
 @author: PaulKyberd
 """
 
@@ -179,6 +184,11 @@ class control:
     def logFile(self):
         sDir =os.environ['StudyDir'] + "/" + os.environ["StudyName"]
         return sDir + "/" + "/"+ self._controlInfo["files"]["logFile"] + str(self.runNumber()) + ".log"
+
+#   Directory to put the fluka file in
+    def flukaFileDir(self):
+        return self._controlInfo["files"]["flukaFileDir"]
+
 
 #plots dictionary file name
     def plotsDict(self):

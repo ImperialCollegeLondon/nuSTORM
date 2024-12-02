@@ -24,11 +24,19 @@
     Add logging to the code
 
 
-    Version 1.1                                22 October 2024
+    @version     1.2
+    @date        02 December 2024
+
+    Instantiation includes the name of the fluka file to write to
+
+
+    Version 1.2                                02 December 2024
     Author:                                     Paul Kyberd
 
     @todo:          Sort out the filename for the root histograms so it is consistent
                     with the mean pion momentum
+
+
 '''
 
 import numpy as np
@@ -43,12 +51,12 @@ class genPion:
 
     _dbg = True
 
-    def __init__(self, pionMeanP, genType, nEvents, inputFile):
+    def __init__(self, pionMeanP, genType, nEvents, inputFile, KDEFlukaFile):
 
         '''
         @parameter      pionMeanP       mean momentum of the pion - but the target inpout file is hardwired
         @parameter      genType         can be "pencil", "root", "fluka"
-        @parameter      nEvents         a b it clunky only actually used for KDE, but keep it simple
+        @parameter      nEvents         a bit clunky only actually used for KDE, but keep it simple
         @parameter      inputFile       this is the file for the root or KDE generation as appropriate
         '''
 
@@ -96,7 +104,7 @@ class genPion:
         #   Generate the pion kinematics and put in a pandas array. num_samples is used set to the new sample size (hardwired)
             self._KDEdist = self._KDEdata.beamGen_kde(self._df, columns=['x', 'y', 'xp', 'yp', 'pz', 'p'], num_samples=nSamples)
         #   Save the new data to a text file
-            self._KDEFile = "flukaDist.txt"
+            self._KDEFile = KDEFlukaFile
             self._KDEdata.writeFile(self._KDEdist,self._KDEFile)
         #   Read the generated data file
             self._KDEdata.openGenFile(self._KDEFile)

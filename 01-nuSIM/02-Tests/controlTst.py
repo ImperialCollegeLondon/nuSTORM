@@ -11,6 +11,8 @@ Version history:
 ----------------------------------------------
  1.0: 07Jan22: Test the class
 
+ 1.1: 02Dec:    Add test for flukaFile directory
+
 
 """
 
@@ -37,10 +39,11 @@ descString = "Create control - and dump contents of controlFile"
 descriptions.append(descString)
 print(f"{testTitle} :  {descString}")
 
-con = control.control("02-Tests/referenceOutput/PSPiFlash.dict")
+con = control.control("02-Tests/referenceOutput/PiFlash40-304.dict")
 
 print(f"con is {con} ... ")
 
+print(f"flukaFileDir is {con.flukaFileDir()} ... ")
 
 ##! Create particle and check get methods #############################################################################
 nTests = nTests + 1

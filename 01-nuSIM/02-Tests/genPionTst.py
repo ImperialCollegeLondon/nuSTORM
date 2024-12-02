@@ -18,7 +18,19 @@
     Adding tests when generating with the fluka KDE.
     Problem trying to create histos for more than one running condition
     causes a problem. At present only run 1 set
-   
+    @author  Paul Kyberd
+    @version     1.1
+    @date        15 October 2024
+
+    Changed the constructor to include the file to write the KDE pions, need to
+    change all calls
+
+
+    @author  Paul Kyberd
+    @version     1.2
+    @date        02 December 2024
+
+
     Version 1.0                                 07 October 2024
     Author:                                     Paul Kyberd
 '''
@@ -39,6 +51,10 @@ class genPionTst:
 
     def main(self):
 
+        runNumber = 442
+        KDEFlukaFile = "/Users/paulkyberd/work/development/cluster/flukaDist"+str(runNumber)+".txt"
+
+
 ##! Start:
         classToTest="pionGen"
         print()
@@ -53,7 +69,7 @@ class genPionTst:
         meanP = 3.0
         nEvents = 1000
         inputFile = ""
-        gp = genPion.genPion(meanP, "pencil", nEvents, inputFile)
+        gp = genPion.genPion(meanP, "pencil", nEvents, inputFile, KDEFlukaFile)
         print ("instance of genPion ", gp)
 
         piTSp,p = gp.newParticle()
@@ -67,7 +83,7 @@ class genPionTst:
 ##! book the histograms
 #        self.histBook()
         meanP = 3.0
-        gp = genPion.genPion(meanP, "pencil", nEvents,  inputFile)
+        gp = genPion.genPion(meanP, "pencil", nEvents,  inputFile, KDEFlukaFile)
 #! generate events and plot them        
 #        for eventNum in range(5000):
 #            pionStart, p = gp.newParticle()
@@ -85,7 +101,7 @@ class genPionTst:
         print("pionGen:", pionTest, " Create pionGen('parabolic') and print quantities.")    
         meanP = 5.0
         inputFile = ""
-        gp = genPion.genPion(meanP, "parabolic", nEvents, inputFile)
+        gp = genPion.genPion(meanP, "parabolic", nEvents, inputFile, KDEFlukaFile)
         print ("instance of genPion ", gp)
 
         print()
@@ -116,7 +132,7 @@ class genPionTst:
         nEvents = 100000
         self.histBook(meanP)
         flukaDataFile = '/Users/paulkyberd/work/nuSTORMAug24/01-nuSIM/31-Target/v2/selected_pions_5GeV_2.0mm.txt'
-        gp = genPion.genPion(meanP, "flukaKDE", nEvents, flukaDataFile)
+        gp = genPion.genPion(meanP, "flukaKDE", nEvents, flukaDataFile, KDEFlukaFile)
 #! generate events and plot them        
         for eventNum in range(nEvents):
             pionStart, p = gp.newParticle()
